@@ -1,11 +1,11 @@
 import React from 'react';
-import { TextInput } from 'react-native';
 
-import { Container } from './styles';
+import { Container, Label, TextInput } from './styles';
 
 const Home: React.FC = () => {
   return (
     <Container>
+      <Label>Type something here with keyboard open:</Label>
       <TextInput />
     </Container>
   );

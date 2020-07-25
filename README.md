@@ -1,8 +1,10 @@
 # React-Native-Rooster 🐔
 
-**NOTE: This is a WIP it is not production ready yet.**
-
 An elegant Toast solution for react-native apps. It works on Android and iOS platforms.
+
+![Demo](./demo.gif)
+
+**NOTE: This is a WIP it is not available for production yet!**
 
 ## Motivation
 
@@ -41,4 +43,4 @@ yarn localPublish
 
 It will release a new Toast's local version and install it automatically in the example project
 
-**Pull requests are always welcome** ❤️
+#### Pull requests are always welcome ❤️
