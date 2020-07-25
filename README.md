@@ -31,7 +31,7 @@ You can clone this repository and just run:
 yarn localPublish
 ```
 
-After that, you can run the example project inside [examples](./examples)
+After that, you can run the example project inside [example](./example)
 
 ### Changing Toast's code
 
