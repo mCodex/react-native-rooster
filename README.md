@@ -8,7 +8,7 @@ An elegant Toast solution for react-native apps. It works on Android and iOS pla
 
 ## 🌟 Motivation
 
-I've been working on React-Native projects for a long time and I use toast very often, but I still haven't found a library that is flexible enough for handling toasts. So, I decided to work on this to build a flexbible and functional Toast library powerful like [react-toastify](https://github.com/fkhadra/react-toastify)
+I've been working on React-Native projects for a long time and I use toast very often, but I still haven't found a library that is flexible enough for handling toasts. So, I decided to work on this to build a flexible and functional Toast library powerful like [react-toastify](https://github.com/fkhadra/react-toastify)
 
 
 ## 🛠 Features
