@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "react-native-rooster": {
+      "signature": "261afa7d316ccb4122f5cc4245cb6be8",
+      "file": true
+    }
+  }
+}
