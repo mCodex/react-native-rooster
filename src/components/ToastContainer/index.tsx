@@ -1,13 +1,16 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 
-import styles from './styles';
+import useKeyboard from '../../hooks/Keyboard';
+
+import { Container, Text } from './styles';
 
 const Toast: React.FC = () => {
+  const [keyboardHeight] = useKeyboard();
+
   return (
-    <View style={styles.container}>
+    <Container bottom={keyboardHeight}>
       <Text>Hello</Text>
-    </View>
+    </Container>
   );
 };
 

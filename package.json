@@ -6,6 +6,7 @@
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
   "scripts": {
+    "localPublish": "yalc publish && cd example && yalc add react-native-rooster --yarn && cd ..",
     "build": "rimraf -rf build && rollup -c",
     "prepublish": "yarn build",
     "test": "jest --coverage"
@@ -15,7 +16,8 @@
   "license": "MIT",
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "styled-components": "*"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^14.0.0",
@@ -24,6 +26,7 @@
     "@types/jest": "^26.0.7",
     "@types/react": "^16.9.43",
     "@types/react-native": "^0.63.2",
+    "@types/styled-components": "^5.1.1",
     "@typescript-eslint/eslint-plugin": "^3.7.0",
     "@typescript-eslint/parser": "^3.7.0",
     "eslint": "^7.5.0",
@@ -43,8 +46,10 @@
     "rollup": "^2.23.0",
     "rollup-plugin-peer-deps-external": "^2.2.3",
     "rollup-plugin-typescript2": "^0.27.1",
+    "styled-components": "^5.1.1",
     "ts-jest": "^26.1.3",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "yalc": "^1.0.0-pre.40"
   },
   "jest": {
     "preset": "ts-jest",

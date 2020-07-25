@@ -1,9 +1,14 @@
 import React from 'react';
+import { TextInput } from 'react-native';
 
-import { ToastContainer } from 'react-native-rooster';
+import { Container } from './styles';
 
 const Home: React.FC = () => {
-  return <ToastContainer />;
+  return (
+    <Container>
+      <TextInput />
+    </Container>
+  );
 };
 
 export default Home;
