@@ -6,12 +6,12 @@ An elegant Toast solution for react-native apps. It works on Android and iOS pla
 
 **NOTE: This is a WIP it is not available for production yet!**
 
-## Motivation
+## 🌟 Motivation
 
 I've been working on React-Native projects for a long time and I use toast very often, but I still haven't found a library that is flexible enough for handling toasts. So, I decided to work on this to build a flexbible and function Toast library something powerful like [react-toastify](https://github.com/fkhadra/react-toastify)
 
 
-## Features
+## 🛠 Features
 
 - [x] Automatically keyboard listener. If keyboard is open the toast will not be hidden by it
 
@@ -23,7 +23,7 @@ I've been working on React-Native projects for a long time and I use toast very 
 
 Have more ideas? Put it here!
 
-## Contributing
+## 🤝 Contributing
 
 You can clone this repository and just run:
 
