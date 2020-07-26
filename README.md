@@ -1,6 +1,6 @@
 # React-Native-Rooster 🐔
 
-An elegant Toast solution for react-native apps. It works on Android and iOS platforms.
+An elegant Toast solution for react-native apps. Built using Typescript, hooks, contexts and providers. It works on Android and iOS platforms
 
 ![Demo](./demo.gif)
 
@@ -22,6 +22,44 @@ I've been working on React-Native projects for a long time and I use toast very 
 - [ ] Support for toasts be used inside regular functions not only components' functions
 
 Have more ideas? Put it here!
+
+## How it works
+
+First, you need to import and wrap your application within ToastProvider:
+
+```javascript
+    import { ToastProvider } from 'react-native-rooster';
+
+    <ToastProvider>
+        {...}
+    </ToastProvider>
+```
+
+Now you can use our hooks to show your toasts:
+
+```javascript
+import { useToast } from 'react-native-rooster';
+
+addToast({
+  type?: 'success' | 'error' | 'info',
+  title: string,
+  message?: string
+})
+```
+
+## API
+
+### ToastProvider
+
+It is the provider which controls displaying new toasts
+
+### addToast({ type?: 'success' | 'error' | 'info', title: string, message?: string })
+
+Will show a new toast based on given parameters. Also, it will automatically disappear after 3 seconds on the screen.
+
+### removeToast
+
+Removes the last toast from screen.
 
 ## 🤝 Contributing
 
