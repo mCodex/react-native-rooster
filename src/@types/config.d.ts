@@ -1,5 +1,5 @@
 declare interface IConfig {
-  colors: {
+  bgColor: {
     error: string;
     success: string;
     warning: string;

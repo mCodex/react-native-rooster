@@ -1,10 +1,10 @@
-# React-Native-Rooster 🐔
+<img alt="RNRooster" src="./cover.png" />
 
 An elegant Toast solution for react-native apps. Built using Typescript, hooks, contexts and providers. It works on Android and iOS platforms
 
-![Demo](./demo.gif)
-
-**NOTE: This is a WIP it is not available for production yet!**
+<center>
+<img alt="Demo" src="./demo.gif" />
+</center>
 
 ## 🌟 Motivation
 
@@ -59,6 +59,27 @@ Will show a new toast based on given parameters. Also, it will automatically dis
 ### removeToast()
 
 Removes the last toast from screen.
+
+### setToastConfig([data](./src/@types/config.d.ts))
+
+You can change some configs globally. Right now, we only support `bgColor` for each type of toast. The default colors for each type of toast are:
+
+* <p style="color:#7890f0;">Info: #7890f0</p> 
+* <p style="color:#35d0ba;">Success: #35d0ba</p> 
+* <p style="color:#ff9100;">Warning: #ff9100</p> 
+* <p style="color:#d92027;">Error: #d92027</p> 
+
+For example:
+
+```javascript
+import { setToastConfig } from 'react-native-rooster';
+
+addToast({
+  bgColor: {
+      success: 'olive',
+    },
+})
+```
 
 ## 🤝 Contributing
 

@@ -23,6 +23,7 @@
     "test": "jest --coverage"
   },
   "peerDependencies": {
+    "lodash": "*",
     "react": "*",
     "react-native": "*",
     "styled-components": "*"
@@ -47,6 +48,7 @@
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.0.8",
     "jest": "^26.1.0",
+    "lodash": "^4.17.19",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
     "react-native": "^0.63.2",

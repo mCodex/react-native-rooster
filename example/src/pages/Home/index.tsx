@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useToast } from 'react-native-rooster';
 
 import { Button } from 'react-native';
 import { Container, Label, TextInput } from './styles';
 
 const Home: React.FC = () => {
-  const { addToast, removeToast } = useToast();
+  const { addToast, removeToast, setToastConfig } = useToast();
 
   const handleShowToastOnPress = useCallback(
     (type?: string) => {
@@ -17,6 +17,14 @@ const Home: React.FC = () => {
     },
     [addToast],
   );
+
+  const handleChangeSuccessColorToOliveOnPress = useCallback(() => {
+    setToastConfig({
+      bgColor: {
+        success: 'olive',
+      },
+    });
+  }, [setToastConfig]);
 
   const handleRemoveToastOnPress = useCallback(() => {
     removeToast();
@@ -41,6 +49,11 @@ const Home: React.FC = () => {
       <Button
         title="Show Warning Toast"
         onPress={() => handleShowToastOnPress('warning')}
+      />
+
+      <Button
+        title="Set toast's success color to olive"
+        onPress={handleChangeSuccessColorToOliveOnPress}
       />
       <Button title="Remove Last Toast" onPress={handleRemoveToastOnPress} />
     </Container>

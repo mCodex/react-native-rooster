@@ -16,7 +16,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
 
   const {
     messages,
-    toastConfig: { colors },
+    toastConfig: { bgColor },
   } = props;
 
   useEffect(() => {
@@ -32,7 +32,12 @@ const Toast: React.FC<IToastComponent> = (props) => {
   return (
     <>
       {messages.map(({ id, title, message, type }) => (
-        <Container key={id} bottom={keyboardHeight} type={type} colors={colors}>
+        <Container
+          key={id}
+          bottom={keyboardHeight}
+          type={type}
+          bgColor={bgColor}
+        >
           {title && <Title>{title}</Title>}
           <Message>{message}</Message>
         </Container>

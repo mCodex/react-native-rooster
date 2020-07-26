@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 interface ContainerProps {
   bottom: number;
   type?: 'success' | 'error' | 'info' | 'warning';
-  colors: {
+  bgColor: {
     error: string;
     success: string;
     warning: string;
@@ -18,8 +18,8 @@ export const Container = styled.View<ContainerProps>`
   bottom: ${(props) => props.bottom || 20}px;
   padding: 20px;
 
-  background-color: ${(props) => props.colors[props.type ?? 'info']};
-  box-shadow: 2px 2px 4px ${(props) => props.colors[props.type ?? 'info']};
+  background-color: ${(props) => props.bgColor[props.type ?? 'info']};
+  box-shadow: 2px 2px 4px ${(props) => props.bgColor[props.type ?? 'info']};
   border-radius: 5px;
 `;
 
