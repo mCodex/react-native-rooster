@@ -2,20 +2,20 @@
 
 An elegant Toast solution for react-native apps. Built using Typescript, hooks, contexts and providers. It works on Android and iOS platforms
 
-<center>
-<img alt="Demo" src="./demo.gif" />
-</center>
+<p align="center">
+  <img alt="Demo" src="./demo.gif" />
+</p>
 
 ## 🌟 Motivation
 
 I've been working on React-Native projects for a long time and I use toast very often, but I still haven't found a library that is flexible enough for handling toasts. So, I decided to work on this to build a flexible and functional Toast library powerful like [react-toastify](https://github.com/fkhadra/react-toastify)
 
 
-## 🛠 Features
+## 📦 Features
 
 - [x] Automatically keyboard listener. If keyboard is open the toast will not be hidden by it
 
-- [ ] Support for different types of toasts (success, info, warning)
+- [x] Support for different types of toasts (success, info, warning)
 - [ ] Support for different positions (top, center, top-left, top-right and so on...)
 - [ ] Support for icons
 - [ ] Support for multiple toasts being shown at the same time
@@ -23,7 +23,7 @@ I've been working on React-Native projects for a long time and I use toast very 
 
 Have more ideas? Put it here!
 
-## How it works
+## 🛠 How it works
 
 First, you need to import and wrap your application within ToastProvider:
 
@@ -46,13 +46,13 @@ addToast({
 })
 ```
 
-## API
+## 🔗 API
 
 ### ToastProvider
 
 It is the provider which controls displaying new toasts
 
-### addToast({ type?: 'success' | 'error' | 'info', title?: string, message: string })
+### addToast([params](./src/@types/toast.d.ts))
 
 Will show a new toast based on given parameters. Also, it will automatically disappear after 3 seconds on the screen.
 
@@ -60,7 +60,7 @@ Will show a new toast based on given parameters. Also, it will automatically dis
 
 Removes the last toast from screen.
 
-### setToastConfig([data](./src/@types/config.d.ts))
+### setToastConfig([params](./src/@types/config.d.ts))
 
 You can change some configs globally. Right now, we only support `bgColor` for each type of toast. The default colors for each type of toast are:
 
@@ -101,4 +101,5 @@ yarn localPublish
 
 It will release a new Toast's local version and install it automatically in the example project
 
-#### Pull requests are always welcome ❤️
+<hr/>
+Pull requests are always welcome ❤️
