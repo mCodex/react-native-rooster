@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Keyboard, KeyboardEvent } from 'react-native';
 
 const useKeyboard = (): [number] => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  const onKeyboardDidShow = (e: KeyboardEvent): void => {
+  const onKeyboardDidShow = useCallback((e: KeyboardEvent): void => {
     setKeyboardHeight(e.endCoordinates.height + 20);
-  };
+  }, []);
 
-  const onKeyboardDidHide = (): void => {
+  const onKeyboardDidHide = useCallback((): void => {
     setKeyboardHeight(0);
-  };
+  }, []);
 
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
@@ -20,7 +20,7 @@ const useKeyboard = (): [number] => {
       Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow);
       Keyboard.removeListener('keyboardDidHide', onKeyboardDidHide);
     };
-  }, []);
+  }, [onKeyboardDidShow, onKeyboardDidHide]);
 
   return [keyboardHeight];
 };

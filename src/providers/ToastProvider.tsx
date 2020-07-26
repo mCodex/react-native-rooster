@@ -22,9 +22,18 @@ const ToastProvider: React.FC = ({ children }) => {
     [],
   );
 
-  const removeToast = useCallback((id: string) => {
-    setMessages((state) => state.filter((s) => s.id !== id));
-  }, []);
+  const removeToast = useCallback(
+    (id?: string) => {
+      if (id) {
+        setMessages((state) => state.filter((s) => s.id !== id));
+      } else if (messages.length > 0) {
+        const messagesClone = [...messages];
+        messagesClone.pop();
+        setMessages(messagesClone);
+      }
+    },
+    [messages],
+  );
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>

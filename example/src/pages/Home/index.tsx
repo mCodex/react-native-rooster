@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useToast } from 'react-native-rooster';
 
+import { Button } from 'react-native';
 import { Container, Label, TextInput } from './styles';
 
 const Home: React.FC = () => {
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
-  useEffect(() => {
+  const handleShowToastOnPress = useCallback(() => {
     addToast({
       type: 'error',
       title: 'Error',
@@ -14,10 +15,16 @@ const Home: React.FC = () => {
     });
   }, [addToast]);
 
+  const handleRemoveToastOnPress = useCallback(() => {
+    removeToast();
+  }, [removeToast]);
+
   return (
     <Container>
       <Label>Type something here with keyboard open:</Label>
       <TextInput />
+      <Button title="Show Toast" onPress={handleShowToastOnPress} />
+      <Button title="Remove Last Toast" onPress={handleRemoveToastOnPress} />
     </Container>
   );
 };
