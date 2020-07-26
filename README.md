@@ -49,7 +49,7 @@ addToast({
 
 ## API
 
-### <ToastProvider>
+### ToastProvider
 
 It is the provider which controls displaying new toasts
 
