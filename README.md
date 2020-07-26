@@ -41,9 +41,8 @@ Now you can use our hooks to show your toasts:
 import { useToast } from 'react-native-rooster';
 
 addToast({
-  type?: 'success' | 'error' | 'info',
-  title: string,
-  message?: string
+  title: 'Error',
+  message: 'An error ocurred'
 })
 ```
 
@@ -53,7 +52,7 @@ addToast({
 
 It is the provider which controls displaying new toasts
 
-### addToast({ type?: 'success' | 'error' | 'info', title: string, message?: string })
+### addToast({ type?: 'success' | 'error' | 'info', title?: string, message: string })
 
 Will show a new toast based on given parameters. Also, it will automatically disappear after 3 seconds on the screen.
 

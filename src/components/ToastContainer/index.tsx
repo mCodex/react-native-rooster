@@ -7,13 +7,17 @@ import { Container, Title, Message } from './styles';
 
 interface IToastComponent {
   messages: IToastMessage[];
+  toastConfig: IConfig;
 }
 
 const Toast: React.FC<IToastComponent> = (props) => {
   const { removeToast } = useToast();
   const [keyboardHeight] = useKeyboard();
 
-  const { messages } = props;
+  const {
+    messages,
+    toastConfig: { colors },
+  } = props;
 
   useEffect(() => {
     messages.map(({ id }) => {
@@ -27,8 +31,8 @@ const Toast: React.FC<IToastComponent> = (props) => {
 
   return (
     <>
-      {messages.map(({ id, title, message }) => (
-        <Container key={id} bottom={keyboardHeight}>
+      {messages.map(({ id, title, message, type }) => (
+        <Container key={id} bottom={keyboardHeight} type={type} colors={colors}>
           {title && <Title>{title}</Title>}
           <Message>{message}</Message>
         </Container>

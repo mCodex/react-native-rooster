@@ -9,8 +9,8 @@ const Home: React.FC = () => {
 
   const handleShowToastOnPress = useCallback(() => {
     addToast({
-      type: 'error',
-      title: 'Error',
+      type: 'warning',
+      // title: 'Error',
       message: 'An error ocurred',
     });
   }, [addToast]);

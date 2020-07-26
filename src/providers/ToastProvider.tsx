@@ -5,6 +5,14 @@ import ToastContext from 'contexts/ToastContext';
 
 const ToastProvider: React.FC = ({ children }) => {
   const [messages, setMessages] = useState<IToastMessage[]>([]);
+  const [config, setConfig] = useState<IConfig>({
+    colors: {
+      error: '#d92027',
+      success: '#35d0ba',
+      warning: '#ff9100',
+      info: '#95b3d8',
+    },
+  });
 
   const addToast = useCallback(
     ({ type, title, message }: Omit<IToastMessage, 'id'>) => {
@@ -35,10 +43,14 @@ const ToastProvider: React.FC = ({ children }) => {
     [messages],
   );
 
+  const toastConfig = useCallback((updatedConfig: IConfig) => {
+    setConfig((state) => ({ ...state, ...updatedConfig }));
+  }, []);
+
   return (
-    <ToastContext.Provider value={{ addToast, removeToast }}>
+    <ToastContext.Provider value={{ addToast, removeToast, toastConfig }}>
       {children}
-      <ToastContainer messages={messages} />
+      <ToastContainer messages={messages} toastConfig={config} />
     </ToastContext.Provider>
   );
 };
