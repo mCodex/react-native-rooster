@@ -10,7 +10,7 @@ export const Container = styled.View<ContainerProps>`
   align-self: center;
   position: absolute;
 
-  bottom: ${(props) => props.bottom || 0}px;
+  bottom: ${(props) => props.bottom || 20}px;
 
   box-shadow: 5px 5px 8px red;
   border-radius: 5px;
@@ -18,7 +18,14 @@ export const Container = styled.View<ContainerProps>`
   padding: 20px;
 `;
 
-export const Text = styled.Text`
+export const Title = styled.Text`
   color: #fff;
-  font-size: 24px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+`;
+
+export const Message = styled.Text`
+  color: #fff;
+  font-size: 14px;
 `;

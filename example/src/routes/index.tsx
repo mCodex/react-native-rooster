@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ToastContainer } from 'react-native-rooster';
+import { ToastProvider } from 'react-native-rooster';
 import HomeScreen from '../pages/Home';
 
 const Stack = createStackNavigator();
@@ -15,10 +15,9 @@ const RootRoute: React.FC = () => (
 );
 
 export const App: React.FC = () => (
-  <>
+  <ToastProvider>
     <RootRoute />
-    <ToastContainer />
-  </>
+  </ToastProvider>
 );
 
 export default App;

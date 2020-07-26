@@ -1,16 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-import useKeyboard from '../../hooks/Keyboard';
+import useKeyboard from 'hooks/useKeyboard';
+import useToast from 'hooks/useToast';
 
-import { Container, Text } from './styles';
+import { Container, Title, Message } from './styles';
 
-const Toast: React.FC = () => {
+interface IToastComponent {
+  messages: IToastMessage[];
+}
+
+const Toast: React.FC<IToastComponent> = (props) => {
+  const { removeToast } = useToast();
   const [keyboardHeight] = useKeyboard();
 
+  const { messages } = props;
+
+  useEffect(() => {
+    messages.map(({ id }) => {
+      const timer = setTimeout(() => removeToast(id), 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    });
+  }, [messages, removeToast]);
+
   return (
-    <Container bottom={keyboardHeight}>
-      <Text>Hello</Text>
-    </Container>
+    <>
+      {messages.map(({ id, title, message }) => (
+        <Container key={id} bottom={keyboardHeight}>
+          {title && <Title>{title}</Title>}
+          <Message>{message}</Message>
+        </Container>
+      ))}
+    </>
   );
 };
 

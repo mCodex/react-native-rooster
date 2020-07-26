@@ -1,3 +1,4 @@
-import ToastContainer from './components/ToastContainer';
+import ToastProvider from 'providers/ToastProvider';
+import useToast from 'hooks/useToast';
 
-export { ToastContainer };
+export { ToastProvider, useToast };
