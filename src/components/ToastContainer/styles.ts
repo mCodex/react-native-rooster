@@ -19,7 +19,7 @@ export const Container = styled.View<ContainerProps>`
   padding: 20px;
 
   background-color: ${(props) => props.colors[props.type ?? 'info']};
-  box-shadow: 5px 5px 4px ${(props) => props.colors[props.type ?? 'info']};
+  box-shadow: 2px 2px 4px ${(props) => props.colors[props.type ?? 'info']};
   border-radius: 5px;
 `;
 

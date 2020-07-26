@@ -9,8 +9,8 @@ const ToastProvider: React.FC = ({ children }) => {
     colors: {
       error: '#d92027',
       success: '#35d0ba',
-      warning: '#ff9100',
-      info: '#95b3d8',
+      warning: '#FF9100',
+      info: '#7890F0',
     },
   });
 

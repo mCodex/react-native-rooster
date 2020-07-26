@@ -7,13 +7,16 @@ import { Container, Label, TextInput } from './styles';
 const Home: React.FC = () => {
   const { addToast, removeToast } = useToast();
 
-  const handleShowToastOnPress = useCallback(() => {
-    addToast({
-      type: 'warning',
-      // title: 'Error',
-      message: 'An error ocurred',
-    });
-  }, [addToast]);
+  const handleShowToastOnPress = useCallback(
+    (type?: string) => {
+      addToast({
+        type,
+        title: 'Error',
+        message: 'An error ocurred',
+      });
+    },
+    [addToast],
+  );
 
   const handleRemoveToastOnPress = useCallback(() => {
     removeToast();
@@ -21,9 +24,24 @@ const Home: React.FC = () => {
 
   return (
     <Container>
-      <Label>Type something here with keyboard open:</Label>
+      <Label>Open a toast with keyboard opened:</Label>
       <TextInput />
-      <Button title="Show Toast" onPress={handleShowToastOnPress} />
+      <Button
+        title="Show Default Toast"
+        onPress={() => handleShowToastOnPress()}
+      />
+      <Button
+        title="Show Error Toast"
+        onPress={() => handleShowToastOnPress('error')}
+      />
+      <Button
+        title="Show Success Toast"
+        onPress={() => handleShowToastOnPress('success')}
+      />
+      <Button
+        title="Show Warning Toast"
+        onPress={() => handleShowToastOnPress('warning')}
+      />
       <Button title="Remove Last Toast" onPress={handleRemoveToastOnPress} />
     </Container>
   );
