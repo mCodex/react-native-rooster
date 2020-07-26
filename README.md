@@ -28,11 +28,11 @@ Have more ideas? Put it here!
 First, you need to import and wrap your application within ToastProvider:
 
 ```javascript
-    import { ToastProvider } from 'react-native-rooster';
+import { ToastProvider } from 'react-native-rooster';
 
-    <ToastProvider>
-        {...}
-    </ToastProvider>
+<ToastProvider>
+    {...}
+</ToastProvider>
 ```
 
 Now you can use our hooks to show your toasts:
@@ -49,7 +49,7 @@ addToast({
 
 ## API
 
-### ToastProvider
+### <ToastProvider>
 
 It is the provider which controls displaying new toasts
 
@@ -57,7 +57,7 @@ It is the provider which controls displaying new toasts
 
 Will show a new toast based on given parameters. Also, it will automatically disappear after 3 seconds on the screen.
 
-### removeToast
+### removeToast()
 
 Removes the last toast from screen.
 
