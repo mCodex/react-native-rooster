@@ -5,15 +5,23 @@
   "main": "build/index.js",
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
+  "keywords": [],
+  "author": "mCodex",
+  "license": "MIT",
+  "homepage": "https://github.com/mcodex/react-native-rooster",
+  "bugs": {
+    "url": "https://github.com/mcodex/react-native-rooster/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mcodex/react-native-rooster.git"
+  },
   "scripts": {
     "localPublish": "yalc publish && cd example && yalc add react-native-rooster --yarn && cd ..",
     "build": "rimraf -rf build && rollup -c",
     "prepublish": "yarn build",
     "test": "jest --coverage"
   },
-  "keywords": [],
-  "author": "mCodex",
-  "license": "MIT",
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
