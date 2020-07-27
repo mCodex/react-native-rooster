@@ -1,5 +1,7 @@
 <img alt="RNRooster" src="./cover.png" />
 
+# react-native-rooster
+
 An elegant Toast solution for react-native apps. Built using Typescript, hooks and context. It works on Android and iOS platforms
 
 <p align="center">
