@@ -31,6 +31,6 @@
     "example",
     "website",
     "node_modules",
-    "__tests__"
+    "src/**/__tests__"
   ]
 }

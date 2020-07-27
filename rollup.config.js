@@ -28,7 +28,7 @@ export default {
     json(),
     typescript({
       rollupCommonJSResolveHack: true,
-      exclude: '**/__tests__/**',
+      exclude: 'src/**/__tests__/',
       clean: true,
     }),
     commonjs({
