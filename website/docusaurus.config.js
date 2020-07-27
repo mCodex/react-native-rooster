@@ -1,8 +1,8 @@
 module.exports = {
   title: "react-native-rooster",
   tagline: "An elegant toast solution for your react-native apps",
-  url: "https://mcodex.dev/react-native-rooster",
-  baseUrl: "/",
+  url: "https://mcodex.dev",
+  baseUrl: "/react-native-rooster/",
   onBrokenLinks: "throw",
   favicon: "img/favicon.ico",
   organizationName: "mcodex",
