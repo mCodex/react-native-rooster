@@ -27,3 +27,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn install    
     - run: yarn test
+    - run: yarn build
+
+    - name: Generate artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: react-native-rooster-nightly
+        path: build/*
