@@ -5,7 +5,13 @@
   "main": "build/index.js",
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
-  "keywords": [],
+  "keywords": [
+    "react-native",
+    "react-native-rooster",
+    "ios",
+    "android",
+    "toast"
+  ],
   "author": "mCodex",
   "license": "MIT",
   "homepage": "https://github.com/mcodex/react-native-rooster",

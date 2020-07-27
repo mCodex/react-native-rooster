@@ -1,6 +1,6 @@
 <img alt="RNRooster" src="./cover.png" />
 
-An elegant Toast solution for react-native apps. Built using Typescript, hooks, contexts and providers. It works on Android and iOS platforms
+An elegant Toast solution for react-native apps. Built using Typescript, hooks and context. It works on Android and iOS platforms
 
 <p align="center">
   <img alt="Demo" src="./demo.gif" />
@@ -10,18 +10,17 @@ An elegant Toast solution for react-native apps. Built using Typescript, hooks, 
 
 I've been working on React-Native projects for a long time and I use toast very often, but I still haven't found a library that is flexible enough for handling toasts. So, I decided to work on this to build a flexible and functional Toast library powerful like [react-toastify](https://github.com/fkhadra/react-toastify)
 
+## ⬇️ Installation
 
-## 📦 Features
+```bash
+yarn add react-native-rooster styled-components
+```
 
-- [x] Automatically keyboard listener. If keyboard is open the toast will not be hidden by it
+or
 
-- [x] Support for different types of toasts (success, info, warning)
-- [ ] Support for different positions (top, center, top-left, top-right and so on...)
-- [ ] Support for icons
-- [ ] Support for multiple toasts being shown at the same time
-- [ ] Support for toasts be used inside regular functions not only components' functions
-
-Have more ideas? Put it here!
+```bash
+npm i react-native-rooster styled-components
+```
 
 ## 🛠 How it works
 
@@ -41,7 +40,8 @@ Now you can use our hooks to show your toasts:
 import { useToast } from 'react-native-rooster';
 
 addToast({
-  title: 'Error',
+  type: 'success', //optional - default: info
+  title: 'Error', //optional - default: none
   message: 'An error ocurred'
 })
 ```
@@ -64,10 +64,14 @@ Removes the last toast from screen.
 
 You can change some configs globally. Right now, we only support `bgColor` for each type of toast. The default colors for each type of toast are:
 
-* <p style="color:#7890f0;">Info: #7890f0</p> 
-* <p style="color:#35d0ba;">Success: #35d0ba</p> 
-* <p style="color:#ff9100;">Warning: #ff9100</p> 
-* <p style="color:#d92027;">Error: #d92027</p> 
+- ![#7890f0](https://via.placeholder.com/15/7890f0/000000?text=+) `Info: #7890f0`
+
+- ![#35d0ba](https://via.placeholder.com/15/35d0ba/000000?text=+) `Success: #35d0ba`
+
+- ![#ff9100](https://via.placeholder.com/15/ff9100/000000?text=+) `Warning: #ff9100`
+
+- ![#d92027](https://via.placeholder.com/15/d92027/000000?text=+) `Error: #d92027`
+
 
 For example:
 
@@ -80,6 +84,18 @@ addToast({
     },
 })
 ```
+
+## 📦 Features
+
+- [x] Automatically keyboard listener. If keyboard is open the toast will not be hidden by it
+
+- [x] Support for different types of toasts (success, info, warning)
+- [ ] Support for different positions (top, center, top-left, top-right and so on...)
+- [ ] Support for icons
+- [ ] Support for multiple toasts being shown at the same time
+- [ ] Support for toasts be used inside regular functions not only components' functions
+
+Have more ideas? Put it here!
 
 ## 🤝 Contributing
 
