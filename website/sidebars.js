@@ -1,5 +1,6 @@
 module.exports = {
   someSidebar: {
-    API: ['addToast'],
+    Introduction: ["overview", "installation"],
+    API: ["addToast", "removeToast", "setToastConfig"],
   },
 };

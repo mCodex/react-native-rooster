@@ -24,5 +24,5 @@ import { addToast } from 'react-native-rooster';
 addToast({
   type: 'success',
   message: 'Success message'
-})
+});
 ```
