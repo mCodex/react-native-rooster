@@ -1,8 +1,6 @@
-name: CI
+name: test-and-generate-artifact
 on:
   push:
-    branches: [ master ]
-  pull_request:
     branches: [ master ]
 
 jobs:
