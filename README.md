@@ -17,7 +17,7 @@ An elegant Toast solution for react-native apps. Built using Typescript, hooks a
 
 ## 📚 Docs
 
-Check out the docs [here](https://mcodex.dev/react-native-rooster) for installation and usages instructions
+Check out the docs [here](https://mcodex.dev/react-native-rooster) for installation and usage instructions
 
 <hr/>
 Pull requests are always welcome ❤️
