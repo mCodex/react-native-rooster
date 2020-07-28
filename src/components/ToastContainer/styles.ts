@@ -11,7 +11,7 @@ interface ContainerProps {
   };
 }
 
-export const Container = styled.View<ContainerProps>`
+export const Container = styled.TouchableOpacity<ContainerProps>`
   align-self: center;
   position: absolute;
 

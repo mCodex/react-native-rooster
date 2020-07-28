@@ -47,6 +47,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
           bottom={handleBottomPadding}
           type={type}
           bgColor={bgColor}
+          onPress={() => removeToast(id)}
         >
           {title && <Title>{title}</Title>}
           <Message>{message}</Message>

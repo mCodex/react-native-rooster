@@ -4,6 +4,8 @@
 [![npm version](https://badge.fury.io/js/react-native-rooster.svg)](https://badge.fury.io/js/react-native-rooster)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/react-native-rooster)
+![snyk](https://img.shields.io/snyk/vulnerabilities/npm/react-native-rooster)
+![website](https://img.shields.io/website?url=https%3A%2F%2Fmcodex.dev%2Freact-native-rooster)
 
 # react-native-rooster
 
@@ -85,7 +87,7 @@ For example:
 ```javascript
 import { setToastConfig } from 'react-native-rooster';
 
-addToast({
+setToastConfig({
   bgColor: {
       success: 'olive',
     },

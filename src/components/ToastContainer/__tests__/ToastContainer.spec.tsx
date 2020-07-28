@@ -1,5 +1,12 @@
 import React from 'react';
-import { render } from 'react-native-testing-library';
+import { render, fireEvent } from 'react-native-testing-library';
+import { renderHook } from '@testing-library/react-hooks';
+
+import ToastProvider from '../../../providers/ToastProvider';
+
+import ToastContext from '../../../contexts/ToastContext';
+
+import useToast from '../../../hooks/useToast';
 
 import ToastContainer from '..';
 
@@ -33,29 +40,6 @@ describe('ToastContainer', () => {
     expect(getByText('Toast success message')).toBeTruthy();
   });
 
-  // it('should be able to automatically dismiss toast with setTimeout fn', () => {
-  //   const messages = [
-  //     {
-  //       id: '1',
-  //       message: 'Testing toast timeout',
-  //     },
-  //   ];
-
-  //   const { getByText } = render(
-  //     <ToastContainer messages={messages} toastConfig={defaultConfig} />,
-  //     {
-  //       wrapper: ToastProvider,
-  //     },
-  //   );
-
-  //   expect(setTimeout).toHaveBeenCalledTimes(1);
-  //   expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 3000);
-  //   setTimeout(() => {
-  //     expect(getByText('Testing toast timeout')).toBeFalsy();
-  //   }, 3000);
-  //   jest.runAllTimers();
-  // });
-
   it('should be able to render a toast on screen with title', () => {
     const messages = [
       {
@@ -71,5 +55,76 @@ describe('ToastContainer', () => {
 
     expect(getByText('My Title')).toBeTruthy();
     expect(getByText('Toast success message')).toBeTruthy();
+  });
+
+  it('should be able to automatically dismiss toast with setTimeout fn', () => {
+    const messages = [
+      {
+        id: '1',
+        message: 'Testing toast timeout',
+      },
+    ];
+
+    const { result } = renderHook(() => useToast(), {
+      wrapper: ToastProvider,
+    });
+
+    const CustomProvider: React.FC = ({ children }) => (
+      <ToastContext.Provider value={result.current}>
+        {children}
+      </ToastContext.Provider>
+    );
+
+    const { getByText } = render(
+      <ToastContainer messages={messages} toastConfig={defaultConfig} />,
+      {
+        wrapper: CustomProvider,
+      },
+    );
+
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    setTimeout(() => {
+      expect(getByText('Testing toast timeout')).toBeFalsy();
+    }, 3000);
+
+    jest.useFakeTimers();
+  });
+
+  it('should be able to render a toast on screen and close by clicking on it', async () => {
+    const messages = [
+      {
+        id: '1',
+        message: 'An error ocurred',
+      },
+    ];
+
+    const { result } = renderHook(() => useToast(), {
+      wrapper: ToastProvider,
+    });
+
+    const removeToastHookSpy = jest
+      .spyOn(result.current, 'removeToast')
+      .mockImplementationOnce(() => jest.fn());
+
+    const CustomProvider: React.FC = ({ children }) => (
+      <ToastContext.Provider value={result.current}>
+        {children}
+      </ToastContext.Provider>
+    );
+
+    const { getByText } = render(
+      <ToastContainer messages={messages} toastConfig={defaultConfig} />,
+      {
+        wrapper: CustomProvider,
+      },
+    );
+
+    const toast = getByText('An error ocurred');
+
+    expect(toast).toBeTruthy();
+
+    fireEvent.press(toast);
+
+    expect(removeToastHookSpy).toHaveBeenCalledTimes(1);
   });
 });
