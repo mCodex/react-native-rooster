@@ -22,7 +22,7 @@ For example:
 ```javascript
 import { setToastConfig } from 'react-native-rooster';
 
-addToast({
+setToastConfig({
   bgColor: {
       success: 'olive',
     },

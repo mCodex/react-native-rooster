@@ -8,6 +8,10 @@ A simple toast manager for your react-native apps. Aiming to be flexible, functi
 
 Works on: Android, iOS and Expo
 
+<p align="center">
+  <img alt="Demo" src="https://github.com/mCodex/react-native-rooster/blob/master/demo.gif?raw=true" />
+</p>
+
 ## Features
 
 - [x] Automatically keyboard listener. If keyboard is open the toast will not be hidden by it
