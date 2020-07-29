@@ -20,6 +20,9 @@ const Home: React.FC = () => {
 
   const handleChangeSuccessColorToOliveOnPress = useCallback(() => {
     setToastConfig({
+      font: {
+        fontFamily: 'SpectralSC-Regular',
+      },
       bgColor: {
         success: 'olive',
       },

@@ -7,6 +7,9 @@ import ToastContext from 'contexts/ToastContext';
 const ToastProvider: React.FC = ({ children }) => {
   const [messages, setMessages] = useState<IToastMessage[]>([]);
   const [config, setConfig] = useState<IConfig>({
+    font: {
+      fontFamily: null,
+    },
     bgColor: {
       error: '#d92027',
       success: '#35d0ba',
