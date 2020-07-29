@@ -6,7 +6,7 @@ sidebar_label: Overview
 
 A simple toast manager for your react-native apps. Aiming to be flexible, functional and testable.
 
-Multiplatform support works on: Android, iOS, Expo and MacOS.
+Multiplatform support works on: Android, iOS, Expo, MacOS and Windows.
 
 <p align="center">
   <img alt="Demo" src="https://github.com/mCodex/react-native-rooster/blob/master/demo.gif?raw=true" />
