@@ -4,7 +4,11 @@ title: setToastConfig
 sidebar_label: setToastConfig
 ---
 
-You can change some configs globally. Right now, we only support `bgColor` for each type of toast. 
+You can change some configs globally.
+
+# bgColor
+
+You can change the default bgColors for each type of toast.
 
 The default colors are:
 
@@ -17,7 +21,7 @@ The default colors are:
 - ![#d92027](https://via.placeholder.com/15/d92027/000000?text=+) Error: #d92027
 
 
-For example:
+An example changing the default success' bgColor to olive:
 
 ```javascript
 import { setToastConfig } from 'react-native-rooster';
@@ -25,6 +29,29 @@ import { setToastConfig } from 'react-native-rooster';
 setToastConfig({
   bgColor: {
       success: 'olive',
+    },
+})
+```
+
+# font
+
+You can change the custom fontFamily for the texts.
+
+| option            | required | default                   | Description                                 |
+|-------------------|----------|---------------------------|---------------------------------------------|
+| fontFamilyRegular | No       | React-Native default font | Changes the regular font used within toasts |
+| fontFamilyBold    | No       | React-Native default font | Changes the bold font used within toasts    |
+
+**Note:** You must have previously configured the desired custom font in your project.
+
+An example changing `fontFamilyBold` to `Montserrat` family:
+
+```javascript
+import { setToastConfig } from 'react-native-rooster';
+
+setToastConfig({
+  font: {
+      fontFamilyBold: 'Montserrat-Bold',
     },
 })
 ```
