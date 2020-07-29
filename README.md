@@ -9,7 +9,7 @@
 
 # react-native-rooster
 
-An elegant Toast solution for react-native apps. Built using Typescript, hooks and context with multiplatform support: Android, iOS, Expo and MacOS.
+An elegant Toast solution for react-native apps. Built using Typescript, hooks and context with multiplatform support: Android, iOS, Expo, MacOS and Windows.
 
 <p align="center">
   <img alt="Demo" src="./demo.gif" />
