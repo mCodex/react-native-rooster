@@ -1,6 +1,7 @@
 declare interface IConfig {
-  font: {
-    fontFamily?: string | null;
+  font?: {
+    fontFamilyRegular?: string | null;
+    fontFamilyBold?: string | null;
   };
   bgColor: {
     error: string;

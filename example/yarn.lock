@@ -5916,7 +5916,7 @@ react-native-reanimated@^1.10.1:
     fbjs "^1.0.0"
 
 "react-native-rooster@file:.yalc/react-native-rooster":
-  version "1.0.0"
+  version "1.0.1"
 
 react-native-safe-area-context@^3.1.1:
   version "3.1.1"

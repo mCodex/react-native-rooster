@@ -25,6 +25,7 @@
   },
   "scripts": {
     "localPublish": "yalc publish && cd example && yalc add react-native-rooster --yarn && cd ..",
+    "localPublishMacOS": "yalc publish && cd macOS-example && yalc add react-native-rooster --yarn && cd ..",
     "build": "rimraf -rf build && rollup -c",
     "prepublish": "yarn build",
     "test": "jest --coverage"

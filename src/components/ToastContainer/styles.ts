@@ -12,7 +12,8 @@ interface IContainer {
 }
 
 interface IMessageAndTitle {
-  fontFamily: string | null | undefined;
+  fontFamilyBold?: string | null | undefined;
+  fontFamilyRegular?: string | null | undefined;
 }
 
 export const Container = styled.TouchableOpacity<IContainer>`
@@ -34,9 +35,12 @@ export const Title = styled.Text<IMessageAndTitle>`
   text-align: center;
 
   ${(props) =>
-    props.fontFamily &&
+    props.fontFamilyBold &&
     css`
-      font-family: ${props.fontFamily};
+      font-family: ${props.fontFamilyBold};
+
+      /* Need to override font-weight, because Android won't display the custom font*/
+      font-weight: normal;
     `}
 `;
 
@@ -45,8 +49,8 @@ export const Message = styled.Text<IMessageAndTitle>`
   font-size: 14px;
 
   ${(props) =>
-    props.fontFamily &&
+    props.fontFamilyRegular &&
     css`
-      font-family: ${props.fontFamily};
+      font-family: ${props.fontFamilyRegular};
     `}
 `;

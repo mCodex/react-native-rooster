@@ -22,7 +22,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
 
   useEffect(() => {
     messages.map(({ id }) => {
-      const timer = setTimeout(() => removeToast(id), 30000);
+      const timer = setTimeout(() => removeToast(id), 3000);
 
       return () => {
         clearTimeout(timer);
@@ -49,8 +49,12 @@ const Toast: React.FC<IToastComponent> = (props) => {
           bgColor={bgColor}
           onPress={() => removeToast(id)}
         >
-          {title && <Title fontFamily={font.fontFamily}>{title}</Title>}
-          <Message fontFamily={font.fontFamily}>{message}</Message>
+          {title && (
+            <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>
+          )}
+          <Message fontFamilyRegular={font?.fontFamilyRegular}>
+            {message}
+          </Message>
         </Container>
       ))}
     </KeyboardAvoidingView>
