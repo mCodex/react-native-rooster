@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useToast } from 'react-native-rooster';
 
 import { Button } from 'react-native';
@@ -20,6 +20,10 @@ const Home: React.FC = () => {
 
   const handleChangeSuccessColorToOliveOnPress = useCallback(() => {
     setToastConfig({
+      font: {
+        fontFamilyRegular: 'SpectralSC-Regular',
+        fontFamilyBold: 'SpectralSC-Bold',
+      },
       bgColor: {
         success: 'olive',
       },

@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
+  "types": "build/index.d.ts",
   "keywords": [
     "react-native",
     "react-native-rooster",
@@ -24,6 +25,7 @@
   },
   "scripts": {
     "localPublish": "yalc publish && cd example && yalc add react-native-rooster --yarn && cd ..",
+    "localPublishMacOS": "yalc publish && cd macOS-example && yalc add react-native-rooster --yarn && cd ..",
     "build": "rimraf -rf build && rollup -c",
     "prepublish": "yarn build",
     "test": "jest --coverage"

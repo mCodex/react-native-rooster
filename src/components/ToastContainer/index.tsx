@@ -17,7 +17,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
 
   const {
     messages,
-    toastConfig: { bgColor },
+    toastConfig: { font, bgColor },
   } = props;
 
   useEffect(() => {
@@ -49,8 +49,12 @@ const Toast: React.FC<IToastComponent> = (props) => {
           bgColor={bgColor}
           onPress={() => removeToast(id)}
         >
-          {title && <Title>{title}</Title>}
-          <Message>{message}</Message>
+          {title && (
+            <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>
+          )}
+          <Message fontFamilyRegular={font?.fontFamilyRegular}>
+            {message}
+          </Message>
         </Container>
       ))}
     </KeyboardAvoidingView>

@@ -1,0 +1,63 @@
+{
+  "name": "react-native-rooster",
+  "version": "1.0.1+86ad407a",
+  "description": "",
+  "main": "build/index.js",
+  "module": "build/index.es.js",
+  "jsnext:main": "build/index.es.js",
+  "types": "build/index.d.ts",
+  "keywords": [
+    "react-native",
+    "react-native-rooster",
+    "ios",
+    "android",
+    "toast"
+  ],
+  "author": "mCodex",
+  "license": "MIT",
+  "homepage": "https://mcodex.dev/react-native-rooster/",
+  "bugs": {
+    "url": "https://github.com/mcodex/react-native-rooster/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mcodex/react-native-rooster.git"
+  },
+  "scripts": {
+    "localPublish": "yalc publish && cd example && yalc add react-native-rooster --yarn && cd ..",
+    "localPublishMacOS": "yalc publish && cd macOS-example && yalc add react-native-rooster --yarn && cd ..",
+    "build": "rimraf -rf build && rollup -c",
+    "prepublish": "yarn build",
+    "test": "jest --coverage"
+  },
+  "peerDependencies": {
+    "lodash": "*",
+    "react": "*",
+    "react-native": "*",
+    "styled-components": "*"
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/",
+      "build/"
+    ]
+  }
+}

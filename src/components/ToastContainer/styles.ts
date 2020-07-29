@@ -1,6 +1,6 @@
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 
-interface ContainerProps {
+interface IContainer {
   bottom: number;
   type?: 'success' | 'error' | 'info' | 'warning';
   bgColor: {
@@ -11,7 +11,12 @@ interface ContainerProps {
   };
 }
 
-export const Container = styled.TouchableOpacity<ContainerProps>`
+interface IMessageAndTitle {
+  fontFamilyBold?: string | null | undefined;
+  fontFamilyRegular?: string | null | undefined;
+}
+
+export const Container = styled.TouchableOpacity<IContainer>`
   align-self: center;
   position: absolute;
 
@@ -23,14 +28,29 @@ export const Container = styled.TouchableOpacity<ContainerProps>`
   border-radius: 5px;
 `;
 
-export const Title = styled.Text`
+export const Title = styled.Text<IMessageAndTitle>`
   color: #fff;
   font-size: 18px;
   font-weight: bold;
   text-align: center;
+
+  ${(props) =>
+    props.fontFamilyBold &&
+    css`
+      font-family: ${props.fontFamilyBold};
+
+      /* Need to override font-weight, because Android won't display the custom font*/
+      font-weight: normal;
+    `}
 `;
 
-export const Message = styled.Text`
+export const Message = styled.Text<IMessageAndTitle>`
   color: #fff;
   font-size: 14px;
+
+  ${(props) =>
+    props.fontFamilyRegular &&
+    css`
+      font-family: ${props.fontFamilyRegular};
+    `}
 `;
