@@ -1,6 +1,6 @@
 module.exports = {
-  title: "react-native-rooster",
-  tagline: "An elegant toast solution for your react-native apps",
+  title: "react-native-rooster 🐔",
+  tagline: "An elegant and flexible toast solution for your react-native apps",
   url: "https://mcodex.dev",
   baseUrl: "/react-native-rooster/",
   onBrokenLinks: "throw",
@@ -34,7 +34,7 @@ module.exports = {
     },
     footer: {
       style: "dark",
-      copyright: `Copyright © ${new Date().getFullYear()} mcodex`,
+      copyright: `Copyright © ${new Date().getFullYear()} Made with ❤️ by mCodex`,
     },
   },
   presets: [
@@ -46,6 +46,8 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl:
             "https://github.com/mcodex/react-native-rooster/edit/website/website/",
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
