@@ -12,7 +12,7 @@ const features = [
     imageUrl: "img/undraw_mobile.svg",
     description: (
       <>
-        Works on iOS, Android and Expo   
+        Works on iOS, Android, Expo, MacOS and Windows
       </>
     ),
   },
