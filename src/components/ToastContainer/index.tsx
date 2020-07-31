@@ -42,7 +42,6 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
           message={item}
           toastConfig={toastConfig}
           keyboardHeight={keyboardHeight}
-          removeToast={removeToast}
           style={transitionProps}
         />
       ))}

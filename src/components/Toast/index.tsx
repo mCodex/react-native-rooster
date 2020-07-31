@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Platform } from 'react-native';
 import { AnimatedValue } from 'react-spring/native';
+
+import useToast from 'hooks/useToast';
 
 import { Container, Title, Message } from './styles';
 
@@ -8,13 +10,13 @@ interface IToastComponent {
   message: IToastMessage;
   toastConfig: IConfig;
   keyboardHeight: number;
-  removeToast: (id?: string) => void;
   style: AnimatedValue<any>;
 }
 
 const Toast: React.FC<IToastComponent> = (props) => {
+  const { removeToast } = useToast();
+
   const {
-    removeToast,
     keyboardHeight,
     message: { id, message, title, type },
     toastConfig: { font, bgColor },
@@ -30,13 +32,17 @@ const Toast: React.FC<IToastComponent> = (props) => {
     return Platform.OS === 'ios' ? keyboardHeight : 20;
   }, [keyboardHeight]);
 
+  const handleTapToDismiss = useCallback(() => {
+    removeToast(id);
+  }, [removeToast, id]);
+
   return (
     <Container
       key={id}
       bottom={handleBottomPadding}
       type={type}
       bgColor={bgColor}
-      onPress={() => removeToast(id)}
+      onPress={handleTapToDismiss}
       style={style}
     >
       {title && <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>}
