@@ -1,5 +1,6 @@
-import { Animated, TouchableOpacity, Platform } from 'react-native';
+import { TouchableOpacity, Platform } from 'react-native';
 import styled, { css } from 'styled-components/native';
+import { animated } from 'react-spring/native';
 
 interface IContainer {
   bottom: number;
@@ -17,7 +18,7 @@ interface IMessageAndTitle {
   fontFamilyRegular?: string | null | undefined;
 }
 
-const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedButton = animated<any>(TouchableOpacity);
 
 export const Container = styled(AnimatedButton)<IContainer>`
   align-self: center;

@@ -99,5 +99,8 @@
       "node_modules/",
       "build/"
     ]
+  },
+  "dependencies": {
+    "react-spring": "^8.0.27"
   }
 }

@@ -1,44 +1,25 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, Platform } from 'react-native';
-
-import useToast from 'hooks/useToast';
-import useKeyboard from 'hooks/useKeyboard';
+import React, { useMemo } from 'react';
+import { Platform } from 'react-native';
+import { AnimatedValue } from 'react-spring/native';
 
 import { Container, Title, Message } from './styles';
 
 interface IToastComponent {
   message: IToastMessage;
   toastConfig: IConfig;
+  keyboardHeight: number;
+  removeToast: (id?: string) => void;
+  style: AnimatedValue<any>;
 }
 
 const Toast: React.FC<IToastComponent> = (props) => {
-  const { removeToast } = useToast();
-  const [keyboardHeight] = useKeyboard();
-
-  const { current: fadeAnim } = useRef(new Animated.Value(0));
-
   const {
+    removeToast,
+    keyboardHeight,
     message: { id, message, title, type },
     toastConfig: { font, bgColor },
+    style,
   } = props;
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 400,
-      // easing: Easing.bounce,
-      useNativeDriver: false,
-    }).start();
-
-    return () => {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 0,
-        // easing: Easing.bounce,
-        useNativeDriver: false,
-      }).start();
-    };
-  }, [fadeAnim]);
 
   /**
    * @TODO find a better way to handle Toast's visibility when keyboard is opened.
@@ -56,9 +37,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
       type={type}
       bgColor={bgColor}
       onPress={() => removeToast(id)}
-      style={{
-        opacity: fadeAnim,
-      }}
+      style={style}
     >
       {title && <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>}
       <Message fontFamilyRegular={font?.fontFamilyRegular}>{message}</Message>

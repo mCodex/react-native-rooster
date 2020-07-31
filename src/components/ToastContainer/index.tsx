@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, KeyboardAvoidingView } from 'react-native';
+import React, { useEffect } from 'react';
+import { KeyboardAvoidingView } from 'react-native';
+import { useTransition } from 'react-spring/native';
 
 import useToast from 'hooks/useToast';
+import useKeyboard from 'hooks/useKeyboard';
 
 import Toast from 'components/Toast';
 
@@ -11,11 +13,16 @@ interface IToastComponent {
 }
 
 const ToastContainer: React.FC<IToastComponent> = (props) => {
+  const [keyboardHeight] = useKeyboard();
   const { removeToast } = useToast();
 
-  const { current: fadeAnim } = useRef(new Animated.Value(0));
-
   const { messages, toastConfig } = props;
+
+  const messagesTransitions = useTransition(messages, (message) => message.id, {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+  });
 
   useEffect(() => {
     messages.map(({ id }) => {
@@ -27,27 +34,17 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
     });
   }, [messages, removeToast]);
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      // easing: Easing.bounce,
-      useNativeDriver: false,
-    }).start();
-
-    return () =>
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 800,
-        // easing: Easing.bounce,
-        useNativeDriver: false,
-      }).start();
-  }, [fadeAnim]);
-
   return (
     <KeyboardAvoidingView>
-      {messages.map((message) => (
-        <Toast key={message.id} message={message} toastConfig={toastConfig} />
+      {messagesTransitions.map(({ item, key, props: transitionProps }) => (
+        <Toast
+          key={key}
+          message={item}
+          toastConfig={toastConfig}
+          keyboardHeight={keyboardHeight}
+          removeToast={removeToast}
+          style={transitionProps}
+        />
       ))}
     </KeyboardAvoidingView>
   );
