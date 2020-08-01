@@ -1,4 +1,6 @@
+import { Platform, TouchableOpacity, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
+import { animated } from 'react-spring/native';
 
 interface IContainer {
   bottom: number;
@@ -16,7 +18,9 @@ interface IMessageAndTitle {
   fontFamilyRegular?: string | null | undefined;
 }
 
-export const Container = styled.TouchableOpacity<IContainer>`
+const AnimatedButton = animated<any>(TouchableOpacity);
+
+export const Container = styled(AnimatedButton)<IContainer>`
   align-self: center;
   position: absolute;
 
@@ -24,7 +28,7 @@ export const Container = styled.TouchableOpacity<IContainer>`
   padding: 20px;
 
   background-color: ${(props) => props.bgColor[props.type ?? 'info']};
-  box-shadow: 2px 2px 4px ${(props) => props.bgColor[props.type ?? 'info']};
+  box-shadow: 1px 1px 2px ${(props) => props.bgColor[props.type ?? 'info']};
   border-radius: 5px;
 `;
 
@@ -40,7 +44,7 @@ export const Title = styled.Text<IMessageAndTitle>`
       font-family: ${props.fontFamilyBold};
 
       /* Need to override font-weight, because Android won't display the custom font*/
-      font-weight: normal;
+      font-weight: ${Platform.OS === 'android' ? 'normal' : 'bold'};
     `}
 `;
 
@@ -53,4 +57,15 @@ export const Message = styled.Text<IMessageAndTitle>`
     css`
       font-family: ${props.fontFamilyRegular};
     `}
+`;
+
+const AnimatedView = animated<any>(View);
+
+export const ProgressBar = styled(AnimatedView)`
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  width: auto;
+  background-color: #fff;
+  height: 2px;
 `;

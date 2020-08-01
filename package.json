@@ -99,5 +99,8 @@
       "node_modules/",
       "build/"
     ]
+  },
+  "dependencies": {
+    "react-spring": "^9.0.0-rc.3"
   }
 }
