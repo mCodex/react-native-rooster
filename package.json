@@ -101,6 +101,6 @@
     ]
   },
   "dependencies": {
-    "react-spring": "^8.0.27"
+    "react-spring": "^9.0.0-rc.3"
   }
 }

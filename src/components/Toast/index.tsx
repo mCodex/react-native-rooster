@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { Platform } from 'react-native';
-import { AnimatedValue } from 'react-spring/native';
 
 import useToast from 'hooks/useToast';
 
@@ -10,7 +9,7 @@ interface IToastComponent {
   message: IToastMessage;
   toastConfig: IConfig;
   keyboardHeight: number;
-  style: AnimatedValue<any>;
+  style: any;
 }
 
 const Toast: React.FC<IToastComponent> = (props) => {
@@ -28,6 +27,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
    * On Android KeyboardAvoidingView works perfectly, but not on iOS.
    * On the other hand, the useKeyboard works perfectly on iOS, but not on Android which gives wrong calculation
    */
+
   const handleBottomPadding = useMemo(() => {
     return Platform.OS === 'ios' ? keyboardHeight : 20;
   }, [keyboardHeight]);

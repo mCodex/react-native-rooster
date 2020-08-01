@@ -18,7 +18,8 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
 
   const { messages, toastConfig } = props;
 
-  const messagesTransitions = useTransition(messages, (message) => message.id, {
+  const messagesTransition = useTransition(messages, {
+    key: (message) => message.id,
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
@@ -36,13 +37,13 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
 
   return (
     <KeyboardAvoidingView>
-      {messagesTransitions.map(({ item, key, props: transitionProps }) => (
+      {messagesTransition((style, item) => (
         <Toast
-          key={key}
+          key={item.id}
           message={item}
           toastConfig={toastConfig}
           keyboardHeight={keyboardHeight}
-          style={transitionProps}
+          style={style}
         />
       ))}
     </KeyboardAvoidingView>
