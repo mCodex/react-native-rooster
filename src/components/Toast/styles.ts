@@ -1,4 +1,4 @@
-import { TouchableOpacity, Platform } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { animated } from 'react-spring/native';
 
@@ -57,4 +57,11 @@ export const Message = styled.Text<IMessageAndTitle>`
     css`
       font-family: ${props.fontFamilyRegular};
     `}
+`;
+
+const AnimatedView = animated<any>(View);
+
+export const ProgressBar = styled(AnimatedView)`
+  background-color: #fff;
+  height: 2px;
 `;

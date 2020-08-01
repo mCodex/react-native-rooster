@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { KeyboardAvoidingView } from 'react-native';
-import { useTransition } from 'react-spring/native';
+import { useTransition, config } from 'react-spring/native';
 
 import useToast from 'hooks/useToast';
 import useKeyboard from 'hooks/useKeyboard';
@@ -20,9 +20,13 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
 
   const messagesTransition = useTransition(messages, {
     key: (message) => message.id,
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
+    from: { opacity: 0, life: '100%' },
+    enter: () => async (next) => next({ opacity: 1 }),
+    leave: () => async (next) => {
+      await next({ life: '0%' });
+      await next({ opacity: 0 });
+    },
+    config: config.slow,
   });
 
   useEffect(() => {
