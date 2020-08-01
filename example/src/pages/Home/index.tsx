@@ -20,12 +20,17 @@ const Home: React.FC = () => {
 
   const handleChangeSuccessColorToOliveOnPress = useCallback(() => {
     setToastConfig({
+      bgColor: {
+        success: 'olive',
+      },
+    });
+  }, [setToastConfig]);
+
+  const handleChangeFontFamilyOnPress = useCallback(() => {
+    setToastConfig({
       font: {
         fontFamilyRegular: 'SpectralSC-Regular',
         fontFamilyBold: 'SpectralSC-Bold',
-      },
-      bgColor: {
-        success: 'olive',
       },
     });
   }, [setToastConfig]);
@@ -58,6 +63,11 @@ const Home: React.FC = () => {
       <Button
         title="Set toast's success color to olive"
         onPress={handleChangeSuccessColorToOliveOnPress}
+      />
+
+      <Button
+        title="Change font family to SpectralSC"
+        onPress={handleChangeFontFamilyOnPress}
       />
       <Button title="Remove Last Toast" onPress={handleRemoveToastOnPress} />
     </Container>

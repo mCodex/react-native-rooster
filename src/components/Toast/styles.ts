@@ -62,6 +62,10 @@ export const Message = styled.Text<IMessageAndTitle>`
 const AnimatedView = animated<any>(View);
 
 export const ProgressBar = styled(AnimatedView)`
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  width: auto;
   background-color: #fff;
   height: 2px;
 `;
