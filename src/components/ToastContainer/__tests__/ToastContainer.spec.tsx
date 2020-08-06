@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from 'react-native-testing-library';
+import { render, fireEvent } from '@testing-library/react-native';
 import { renderHook } from '@testing-library/react-hooks';
 
 import ToastProvider from '../../../providers/ToastProvider';

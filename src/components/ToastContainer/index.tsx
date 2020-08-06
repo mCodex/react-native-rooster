@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { KeyboardAvoidingView } from 'react-native';
-import { useTransition, config } from 'react-spring/native';
+import { useTransition, config } from 'react-spring/native.cjs';
 
 import useToast from 'hooks/useToast';
 import useKeyboard from 'hooks/useKeyboard';

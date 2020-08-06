@@ -1,6 +1,6 @@
 import { Platform, TouchableOpacity, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
-import { animated } from 'react-spring/native';
+import { animated } from 'react-spring/native.cjs';
 
 interface IContainer {
   bottom: number;
