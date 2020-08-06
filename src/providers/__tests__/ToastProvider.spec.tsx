@@ -1,5 +1,5 @@
 import React from 'react';
-import { waitFor } from 'react-native-testing-library';
+import { waitFor } from '@testing-library/react-native';
 import { renderHook, act } from '@testing-library/react-hooks';
 
 import ToastProvider from '../ToastProvider';
