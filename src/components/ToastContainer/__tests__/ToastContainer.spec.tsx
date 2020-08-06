@@ -82,7 +82,7 @@ describe('ToastContainer', () => {
       },
     );
 
-    expect(setTimeout).toHaveBeenCalledTimes(4);
+    expect(setTimeout).toHaveBeenCalledTimes(1);
     setTimeout(() => {
       expect(getByText('Testing toast timeout')).toBeFalsy();
     }, 3000);
