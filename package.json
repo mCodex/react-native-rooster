@@ -30,6 +30,9 @@
     "prepublish": "yarn build",
     "test": "jest --coverage"
   },
+  "dependencies": {
+    "react-spring": "^9.0.0-rc.3"
+  },
   "peerDependencies": {
     "lodash": "*",
     "react": "*",
@@ -99,8 +102,5 @@
       "node_modules/",
       "build/"
     ]
-  },
-  "dependencies": {
-    "react-spring": "^9.0.0-rc.3"
   }
 }

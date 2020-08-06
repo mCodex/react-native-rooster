@@ -9,4 +9,5 @@ declare interface IConfig {
     warning: string;
     info: string;
   };
+  timeToDismiss: number;
 }
