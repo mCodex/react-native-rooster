@@ -13,7 +13,7 @@ const ToastProvider: React.FC = ({ children }) => {
       warning: '#ff9100',
       info: '#7890f0',
     },
-    timeToDismiss: 1000,
+    timeToDismiss: 1500,
   });
 
   const addToast = useCallback(
