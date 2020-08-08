@@ -18,20 +18,6 @@ yarn add react-native-rooster styled-components
 npm i react-native-rooster styled-components
 ```
 
-### Using yarn
-
-```bash
-yarn add react-native-rooster@next styled-components
-```
-
-### Using npm
-
-```bash
-npm i react-native-rooster@next styled-components
-```
-
-Check out the status of this version [here](https://github.com/mCodex/react-native-rooster/projects/1)
-
 **NOTE:** RNRooster relies on styled-components because it makes easier to handle different kinds of style props and also helps making the code cleaner. You should install manually styled-components in your project (using one of the commands above).
 
 ## Import and wrap your application within RNRooster's provider
