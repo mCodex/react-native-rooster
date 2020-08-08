@@ -30,6 +30,9 @@
     "prepublish": "yarn build",
     "test": "jest --coverage"
   },
+  "dependencies": {
+    "react-spring": "^9.0.0-rc.3"
+  },
   "peerDependencies": {
     "lodash": "*",
     "react": "*",
@@ -45,8 +48,8 @@
     "@testing-library/react-hooks": "^3.4.1",
     "@testing-library/react-native": "^7.0.1",
     "@types/jest": "^26.0.9",
-    "@types/react": "^16.9.44",
-    "@types/react-native": "^0.63.4",
+    "@types/react": "^16.9.45",
+    "@types/react-native": "^0.63.5",
     "@types/react-test-renderer": "^16.9.3",
     "@types/styled-components": "^5.1.2",
     "@typescript-eslint/eslint-plugin": "^3.8.0",
@@ -68,9 +71,9 @@
     "react-native": "^0.63.2",
     "react-test-renderer": "^16.13.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.23.0",
+    "rollup": "^2.23.1",
     "rollup-plugin-peer-deps-external": "^2.2.3",
-    "rollup-plugin-typescript2": "^0.27.1",
+    "rollup-plugin-typescript2": "^0.27.2",
     "styled-components": "^5.1.1",
     "ts-jest": "^26.1.4",
     "typescript": "^3.9.7",
@@ -99,8 +102,5 @@
       "node_modules/",
       "build/"
     ]
-  },
-  "dependencies": {
-    "react-spring": "^9.0.0-rc.3"
   }
 }
