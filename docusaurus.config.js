@@ -32,6 +32,11 @@ module.exports = {
           label: 'GitHub',
           position: 'right',
         },
+        {
+          href: 'https://github.com/mCodex/react-native-rooster/stargazers',
+          label: 'Give a star ⭐️',
+          position: 'right',
+        },
       ],
     },
     footer: {
