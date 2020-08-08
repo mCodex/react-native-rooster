@@ -47,7 +47,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
     >
       {title && <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>}
       <Message fontFamilyRegular={font?.fontFamilyRegular}>{message}</Message>
-      <ProgressBar style={{ right: life }} />
+      <ProgressBar style={life} />
     </Container>
   );
 };

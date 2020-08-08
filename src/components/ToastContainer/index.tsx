@@ -21,7 +21,10 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
   const messagesTransition = useTransition(messages, {
     key: (message) => message.id,
     from: { opacity: 0 },
-    enter: { opacity: 1, life: '100%' },
+    enter: () => async (next) => {
+      await next({ opacity: 1 });
+      // await next({ life: '100%' });
+    },
     leave: () => async (next) => {
       await next({ life: '0%' });
       await next({ opacity: 0 });

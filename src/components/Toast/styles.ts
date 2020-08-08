@@ -64,7 +64,7 @@ const AnimatedView = animated<any>(View);
 export const ProgressBar = styled(AnimatedView)`
   position: absolute;
   bottom: 0;
-  left: 0px;
+  left: 0;
   width: auto;
   background-color: #fff;
   height: 2px;

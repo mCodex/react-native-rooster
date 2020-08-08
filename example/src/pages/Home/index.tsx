@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useToast } from 'react-native-rooster';
 
 import { Button } from 'react-native';
+
 import { Container, Label, TextInput } from './styles';
 
 const Home: React.FC = () => {
@@ -32,6 +33,12 @@ const Home: React.FC = () => {
         fontFamilyRegular: 'SpectralSC-Regular',
         fontFamilyBold: 'SpectralSC-Bold',
       },
+    });
+  }, [setToastConfig]);
+
+  const handleChangeTimeToDismissOnPress = useCallback(() => {
+    setToastConfig({
+      timeToDismiss: 4000,
     });
   }, [setToastConfig]);
 
@@ -68,6 +75,11 @@ const Home: React.FC = () => {
       <Button
         title="Change font family to SpectralSC"
         onPress={handleChangeFontFamilyOnPress}
+      />
+
+      <Button
+        title="Change time to dismiss to 4000ms"
+        onPress={handleChangeTimeToDismissOnPress}
       />
       <Button title="Remove Last Toast" onPress={handleRemoveToastOnPress} />
     </Container>
