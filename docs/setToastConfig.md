@@ -55,3 +55,21 @@ setToastConfig({
     },
 })
 ```
+
+# timeToDismiss
+
+You can change the default toast's time to dismiss.
+
+| option            | required | default (ms) 
+|-------------------|----------|---------
+| timeToDismiss     | No       | 1500
+
+To change this to 4000ms you can just do:
+
+```javascript
+import { setToastConfig } from 'react-native-rooster';
+
+setToastConfig({
+  timeToDismiss: 4000
+})
+```

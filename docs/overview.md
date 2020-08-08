@@ -18,6 +18,8 @@ Multiplatform support works on: Android, iOS, Expo, MacOS and Windows.
 - [x] Support for different types of toasts (success, info, warning)
 - [x] Tap to dismiss
 - [x] Custom font family support
+- [x] Animation on toast show and hide
+- [x] Customize toast's timing on screen
 - [ ] Support for different positions (top, center, top-left, top-right and so on...)
 - [ ] Support for icons
 - [ ] Support for multiple toasts being shown at the same time

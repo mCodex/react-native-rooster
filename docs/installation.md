@@ -4,9 +4,6 @@ title: Installation
 sidebar_label: Installation
 ---
 
-
-## v1.1.0
-
 To install react-native-rooster's package:
 
 ### Using yarn
@@ -20,15 +17,6 @@ yarn add react-native-rooster styled-components
 ```bash
 npm i react-native-rooster styled-components
 ```
-
-
-## v1.2.0 (beta)
-
-This version includes all features from v1.1.0 plus:
-
-- [x] Animation on toast show and hide
-- [ ] Support for different toast's position on screen [#2](https://github.com/mCodex/react-native-rooster/issues/2)
-- [ ] Customize toast's timing on screen [#4](https://github.com/mCodex/react-native-rooster/issues/4)
 
 ### Using yarn
 
