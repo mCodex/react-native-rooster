@@ -6,7 +6,7 @@ sidebar_label: setToastConfig
 
 You can change some configs globally.
 
-# bgColor
+## bgColor
 
 You can change the default bgColors for each type of toast.
 
@@ -23,7 +23,7 @@ The default colors are:
 
 An example changing the default success' bgColor to olive:
 
-```javascript
+```jsx
 import { setToastConfig } from 'react-native-rooster';
 
 setToastConfig({
@@ -33,7 +33,7 @@ setToastConfig({
 })
 ```
 
-# font
+## font
 
 You can change the custom fontFamily for the texts.
 
@@ -46,7 +46,7 @@ You can change the custom fontFamily for the texts.
 
 An example changing `fontFamilyBold` to `Montserrat` family:
 
-```javascript
+```jsx
 import { setToastConfig } from 'react-native-rooster';
 
 setToastConfig({
@@ -56,7 +56,7 @@ setToastConfig({
 })
 ```
 
-# timeToDismiss
+## timeToDismiss
 
 You can change the default toast's time to dismiss.
 
@@ -66,7 +66,7 @@ You can change the default toast's time to dismiss.
 
 To change this to 4000ms you can just do:
 
-```javascript
+```jsx
 import { setToastConfig } from 'react-native-rooster';
 
 setToastConfig({

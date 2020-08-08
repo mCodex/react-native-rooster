@@ -8,7 +8,7 @@ Use this method to render a toast on screen.
 
 The available options are:
 
-```javascript
+```jsx
 {
   type?: 'success' | 'error' | 'info' | 'warning'; // default: info
   title?: string;
@@ -18,7 +18,7 @@ The available options are:
 
 For example, displaying a success toast would be:
 
-```javascript
+```jsx
 import { addToast } from 'react-native-rooster';
 
 addToast({
