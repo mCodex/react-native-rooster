@@ -19,7 +19,9 @@ The available options are:
 For example, displaying a success toast would be:
 
 ```jsx
-import { addToast } from 'react-native-rooster';
+import { useToast } from 'react-native-rooster';
+
+const { addToast } = useToast();
 
 addToast({
   type: 'success',

@@ -24,7 +24,9 @@ The default colors are:
 An example changing the default success' bgColor to olive:
 
 ```jsx
-import { setToastConfig } from 'react-native-rooster';
+import { useToast } from 'react-native-rooster';
+
+const { setToastConfig } = useToast();
 
 setToastConfig({
   bgColor: {
@@ -47,7 +49,9 @@ You can change the custom fontFamily for the texts.
 An example changing `fontFamilyBold` to `Montserrat` family:
 
 ```jsx
-import { setToastConfig } from 'react-native-rooster';
+import { useToast } from 'react-native-rooster';
+
+const { setToastConfig } = useToast();
 
 setToastConfig({
   font: {
@@ -67,7 +71,9 @@ You can change the default toast's time to dismiss.
 To change this to 4000ms you can just do:
 
 ```jsx
-import { setToastConfig } from 'react-native-rooster';
+import { useToast } from 'react-native-rooster';
+
+const { setToastConfig } = useToast();
 
 setToastConfig({
   timeToDismiss: 4000

@@ -7,7 +7,9 @@ sidebar_label: removeToast
 All toasts are automatically removed after 1.5s. However, you can manually pop the last toast from screen doing:
 
 ```jsx
-import { removeToast } from 'react-native-rooster';
+import { useToast } from 'react-native-rooster';
+
+const { removeToast } = useToast();
 
 removeToast();
 ```
