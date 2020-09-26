@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo } from 'react';
-import { Platform } from 'react-native';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
+import { Animated, Platform } from 'react-native';
 
 import useToast from 'hooks/useToast';
 
@@ -14,11 +14,21 @@ interface IToastComponent {
 const Toast: React.FC<IToastComponent> = (props) => {
   const { removeToast } = useToast();
 
+  const fadeInAnimation = useMemo(() => new Animated.Value(0), []);
+
   const {
     keyboardHeight,
     message: { id, message, title, type },
     toastConfig: { font, bgColor },
   } = props;
+
+  useLayoutEffect(() => {
+    Animated.timing(fadeInAnimation, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  }, [fadeInAnimation]);
 
   /**
    * @TODO find a better way to handle Toast's visibility when keyboard is opened.
@@ -41,6 +51,7 @@ const Toast: React.FC<IToastComponent> = (props) => {
       type={type}
       bgColor={bgColor}
       onPress={handleTapToDismiss}
+      style={{ opacity: fadeInAnimation }}
     >
       {title && <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>}
       <Message fontFamilyRegular={font?.fontFamilyRegular}>{message}</Message>

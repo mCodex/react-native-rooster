@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Animated, Platform, TouchableOpacity } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
 interface IContainer {
@@ -17,7 +17,9 @@ interface IMessageAndTitle {
   fontFamilyRegular?: string | null | undefined;
 }
 
-export const Container = styled.TouchableOpacity<IContainer>`
+const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity);
+
+export const Container = styled(AnimatedButton)<IContainer>`
   align-self: center;
   position: absolute;
 
