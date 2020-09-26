@@ -1,6 +1,5 @@
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { Platform } from 'react-native';
 import styled, { css } from 'styled-components/native';
-import { animated } from 'react-spring/native.cjs';
 
 interface IContainer {
   bottom: number;
@@ -18,9 +17,7 @@ interface IMessageAndTitle {
   fontFamilyRegular?: string | null | undefined;
 }
 
-const AnimatedButton = animated<any>(TouchableOpacity);
-
-export const Container = styled(AnimatedButton)<IContainer>`
+export const Container = styled.TouchableOpacity<IContainer>`
   align-self: center;
   position: absolute;
 
@@ -57,15 +54,4 @@ export const Message = styled.Text<IMessageAndTitle>`
     css`
       font-family: ${props.fontFamilyRegular};
     `}
-`;
-
-const AnimatedView = animated<any>(View);
-
-export const ProgressBar = styled(AnimatedView)`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: auto;
-  background-color: #fff;
-  height: 2px;
 `;

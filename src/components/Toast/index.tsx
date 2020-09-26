@@ -3,13 +3,12 @@ import { Platform } from 'react-native';
 
 import useToast from 'hooks/useToast';
 
-import { Container, Title, Message, ProgressBar } from './styles';
+import { Container, Title, Message } from './styles';
 
 interface IToastComponent {
   message: IToastMessage;
   toastConfig: IConfig;
   keyboardHeight: number;
-  style: any;
 }
 
 const Toast: React.FC<IToastComponent> = (props) => {
@@ -19,7 +18,6 @@ const Toast: React.FC<IToastComponent> = (props) => {
     keyboardHeight,
     message: { id, message, title, type },
     toastConfig: { font, bgColor },
-    style: { life, ...otherStyles },
   } = props;
 
   /**
@@ -43,11 +41,9 @@ const Toast: React.FC<IToastComponent> = (props) => {
       type={type}
       bgColor={bgColor}
       onPress={handleTapToDismiss}
-      style={otherStyles}
     >
       {title && <Title fontFamilyBold={font?.fontFamilyBold}>{title}</Title>}
       <Message fontFamilyRegular={font?.fontFamilyRegular}>{message}</Message>
-      <ProgressBar style={life} />
     </Container>
   );
 };
