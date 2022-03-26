@@ -7,7 +7,9 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "prepare": "yarn run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",
@@ -20,7 +22,8 @@
     "react-native-rooster": "file:.yalc/react-native-rooster",
     "react-native-safe-area-context": "^3.1.8",
     "react-native-screens": "^2.11.0",
-    "styled-components": "^5.2.0"
+    "styled-components": "^5.2.0",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
@@ -57,5 +60,6 @@
       "json",
       "node"
     ]
-  }
+  },
+  "snyk": true
 }
