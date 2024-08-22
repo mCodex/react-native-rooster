@@ -1,6 +1,6 @@
 {
   "name": "react-native-rooster",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Your toast solution for react-native apps",
   "main": "build/index.js",
   "module": "build/index.es.js",
