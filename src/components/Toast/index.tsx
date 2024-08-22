@@ -36,9 +36,10 @@ const Toast: React.FC<IToastComponent> = (props) => {
    * On the other hand, the useKeyboard works perfectly on iOS, but not on Android which gives wrong calculation
    */
 
-  const handleBottomPadding = useMemo(() => {
-    return Platform.OS === 'ios' ? keyboardHeight : 20;
-  }, [keyboardHeight]);
+  const handleBottomPadding = useMemo(
+    () => (Platform.OS === 'ios' ? keyboardHeight : 20),
+    [keyboardHeight],
+  );
 
   const handleTapToDismiss = useCallback(() => {
     removeToast(id);

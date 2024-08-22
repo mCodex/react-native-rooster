@@ -29,6 +29,7 @@ const ToastContainer: React.FC<IToastComponent> = (props) => {
   }, [messages, removeToast, toastConfig]);
 
   return (
+    // @ts-ignore
     <KeyboardAvoidingView>
       {messages.map((message) => (
         <Toast

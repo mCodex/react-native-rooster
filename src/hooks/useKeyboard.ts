@@ -17,10 +17,10 @@ const useKeyboard = (): [number] => {
     Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
 
     return (): void => {
-      Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow);
-      Keyboard.removeListener('keyboardDidHide', onKeyboardDidHide);
+      Keyboard.removeAllListeners('keyboardDidShow');
+      Keyboard.removeAllListeners('keyboardDidHide');
     };
-  }, [onKeyboardDidShow, onKeyboardDidHide]);
+  }, []);
 
   return [keyboardHeight];
 };

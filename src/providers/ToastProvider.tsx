@@ -1,10 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { merge } from 'lodash';
 
 import ToastContainer from 'components/ToastContainer';
 import ToastContext from 'contexts/ToastContext';
 
-const ToastProvider: React.FC = ({ children }) => {
+interface IToastProvider {
+  children: React.ReactNode;
+}
+
+const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
   const [messages, setMessages] = useState<IToastMessage[]>([]);
   const [config, setConfig] = useState<IConfig>({
     bgColor: {
@@ -18,7 +22,7 @@ const ToastProvider: React.FC = ({ children }) => {
 
   const addToast = useCallback(
     ({ type, title, message }: Omit<IToastMessage, 'id'>) => {
-      const id = Math.random().toString(36).substr(2, 5);
+      const id = Math.random().toString(36).substring(7);
 
       const toast = {
         id,
@@ -49,8 +53,13 @@ const ToastProvider: React.FC = ({ children }) => {
     setConfig((state) => merge(state, updatedConfig));
   }, []);
 
+  const contextValues = useMemo(
+    () => ({ addToast, removeToast, setToastConfig }),
+    [addToast, removeToast, setToastConfig],
+  );
+
   return (
-    <ToastContext.Provider value={{ addToast, removeToast, setToastConfig }}>
+    <ToastContext.Provider value={contextValues}>
       {children}
       <ToastContainer messages={messages} toastConfig={config} />
     </ToastContext.Provider>

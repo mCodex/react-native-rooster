@@ -1,5 +1,5 @@
 import { Animated, Platform, TouchableOpacity } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import styled from 'styled-components/native';
 
 interface IContainer {
   bottom: number;
@@ -38,13 +38,10 @@ export const Title = styled.Text<IMessageAndTitle>`
   text-align: center;
 
   ${(props) =>
-    props.fontFamilyBold &&
-    css`
+    props.fontFamilyBold && `
       font-family: ${props.fontFamilyBold};
-
-      /* Need to override font-weight, because Android won't display the custom font*/
       font-weight: ${Platform.OS === 'android' ? 'normal' : 'bold'};
-    `}
+    `};
 `;
 
 export const Message = styled.Text<IMessageAndTitle>`
@@ -52,8 +49,7 @@ export const Message = styled.Text<IMessageAndTitle>`
   font-size: 14px;
 
   ${(props) =>
-    props.fontFamilyRegular &&
-    css`
+    props.fontFamilyRegular && `
       font-family: ${props.fontFamilyRegular};
-    `}
+    `};
 `;
