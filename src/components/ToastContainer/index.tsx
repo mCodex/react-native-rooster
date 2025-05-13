@@ -1,46 +1,58 @@
-import React, { useEffect } from 'react';
-import { KeyboardAvoidingView } from 'react-native';
-
-import useToast from 'hooks/useToast';
+import React, { useMemo } from 'react';
+import { StyleSheet, View, Platform } from 'react-native';
 import useKeyboard from 'hooks/useKeyboard';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// import the actual Toast component instead of self-import
+import Toast from '../Toast';
 
-import Toast from 'components/Toast';
-
-interface IToastComponent {
-  messages: IToastMessage[];
+interface IToastContainer {
+  // messages may be missing or undefined at runtime
+  messages?: IToastMessage[];
   toastConfig: IConfig;
 }
 
-const ToastContainer: React.FC<IToastComponent> = (props) => {
+// Provide a default empty array to avoid undefined
+const ToastContainer: React.FC<IToastContainer> = (props) => {
+  const { messages = [], toastConfig } = props;
+  
   const [keyboardHeight] = useKeyboard();
-  const { removeToast } = useToast();
+  const insets = useSafeAreaInsets();
 
-  const { messages, toastConfig } = props;
+  // only move up for keyboard on iOS; on Android keep at safe area bottom
+  const keyboardInset = Platform.OS === 'ios' ? keyboardHeight : 20;
+  const bottomOffset = insets.bottom + keyboardInset;
 
-  useEffect(() => {
-    messages.map(({ id }) => {
-      const { timeToDismiss } = toastConfig;
-      const timer = setTimeout(() => removeToast(id), timeToDismiss);
-
-      return () => {
-        clearTimeout(timer);
-      };
-    });
-  }, [messages, removeToast, toastConfig]);
-
-  return (
-    // @ts-ignore
-    <KeyboardAvoidingView>
-      {messages.map((message) => (
+  // memoize to avoid re-render flicker and ensure messages is an array
+  const list = useMemo(
+    () =>
+      messages.map((msg, i) => (
         <Toast
-          key={message.id}
-          message={message}
+          key={msg.id}
+          message={msg}
           toastConfig={toastConfig}
-          keyboardHeight={keyboardHeight}
+          index={i}
+          bottomOffset={bottomOffset}
         />
-      ))}
-    </KeyboardAvoidingView>
+      )),
+    [messages, toastConfig, bottomOffset]
+  );
+
+  if (!messages.length) return null;
+
+  // Pass safe area inset to each toast; container itself is full-screen
+  return (
+    <View style={styles.wrapper} pointerEvents="box-none">
+      {list}
+    </View>
   );
 };
 
 export default ToastContainer;
+
+const styles = StyleSheet.create({
+  wrapper: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    pointerEvents: 'box-none',
+  },
+});

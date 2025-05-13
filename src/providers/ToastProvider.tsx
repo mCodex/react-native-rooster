@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { merge } from 'lodash';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastContainer from 'components/ToastContainer';
 import ToastContext from 'contexts/ToastContext';
@@ -31,26 +31,37 @@ const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
         message,
       };
 
-      setMessages((prevState) => [...prevState, toast]);
+      setMessages((prevState) => prevState.concat([toast]));
     },
     [],
   );
 
   const removeToast = useCallback(
     (id?: string) => {
-      if (id) {
-        setMessages((state) => state.filter((s) => s.id !== id));
-      } else if (messages.length > 0) {
-        const messagesClone = [...messages];
-        messagesClone.pop();
-        setMessages(messagesClone);
-      }
+      // Use requestAnimationFrame to ensure removal happens during the next frame
+      // This prevents any visual glitches or blinking during state updates
+      requestAnimationFrame(() => {
+        if (id) {
+          setMessages((state) => state.filter((s) => s.id !== id));
+        } else if (messages.length > 0) {
+          // Use slice instead of spread operator
+          const messagesClone = messages.slice(0, messages.length - 1);
+          setMessages(messagesClone);
+        }
+      });
     },
     [messages],
   );
 
   const setToastConfig = useCallback((updatedConfig: IConfig) => {
-    setConfig((state) => merge(state, updatedConfig));
+    setConfig((state) => {
+      // merge top-level and deep bgColor using Object.assign instead of spread
+      const merged: IConfig = Object.assign({}, state, updatedConfig);
+      if (updatedConfig.bgColor) {
+        merged.bgColor = Object.assign({}, state.bgColor, updatedConfig.bgColor);
+      }
+      return merged;
+    });
   }, []);
 
   const contextValues = useMemo(
@@ -59,10 +70,12 @@ const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
   );
 
   return (
+    <SafeAreaProvider>
     <ToastContext.Provider value={contextValues}>
       {children}
       <ToastContainer messages={messages} toastConfig={config} />
     </ToastContext.Provider>
+    </SafeAreaProvider>
   );
 };
 

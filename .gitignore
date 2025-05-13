@@ -17,3 +17,7 @@ build/
 
 # CocoaPods
 /ios/Pods/
+
+.pnp*
+
+.yarn
