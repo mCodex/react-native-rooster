@@ -2,7 +2,7 @@ name: Deploy Website
 
 on:
   push:
-    branches: [gh-pages]
+    branches: [website]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
