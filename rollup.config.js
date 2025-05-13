@@ -80,6 +80,13 @@ export default [
   {
     input: 'src/index.ts',
     output: [{ file: 'build/index.d.ts', format: 'es' }],
-    plugins: [dts()],
+    plugins: [
+      dts({
+        respectExternal: true,
+        compilerOptions: {
+          preserveSymlinks: false,
+        }
+      })
+    ],
   },
 ];

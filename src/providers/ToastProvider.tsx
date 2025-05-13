@@ -3,14 +3,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastContainer from 'components/ToastContainer';
 import ToastContext from 'contexts/ToastContext';
+import type { ToastMessage, ToastConfig, ToastProviderProps } from '../types';
 
-interface IToastProvider {
-  children: React.ReactNode;
-}
-
-const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
-  const [messages, setMessages] = useState<IToastMessage[]>([]);
-  const [config, setConfig] = useState<IConfig>({
+const ToastProvider: React.FC<ToastProviderProps> = ({ 
+  children,
+  initialConfig
+}) => {
+  const [messages, setMessages] = useState<ToastMessage[]>([]);
+  const [config, setConfig] = useState<ToastConfig>({
     bgColor: {
       error: '#d92027',
       success: '#35d0ba',
@@ -18,6 +18,7 @@ const ToastProvider: React.FC<IToastProvider> = ({ children }) => {
       info: '#7890f0',
     },
     timeToDismiss: 3000,
+    ...initialConfig,
   });
 
   const addToast = useCallback(

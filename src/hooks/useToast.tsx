@@ -1,8 +1,9 @@
 import { useContext } from 'react';
 
 import ToastContext from 'contexts/ToastContext';
+import type { ToastContextProps } from '../types';
 
-const useToast = (): IToastContext => {
+const useToast = (): ToastContextProps => {
   const context = useContext(ToastContext);
 
   if (!context) {

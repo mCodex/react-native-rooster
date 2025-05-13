@@ -8,6 +8,17 @@
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
   "types": "build/index.d.ts",
+  "typings": "build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/index.es.js",
+      "require": "./build/index.js",
+      "default": "./build/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
   "keywords": [
     "react-native",
     "react-native-rooster",
@@ -28,7 +39,10 @@
   "scripts": {
     "build": "rimraf -rf build && rollup -c",
     "prepublish": "yarn build",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "validate": "yarn type-check && yarn lint && yarn test"
   },
   "peerDependencies": {
     "react": "*",

@@ -7,15 +7,16 @@ import {
   Platform,
 } from 'react-native';
 import useToast from 'hooks/useToast';
+import type { ToastMessage, ToastConfig } from '../../types';
 
-interface IToastComponent {
-  message: IToastMessage;
-  toastConfig: IConfig;
+interface ToastComponentProps {
+  message: ToastMessage;
+  toastConfig: ToastConfig;
   index: number;            // stack index
   bottomOffset: number;     // base bottom inset (safe area + keyboard)
 }
 
-const Toast: React.FC<IToastComponent> = ({
+const Toast: React.FC<ToastComponentProps> = ({
   message,
   toastConfig,
   index,

@@ -4,15 +4,16 @@ import useKeyboard from 'hooks/useKeyboard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import the actual Toast component instead of self-import
 import Toast from '../Toast';
+import type { ToastMessage, ToastConfig } from '../../types';
 
-interface IToastContainer {
+interface ToastContainerProps {
   // messages may be missing or undefined at runtime
-  messages?: IToastMessage[];
-  toastConfig: IConfig;
+  messages?: ToastMessage[];
+  toastConfig: ToastConfig;
 }
 
 // Provide a default empty array to avoid undefined
-const ToastContainer: React.FC<IToastContainer> = (props) => {
+const ToastContainer: React.FC<ToastContainerProps> = (props) => {
   const { messages = [], toastConfig } = props;
   
   const [keyboardHeight] = useKeyboard();
