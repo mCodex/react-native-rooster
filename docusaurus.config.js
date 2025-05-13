@@ -8,16 +8,22 @@ const config = {
   url: 'https://mcodex.dev',
   baseUrl: '/react-native-rooster/',
   onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'mcodex',
   projectName: 'react-native-rooster',
   
   // Performance and SEO optimization
-  trailingSlash: true,
+  trailingSlash: false,
   noIndex: false, // Allow search engine indexing
   
   // Improved build settings
   staticDirectories: ['static'],
+  
+  // Configure 404 handling explicitly
+  customFields: {
+    errorPagePath: '404.html',
+  },
   
   // Webpack configuration for better performance
   webpack: {
@@ -78,7 +84,7 @@ const config = {
     },
     footer: {
       style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} Made with ❤️ by mCodex`,
+      copyright: `Copyright © 2020 - ${new Date().getFullYear()} Made with ❤️ by mCodex`,
     },
     // Add image zoom
     zoom: {
@@ -112,7 +118,7 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-        googleAnalytics: {
+        gtag: {
           trackingID: 'UA-79205996-7',
           anonymizeIP: true,
         },
@@ -130,6 +136,13 @@ const config = {
       '@docusaurus/plugin-client-redirects',
       {
         fromExtensions: ['html'],
+        redirects: [
+          // Ensure proper redirects for common patterns
+          {
+            from: '/404.html',
+            to: '/404',
+          },
+        ],
         createRedirects: function (existingPath) {
           // Redirect old paths to new paths if any
           return undefined;

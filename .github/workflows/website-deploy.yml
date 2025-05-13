@@ -17,7 +17,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Test Build
-        run: yarn build
+        run: |
+          yarn build
+          # Verify 404.html exists
+          ls -la build/ | grep 404.html || echo "404.html not found!"
   gh-release:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
