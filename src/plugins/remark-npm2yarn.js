@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+// Using npm-to-yarn v3.0.1 which matches your package.json
 const npmToYarn = require('npm-to-yarn');
 
 // E.g. global install: 'npm i' -> 'yarn'

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap file location
+Sitemap: https://mcodex.dev/react-native-rooster/sitemap.xml

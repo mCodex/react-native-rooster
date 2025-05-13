@@ -1,5 +1,3 @@
-/* stylelint-disable docusaurus/copyright-header */
-
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules
  * and scoped locally.
@@ -10,6 +8,12 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  /* Improved GPU acceleration for smoother animations */
+  transform: translateZ(0);
+  will-change: transform;
+  /* Add hero image gradient overlay for better readability */
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), var(--ifm-color-primary);
+  color: white;
 }
 
 @media screen and (max-width: 966px) {
@@ -22,16 +26,101 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 1rem; /* Modern spacing between buttons */
+  margin-top: 2rem;
+}
+
+.getStarted {
+  border-width: 2px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.getStarted:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
 .features {
   display: flex;
-  align-items: center;
-  padding: 2rem 0;
+  align-items: stretch; /* Allow items to stretch to match tallest item */
+  padding: 3rem 0;
   width: 100%;
+  background-color: var(--ifm-color-emphasis-100); /* Light background for feature section */
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .featureImage {
   height: 200px;
   width: 200px;
+  object-fit: contain; /* Ensure proper image scaling */
+  margin-bottom: 1rem;
+}
+
+/* 404 Page Styles */
+.notFoundContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 2rem;
+  min-height: 60vh;
+}
+
+.notFoundContent {
+  flex: 1;
+  max-width: 500px;
+}
+
+.notFoundImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notFoundImage img {
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+}
+
+.notFoundTitle {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, var(--ifm-color-primary), var(--ifm-color-primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.notFoundText {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Responsive design for mobile */
+@media screen and (max-width: 768px) {
+  .notFoundContainer {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .notFoundContent {
+    margin-bottom: 2rem;
+  }
 }

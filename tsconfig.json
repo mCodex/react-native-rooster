@@ -1,0 +1,22 @@
+{
+  "extends": "@tsconfig/docusaurus/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "ESNext"],
+    "noEmit": true,
+    "types": ["node", "@docusaurus/module-type-aliases"]
+  },
+  "include": [
+    "src/**/*",
+    "docs/**/*",
+    "docusaurus.config.js",
+    "sidebars.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

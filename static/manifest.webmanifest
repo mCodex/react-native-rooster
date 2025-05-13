@@ -1,0 +1,21 @@
+{
+  "name": "react-native-rooster",
+  "short_name": "RN Rooster",
+  "description": "An elegant and flexible toast solution for your react-native apps",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff9100",
+  "icons": [
+    {
+      "src": "img/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "img/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

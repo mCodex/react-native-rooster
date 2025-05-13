@@ -7,11 +7,8 @@ sidebar_label: Installation
 To install react-native-rooster's package:
 
 ```bash npm2yarn
-npm install --save react-native-rooster styled-components
+npm install --save react-native-rooster
 ```
-
-
-**NOTE:** RNRooster relies on styled-components because it makes easier to handle different kinds of style props and also helps making the code cleaner. You should install manually styled-components in your project (using one of the commands above).
 
 ## Import and wrap your application within RNRooster's provider
 
