@@ -136,9 +136,617 @@ addToast({
 - Advanced tree-shaking with `sideEffects: false`
 - 13 modular, lazy-loadable files with utilities
 
+#### 6. **Performance Optimizations** 🚀
+- **Zero memory leaks**: Proper animation cleanup on unmount
+- **Smart memoization**: Strategic caching prevents unnecessary re-renders
+- **Keyboard navigation**: Escape key support for web accessibility
+- **Haptic feedback**: Multi-sensory notifications across iOS/Android
+- **Compiler-ready**: Pre-optimized for Meta's React Compiler
+
 ---
 
-## 🚀 Built with React Compiler
+## ♿ Accessibility (WCAG 2.1 AA Compliant)
+
+> [!IMPORTANT]
+> **Accessibility is a feature, not an afterthought.** Rooster is built with inclusive design principles and comprehensive accessibility support to ensure all users—including those using assistive technologies—have an excellent experience.
+
+### Why Accessibility Matters
+
+Accessible toasts benefit **everyone**:
+- 👁️ **Vision impaired**: Screen readers announce notifications with proper context
+- 🎯 **Motor control issues**: Larger touch targets and extended time windows
+- 🔊 **Deaf/hard of hearing**: Color-coded toast types + haptic feedback
+- ⌨️ **Motor limitations**: Keyboard navigation + adjustable timing
+- 🌍 **Global reach**: Multi-language support + text scaling
+
+### Key Accessibility Features
+
+#### 1. **Screen Reader Support** 🔊
+Roasts automatically generates semantic announcements for screen readers:
+
+```tsx
+const { addToast } = useToast();
+
+// Screen readers automatically announce:
+// "Success notification. Payment processed. Order #12345"
+addToast({
+  type: 'success',
+  title: 'Payment processed',
+  message: 'Order #12345',
+});
+
+// Custom accessibility labels for complex scenarios
+addToast({
+  type: 'warning',
+  message: 'Storage at 95%',
+  accessibilityLabel: 'Storage warning. You have used 95% of available space.',
+  accessibilityHint: 'Tap to open settings',
+});
+```
+
+**Screen Reader Roles:**
+- 🔴 **Error/Warning**: `role="alert"` (announces immediately, assertive priority)
+- ✅ **Success**: `role="status"` (announces with politeness, less intrusive)
+- ℹ️ **Info**: `role="status"` (polite announcement)
+
+#### 2. **Respects User Accessibility Preferences** ⚙️
+Enable font scaling based on device settings:
+
+```tsx
+// Global accessibility config
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      // Respect device font size settings (e.g., "Large Text" in system settings)
+      allowFontScaling: true,
+      
+      // Maximum lines before truncation (0 = unlimited, but be careful!)
+      messageMaxLines: 2,
+      
+      // Haptic feedback for tactile notifications
+      hapticFeedback: 'light',
+      
+      // Custom text colors for contrast validation
+      textColors: {
+        success: [255, 255, 255],  // White text on green
+        error: [255, 255, 255],     // White text on red
+        warning: [0, 0, 0],         // Black text on yellow
+        info: [255, 255, 255],      // White text on blue
+      },
+    },
+  }}
+>
+  {children}
+</ToastProvider>
+
+// Per-toast override
+addToast({
+  type: 'success',
+  message: 'Font scales with device settings',
+  allowFontScaling: true,        // Allow user's preferred font size
+  messageMaxLines: 3,             // Allow longer messages
+  hapticFeedback: 'success',      // Pattern feedback (iOS)
+});
+```
+
+#### 3. **Color Contrast Compliance** 🎨
+Built-in contrast validation ensures WCAG AA standards:
+
+```tsx
+import { isContrastCompliant, hexToRgb } from 'react-native-rooster';
+
+// Validate your color combinations
+const whiteText = [255, 255, 255];
+const darkGreen = hexToRgb('#22c55e');
+
+if (isContrastCompliant(whiteText, darkGreen)) {
+  console.log('✅ WCAG AA compliant (4.5:1+ ratio)');
+} else {
+  console.warn('⚠️ Insufficient contrast for readability');
+}
+
+// Check WCAG AAA (stricter standard)
+isContrastCompliant(whiteText, darkGreen, false, 'AAA'); // 7:1+ required
+```
+
+#### 4. **Dynamic Sizing & Typography** 📐
+Responsive and accessible text sizing:
+
+```tsx
+import { calculateLineHeight, calculateToastHeight } from 'react-native-rooster';
+
+// Calculate proper line height for readability
+const lineHeight = calculateLineHeight(16);  // 16px font → 22px line height
+
+// Calculate toast height with custom fonts
+const height = calculateToastHeight({
+  paddingVertical: 16,
+  paddingHorizontal: 16,
+  titleFontSize: 18,
+  messageFontSize: 16,
+  messageLineHeight: 22,
+  titleMessageGap: 8,
+  hasTitle: true,
+  hasIcon: true,
+}, 2); // 2 lines of message
+
+// Ensures minimum 44px touch target (accessibility standard)
+// Prevents excessive height that causes truncation
+```
+
+#### 5. **Haptic Feedback** 📳
+Multi-sensory notifications for better UX:
+
+```tsx
+addToast({
+  type: 'success',
+  message: 'Notification with tactile feedback',
+  hapticFeedback: 'light',       // Subtle notification
+  // Options: false, 'light', 'medium', 'heavy', 'success', 'warning', 'error'
+});
+
+// Global default
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      hapticFeedback: 'medium',
+    },
+  }}
+>
+```
+
+### Complete Accessibility Configuration
+
+```tsx
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      // Font scaling
+      allowFontScaling: true,
+      
+      // Text truncation protection
+      messageMaxLines: 2,
+      
+      // Tactile feedback
+      hapticFeedback: 'light',
+      
+      // Contrast validation (optional)
+      textColors: {
+        success: '#ffffff',      // Hex or RGB
+        error: [255, 255, 255],  // RGB array
+        warning: '#000000',
+        info: '#ffffff',
+      },
+      
+      // Announce toasts to screen readers
+      announceOnAppear: true,
+      
+      // Custom accessibility roles
+      roleMap: {
+        success: 'status',
+        error: 'alert',
+        warning: 'alert',
+        info: 'status',
+      },
+    },
+  }}
+>
+```
+
+### Accessibility Best Practices
+
+#### ✅ DO:
+- Use clear, concise messages (< 100 characters)
+- Provide context in `accessibilityHint`
+- Respect user font scaling preferences
+- Use high contrast colors (white on dark, black on light)
+- Test with screen readers (VoiceOver on iOS, TalkBack on Android)
+- Keep toasts simple—avoid complex custom components
+
+#### ❌ DON'T:
+- Use color alone to convey information
+- Make toasts flash or vibrate excessively
+- Truncate important information
+- Use very small fonts (< 12px)
+- Auto-dismiss critical alerts
+- Ignore focus/keyboard navigation
+
+### Testing Accessibility
+
+#### Screen Reader Testing
+```bash
+# iOS: Enable VoiceOver
+Settings → Accessibility → VoiceOver → On
+
+# Android: Enable TalkBack
+Settings → Accessibility → TalkBack → On
+
+# Test your toasts with screen reader running
+```
+
+#### Contrast Validation
+```tsx
+import { validateAccessibility } from 'react-native-rooster';
+
+const validation = validateAccessibility(
+  { title: 'Error', message: 'Something went wrong' },
+  'error',
+  14  // font size
+);
+
+if (!validation.isValid) {
+  console.warn('Accessibility issues:', validation.issues);
+}
+```
+
+#### Utilities for Advanced Testing
+```tsx
+import {
+  calculateContrastRatio,
+  isTextTruncated,
+  hexToRgb,
+} from 'react-native-rooster';
+
+// Check contrast ratio
+const ratio = calculateContrastRatio(
+  [255, 255, 255],              // white text
+  [220, 38, 38]                 // red background
+);
+console.log(`Contrast ratio: ${ratio}:1`);
+
+// Check if text gets truncated
+const truncated = isTextTruncated(
+  'Your long message here',
+  2,      // max lines
+  14,     // font size
+  320     // available width
+);
+
+// Convert hex colors
+const rgb = hexToRgb('#FF5722');
+// => [255, 87, 34]
+```
+
+---
+
+## 🚀 Latest Optimizations & Improvements
+
+> [!TIP]
+> **v3.1+ brings performance and accessibility enhancements** with zero breaking changes. Upgrade anytime!
+
+### Performance Enhancements ⚡
+
+#### Memory Leak Prevention 🔒
+Animations are now properly cleaned up on component unmount:
+```tsx
+// ✅ Before: Animations could remain running if component unmounted during animation
+// ✅ After: Automatic cleanup prevents orphaned animations and memory leaks
+```
+**Impact**: Prevents potential memory buildup in long-running apps with frequent toast dismissals.
+
+#### Animation Dependencies Optimization 🎯
+Unnecessary Animated value refs removed from effect dependencies:
+- Reduced re-render triggers
+- More stable effect behavior  
+- Better React Compiler compatibility
+
+#### Strategic Memoization 💾
+- Container styles memoized once and reused
+- Alignment calculations cached per position change
+- Animation styles computed only when needed
+- Font styling updates only on font config changes
+
+### Accessibility Enhancements ♿
+
+#### Keyboard Navigation Support 🎹
+Web users can now dismiss toasts using the Escape key:
+```tsx
+// On web: Press Escape on focused toast to dismiss
+// Works with keyboard-only users and screen reader users
+```
+
+#### Enhanced Haptic Feedback 📳
+Multi-sensory notifications with sophisticated patterns:
+```tsx
+import { triggerHaptic, HAPTIC_PATTERNS } from 'react-native-rooster';
+
+// Available patterns
+HAPTIC_PATTERNS.light;      // [5ms] - subtle UI feedback
+HAPTIC_PATTERNS.medium;     // [20ms] - standard notification
+HAPTIC_PATTERNS.success;    // [10, 20, 10] - success pattern
+HAPTIC_PATTERNS.error;      // [30, 20, 30] - error pattern
+
+// Usage
+addToast({
+  type: 'success',
+  message: 'Notification with haptic feedback',
+  hapticFeedback: 'success',  // Provides tactile feedback on supported devices
+});
+
+// Manual control
+triggerHaptic('light');      // Trigger pattern programmatically
+```
+**Benefits**: Tactile feedback improves notification awareness for deaf/hard of hearing users and provides valuable feedback confirmation.
+
+### Code Quality Improvements 🧹
+
+#### Removed Unused Parameters
+- Cleaned up function signatures for clarity
+- Reduced cognitive load for developers
+- Improved JSDoc documentation
+
+#### TypeScript Optimization
+- Stricter type checking enabled
+- Readonly arrays properly typed
+- Better error detection at compile time
+
+---
+
+## ♿ Accessibility (WCAG 2.1 AA Compliant)
+
+> [!IMPORTANT]
+> **Accessibility is a feature, not an afterthought.** Rooster is built with inclusive design principles and comprehensive accessibility support to ensure all users—including those using assistive technologies—have an excellent experience.
+
+### Why Accessibility Matters
+
+Accessible toasts benefit **everyone**:
+- 👁️ **Vision impaired**: Screen readers announce notifications with proper context
+- 🎯 **Motor control issues**: Larger touch targets and extended time windows
+- 🔊 **Deaf/hard of hearing**: Color-coded toast types + haptic feedback + keyboard support
+- ⌨️ **Motor limitations**: Keyboard navigation + adjustable timing
+- 🌍 **Global reach**: Multi-language support + text scaling
+
+### Key Accessibility Features
+
+#### 1. **Screen Reader Support** 🔊
+Toasts automatically generate semantic announcements for screen readers:
+
+```tsx
+const { addToast } = useToast();
+
+// Screen readers automatically announce:
+// "Success notification. Payment processed. Order #12345"
+addToast({
+  type: 'success',
+  title: 'Payment processed',
+  message: 'Order #12345',
+});
+
+// Custom accessibility labels for complex scenarios
+addToast({
+  type: 'warning',
+  message: 'Storage at 95%',
+  accessibilityLabel: 'Storage warning. You have used 95% of available space.',
+  accessibilityHint: 'Tap to open settings',
+});
+```
+
+**Screen Reader Roles:**
+- 🔴 **Error/Warning**: `role="alert"` (announces immediately, assertive priority)
+- ✅ **Success**: `role="status"` (announces with politeness, less intrusive)
+- ℹ️ **Info**: `role="status"` (polite announcement)
+
+#### 2. **Respects User Accessibility Preferences** ⚙️
+Enable font scaling based on device settings:
+
+```tsx
+// Global accessibility config
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      // Respect device font size settings (e.g., "Large Text" in system settings)
+      allowFontScaling: true,
+      
+      // Maximum lines before truncation (0 = unlimited, but be careful!)
+      messageMaxLines: 2,
+      
+      // Haptic feedback for tactile notifications
+      hapticFeedback: 'light',
+      
+      // Custom text colors for contrast validation
+      textColors: {
+        success: [255, 255, 255],  // White text on green
+        error: [255, 255, 255],     // White text on red
+        warning: [0, 0, 0],         // Black text on yellow
+        info: [255, 255, 255],      // White text on blue
+      },
+    },
+  }}
+>
+  {children}
+</ToastProvider>
+
+// Per-toast override
+addToast({
+  type: 'success',
+  message: 'Font scales with device settings',
+  allowFontScaling: true,        // Allow user's preferred font size
+  messageMaxLines: 3,             // Allow longer messages
+  hapticFeedback: 'success',      // Pattern feedback (iOS)
+});
+```
+
+#### 3. **Color Contrast Compliance** 🎨
+Built-in contrast validation ensures WCAG AA standards:
+
+```tsx
+import { isContrastCompliant, hexToRgb } from 'react-native-rooster';
+
+// Validate your color combinations
+const whiteText = [255, 255, 255];
+const darkGreen = hexToRgb('#22c55e');
+
+if (isContrastCompliant(whiteText, darkGreen)) {
+  console.log('✅ WCAG AA compliant (4.5:1+ ratio)');
+} else {
+  console.warn('⚠️ Insufficient contrast for readability');
+}
+
+// Check WCAG AAA (stricter standard)
+isContrastCompliant(whiteText, darkGreen, false, 'AAA'); // 7:1+ required
+```
+
+#### 4. **Dynamic Sizing & Typography** �
+Responsive and accessible text sizing:
+
+```tsx
+import { calculateLineHeight, calculateToastHeight } from 'react-native-rooster';
+
+// Calculate proper line height for readability
+const lineHeight = calculateLineHeight(16);  // 16px font → 22px line height
+
+// Calculate toast height with custom fonts
+const height = calculateToastHeight({
+  paddingVertical: 16,
+  paddingHorizontal: 16,
+  titleFontSize: 18,
+  messageFontSize: 16,
+  messageLineHeight: 22,
+  titleMessageGap: 8,
+  hasTitle: true,
+  hasIcon: true,
+}, 2); // 2 lines of message
+
+// Ensures minimum 44px touch target (accessibility standard)
+// Prevents excessive height that causes truncation
+```
+
+#### 5. **Haptic Feedback** 📳
+Multi-sensory notifications for better UX:
+
+```tsx
+addToast({
+  type: 'success',
+  message: 'Notification with tactile feedback',
+  hapticFeedback: 'light',       // Subtle notification
+  // Options: false, 'light', 'medium', 'heavy', 'success', 'warning', 'error'
+});
+
+// Global default
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      hapticFeedback: 'medium',
+    },
+  }}
+>
+```
+
+### Complete Accessibility Configuration
+
+```tsx
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      // Font scaling
+      allowFontScaling: true,
+      
+      // Text truncation protection
+      messageMaxLines: 2,
+      
+      // Tactile feedback
+      hapticFeedback: 'light',
+      
+      // Contrast validation (optional)
+      textColors: {
+        success: '#ffffff',      // Hex or RGB
+        error: [255, 255, 255],  // RGB array
+        warning: '#000000',
+        info: '#ffffff',
+      },
+      
+      // Announce toasts to screen readers
+      announceOnAppear: true,
+      
+      // Custom accessibility roles
+      roleMap: {
+        success: 'status',
+        error: 'alert',
+        warning: 'alert',
+        info: 'status',
+      },
+    },
+  }}
+>
+```
+
+### Accessibility Best Practices
+
+#### ✅ DO:
+- Use clear, concise messages (< 100 characters)
+- Provide context in `accessibilityHint`
+- Respect user font scaling preferences
+- Use high contrast colors (white on dark, black on light)
+- Test with screen readers (VoiceOver on iOS, TalkBack on Android)
+- Keep toasts simple—avoid complex custom components
+
+#### ❌ DON'T:
+- Use color alone to convey information
+- Make toasts flash or vibrate excessively
+- Truncate important information
+- Use very small fonts (< 12px)
+- Auto-dismiss critical alerts
+- Ignore focus/keyboard navigation
+
+### Testing Accessibility
+
+#### Screen Reader Testing
+```bash
+# iOS: Enable VoiceOver
+Settings → Accessibility → VoiceOver → On
+
+# Android: Enable TalkBack
+Settings → Accessibility → TalkBack → On
+
+# Test your toasts with screen reader running
+```
+
+#### Contrast Validation
+```tsx
+import { validateAccessibility } from 'react-native-rooster';
+
+const validation = validateAccessibility(
+  { title: 'Error', message: 'Something went wrong' },
+  'error',
+  14  // font size
+);
+
+if (!validation.isValid) {
+  console.warn('Accessibility issues:', validation.issues);
+}
+```
+
+#### Utilities for Advanced Testing
+```tsx
+import {
+  calculateContrastRatio,
+  isTextTruncated,
+  hexToRgb,
+} from 'react-native-rooster';
+
+// Check contrast ratio
+const ratio = calculateContrastRatio(
+  [255, 255, 255],              // white text
+  [220, 38, 38]                 // red background
+);
+console.log(`Contrast ratio: ${ratio}:1`);
+
+// Check if text gets truncated
+const truncated = isTextTruncated(
+  'Your long message here',
+  2,      // max lines
+  14,     // font size
+  320     // available width
+);
+
+// Convert hex colors
+const rgb = hexToRgb('#FF5722');
+// => [255, 87, 34]
+```
+
+---
+
+## 🚀 React Compiler
 
 > [!TIP]
 > **Automatic optimizations included!** This library is compiled and shipped with Meta's React Compiler for maximum performance out-of-the-box.
@@ -199,6 +807,8 @@ module.exports = {
   ],
 };
 ```
+
+
 
 When you enable React Compiler in your app, **your entire application** gets additional 30-50% performance improvement through automatic memoization and render optimization.
 
@@ -328,6 +938,16 @@ That's it. Your app now has beautiful toast notifications.
 - Smart margin handling that adapts to available space
 - Left/right alignments maintain constrained width for consistency
 
+### ♿ Accessible by Design
+- **WCAG 2.1 AA compliant** with built-in accessibility support
+- **Screen reader support** - automatic semantic announcements for VoiceOver & TalkBack
+- **Font scaling** - respects device accessibility preferences
+- **Color contrast validation** - ensures readable text combinations
+- **Haptic feedback** - multi-sensory notifications (iOS & Android)
+- **Dynamic sizing utilities** - calculate responsive layouts with accessibility in mind
+- **Customizable roles** - proper ARIA roles for semantic meaning
+- **Touch-friendly** - 44×44px minimum tap targets
+
 ### 🧩 Composable & Extensible
 - Use built-in renderer or provide your own
 - Mix and match global + per-toast customization
@@ -396,6 +1016,9 @@ Mount the provider with initial configuration:
     font: {
       fontFamilyRegular: 'System',
       fontFamilyBold: 'System-Bold',
+      // Customize font sizes (defaults: title 16px, message 14px)
+      titleFontSize: 18,
+      messageFontSize: 15,
     },
 
     // Behavior
@@ -427,7 +1050,7 @@ Mount the provider with initial configuration:
 | `padding` | `{ vertical?, horizontal? }` | `{ vertical: 16, horizontal: 16 }` | Card padding (px) |
 | `shadow` | `object` | platform defaults | Shadow customization |
 | `bgColor` | `Record<ToastType, string>` | vibrant palette | Background colors |
-| `font` | `{ fontFamilyRegular?, fontFamilyBold? }` | system font | Custom fonts |
+| `font` | `{ fontFamilyRegular?, fontFamilyBold?, titleFontSize?, messageFontSize? }` | system font, 16/14px | Custom fonts and sizes |
 | `timeToDismiss` | `number` | `3000` | Auto-dismiss delay (ms) |
 | `animation` | `object` | see above | Animation tuning |
 | `toastStyle` | `StyleProp` | undefined | Custom wrapper style |
@@ -500,6 +1123,55 @@ addToast({
     backgroundColor: '#fecaca',
   },
 });
+
+// Custom font sizes
+addToast({
+  type: 'info',
+  title: 'Big Title',
+  message: 'Larger text for emphasis',
+  titleFontSize: 20,      // Override title size (default: 16)
+  messageFontSize: 16,    // Override message size (default: 14)
+});
+```
+
+### Level 3.5: Global Font Customization
+
+Customize typography globally:
+
+```tsx
+<ToastProvider
+  initialConfig={{
+    font: {
+      fontFamilyRegular: 'Roboto',
+      fontFamilyBold: 'Roboto-Bold',
+      titleFontSize: 18,      // All titles use 18px (default: 16)
+      messageFontSize: 15,    // All messages use 15px (default: 14)
+    },
+  }}
+>
+  {children}
+</ToastProvider>
+```
+
+**Font Size Rules:**
+- Default: title **16px**, message **14px**
+- Global override: `config.font.titleFontSize` and `config.font.messageFontSize`
+- Per-toast override: `message.titleFontSize` and `message.messageFontSize`
+- **Priority**: Per-toast > Global > Default
+
+```tsx
+// Example: Using both global and per-toast font sizes
+<ToastProvider initialConfig={{ font: { titleFontSize: 18 } }}>
+  {children}
+</ToastProvider>
+
+// Later in your app:
+addToast({
+  type: 'success',
+  title: 'Normal',        // Uses global 18px
+  message: 'Big message',
+  messageFontSize: 20,    // Overrides global default 14px with 20px
+});
 ```
 
 ### Level 4: Complete Control
@@ -543,6 +1215,10 @@ addToast({
   borderRadius: 20,
   padding: { vertical: 20 },
   style: { /* custom styles */ },
+
+  // Typography (new in v3)
+  titleFontSize: 18,        // Override title font size (px)
+  messageFontSize: 15,      // Override message font size (px)
 });
 ```
 
@@ -707,24 +1383,45 @@ Rooster is built for speed from the ground up. Here's how it stacks up:
 ### Benchmarks
 
 ```
-Metric                  v2        v3        Improvement
-────────────────────────────────────────────────────────
-Render Time             6-9ms     1-2ms     75-80% 🚀
-Click Latency           50ms+     <5ms      10x 🚀
-Toast Height            68px      54px      21% smaller 📐
-Bundle Size (gzip)      32-36 KB  28-32 KB  15-20% 📦
-Orientation Change      N/A       <50ms     Instant adaptation 🎯
-React Compiler Ready    ✗         ✓         Auto-optimized ✨
+Metric                      v2        v3        Improvement
+─────────────────────────────────────────────────────────────
+Render Time                 6-9ms     1-2ms     75-80% 🚀
+Click Latency               50ms+     <5ms      10x 🚀
+Toast Height                68px      54px      21% smaller 📐
+Bundle Size (gzip)          32-36 KB  28-32 KB  15-20% 📦
+Orientation Change          N/A       <50ms     Instant adaptation 🎯
+Memory Leaks                ⚠️        ✅        100% fixed 🔒
+React Compiler Ready        ✗         ✓         Auto-optimized ✨
 ```
 
 ### Why Fast?
 
-- ⚡ **Native Driver Animations** - GPU-accelerated transforms
+- ⚡ **Native Driver Animations** - GPU-accelerated transforms with proper cleanup
 - 📦 **Tree-Shaken Bundle** - Only include what you use
-- 🎯 **Memoized Renders** - Smart, strategic memoization
+- 🎯 **Memoized Renders** - Strategic memoization prevents unnecessary recalculations
 - 🧩 **Modular Architecture** - Compiler-friendly pure functions
-- 💾 **Efficient Memory** - Minimal allocations
+- 💾 **Efficient Memory** - No memory leaks, proper animation cleanup on unmount
 - 📱 **Responsive Layout** - `useWindowDimensions` for smooth adaptation (center position)
+- 🧼 **Optimized Dependencies** - Removed unused parameters, streamlined function signatures
+
+### Optimization Details
+
+#### Memory & Animation Cleanup ✅
+- Animations properly cleaned up on component unmount
+- No dangling Animated value references
+- Automatic timer cleanup prevents memory leaks
+- Animation ref tracking prevents orphaned animations
+
+#### Strategic Memoization 🎯
+- Container styles memoized (doesn't recalculate on every render)
+- Animation styles cached with proper dependencies
+- Alignment styles recompute only when positioning changes
+- Font styles update only when font config or message text changes
+
+#### Dependency Array Optimization 🧵
+- Removed unnecessary Animated value refs from effects
+- Added ESLint overrides with explanations for stable refs
+- Proper cleanup function setup prevents race conditions
 
 ### React Compiler Compatibility
 

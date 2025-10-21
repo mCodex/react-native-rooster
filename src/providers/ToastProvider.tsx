@@ -28,29 +28,14 @@ const ToastProvider: React.FC<ToastProviderProps> = ({
     }
   }, [initialConfig]);
 
-  const addToast = useCallback(
-    ({
-      type,
-      title,
-      message,
-      icon,
-      duration,
-      onPress,
-    }: Omit<ToastMessage, 'id'>) => {
-      const toast: ToastMessage = {
-        id: createToastId(),
-        type,
-        title,
-        message,
-        icon,
-        duration,
-        onPress,
-      };
+  const addToast = useCallback((messageData: Omit<ToastMessage, 'id'>) => {
+    const toast: ToastMessage = {
+      id: createToastId(),
+      ...messageData,
+    };
 
-      setMessages((current: ToastMessage[]) => current.concat(toast));
-    },
-    []
-  );
+    setMessages((current: ToastMessage[]) => current.concat(toast));
+  }, []);
 
   const removeToast = useCallback((id?: string) => {
     setMessages((current: ToastMessage[]) => {

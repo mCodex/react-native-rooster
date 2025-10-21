@@ -16,6 +16,7 @@ type ButtonConfig = {
   label: string;
   type: ToastType;
   persistent?: boolean;
+  customFontSize?: boolean;
 };
 
 type ToggleOption<T> = {
@@ -28,6 +29,7 @@ const BUTTONS: ButtonConfig[] = [
   { label: 'Warning toast', type: 'warning' },
   { label: 'Info toast', type: 'info' },
   { label: 'Error toast', type: 'error' },
+  { label: 'Large Font Toast', type: 'success', customFontSize: true },
   { label: 'Persistent toast', type: 'info', persistent: true },
 ];
 
@@ -76,6 +78,17 @@ const ToastDemo: React.FC = () => {
           title: 'Pinned toast',
           message: 'Tap any toast to dismiss it manually.',
           duration: 0,
+        });
+        return;
+      }
+
+      if (config.customFontSize) {
+        addToast({
+          type: config.type,
+          title: 'Custom Font Sizes',
+          message: 'This toast uses larger fonts for emphasis.',
+          titleFontSize: 20,
+          messageFontSize: 18,
         });
         return;
       }
@@ -189,6 +202,14 @@ const ToastDemo: React.FC = () => {
             <Text style={styles.tipText}>
               Toasts stack automatically, respect safe areas, and avoid the
               keyboard when needed.
+            </Text>
+          </View>
+
+          <View style={styles.tipBanner}>
+            <Text style={styles.tipEmoji}>🎨</Text>
+            <Text style={styles.tipText}>
+              Try the "Large Font Toast" button to see per-toast font size
+              customization!
             </Text>
           </View>
         </View>
@@ -360,7 +381,15 @@ const styles = StyleSheet.create({
 });
 
 const App: React.FC = () => (
-  <ToastProvider>
+  <ToastProvider
+    initialConfig={{
+      font: {
+        // Customize font sizes globally (optional)
+        titleFontSize: 17,
+        messageFontSize: 14,
+      },
+    }}
+  >
     <ToastDemo />
   </ToastProvider>
 );
