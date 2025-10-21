@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import type { ViewStyle } from 'react-native';
+import {
+  Animated,
+  Pressable,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 
+import { getToastAlignment, isVerticalPlacement } from '../utils/positioning';
+import { buildToastStyle, toastStyles } from '../utils/styling';
 import type {
   ToastConfig,
   ToastHorizontalPosition,
@@ -9,31 +16,66 @@ import type {
   ToastPlacement,
 } from '../types';
 
-/** Props used by the animated toast card. */
+/**
+ * Props for the Toast component.
+ *
+ * @interface ToastProps
+ * @property message - The toast message to display with optional customizations
+ * @property config - Global toast configuration and styling defaults
+ * @property placement - Vertical position ('top' or 'bottom')
+ * @property horizontalPosition - Horizontal alignment ('left', 'center', or 'right')
+ * @property onRemove - Callback to remove the toast after animation completes
+ *
+ * @example
+ * <Toast
+ *   message={{ id: '1', message: 'Hello' }}
+ *   config={config}
+ *   placement="bottom"
+ *   horizontalPosition="center"
+ *   onRemove={handleRemove}
+ * />
+ */
 export interface ToastProps {
-  /** The toast instance to display. */
   message: ToastMessage;
-  /** Active configuration provided by the container. */
   config: ToastConfig;
-  /** Vertical placement controlling entry direction. */
   placement: ToastPlacement;
-  /** Horizontal alignment selected by the container. */
   horizontalPosition: ToastHorizontalPosition;
-  /** Removes the toast once its exit animation finishes. */
   onRemove: (id: string) => void;
 }
 
-const getHorizontalStyle = (position: ToastHorizontalPosition): ViewStyle => {
-  switch (position) {
-    case 'left':
-      return styles.leftAlign;
-    case 'right':
-      return styles.rightAlign;
-    default:
-      return styles.centerAlign;
-  }
-};
-
+/**
+ * Toast component - displays individual toast notifications with animations.
+ *
+ * Features:
+ * - Enter/exit animations (customizable duration and easing)
+ * - Per-toast customizations (colors, padding, styles)
+ * - Respects press handlers and auto-dismiss timeouts
+ * - Accessible (proper roles and labels for screen readers)
+ * - Touch feedback with hitSlop for comfortable interaction
+ * - **Responsive width**: For top/bottom positions, automatically expands to fill screen width minus margins
+ * - **Orientation-aware**: Automatically adapts when device orientation changes
+ *
+ * Width Behavior:
+ * - **Top/Bottom positions**: Responsive width that respects `marginHorizontal`
+ *   - Width = screenWidth - (2 × marginHorizontal)
+ *   - Automatically updates on orientation change
+ * - **Left/Right positions**: Fixed maximum width (420px) for consistency
+ *
+ * Animation behavior:
+ * - Enters: Slides in from placement edge while fading in
+ * - Auto-dismisses: After configured timeout (if duration > 0)
+ * - Press-dismiss: Immediately starts exit animation
+ * - Exit: Slides back out while fading, removes from DOM when finished
+ *
+ * @example
+ * <Toast
+ *   message={{ id: '1', message: 'Success!', type: 'success' }}
+ *   config={toastConfig}
+ *   placement="bottom"
+ *   horizontalPosition="center"
+ *   onRemove={(id) => console.log(`Toast ${id} removed`)}
+ * />
+ */
 const Toast: React.FC<ToastProps> = ({
   message,
   config,
@@ -41,34 +83,41 @@ const Toast: React.FC<ToastProps> = ({
   horizontalPosition,
   onRemove,
 }) => {
+  const { width: screenWidth } = useWindowDimensions();
   const opacity = useRef(new Animated.Value(0)).current;
   const translate = useRef(new Animated.Value(0)).current;
   const isDismissing = useRef(false);
 
-  const { animation, font, toastStyle, titleStyle, messageStyle, bgColor } =
-    config;
+  // Destructure with defaults for animation and spacing config
+  const {
+    animation,
+    font,
+    titleStyle,
+    messageStyle,
+    marginHorizontal = 16,
+  } = config;
 
   const easing = animation?.easing;
   const appearDuration = animation?.appearDuration ?? 220;
   const disappearDuration = animation?.disappearDuration ?? 180;
   const initialTranslation =
-    (animation?.initialTranslation ?? 24) * (placement === 'top' ? -1 : 1);
+    (animation?.initialTranslation ?? 24) *
+    (isVerticalPlacement(placement) && placement === 'top' ? -1 : 1);
 
   const effectiveDuration = message.duration ?? config.timeToDismiss;
   const shouldAutoDismiss =
     typeof effectiveDuration === 'number' && effectiveDuration > 0;
 
-  const backgroundColor = bgColor[message.type ?? 'info'];
-
+  // Memoize font styling only when font config changes
   const textStyles = useMemo(
     () => ({
       title: [
-        styles.title,
+        toastStyles.title,
         font?.fontFamilyBold && { fontFamily: font.fontFamilyBold },
         titleStyle,
       ],
       message: [
-        styles.message,
+        toastStyles.message,
         font?.fontFamilyRegular && { fontFamily: font.fontFamilyRegular },
         messageStyle,
       ],
@@ -76,26 +125,11 @@ const Toast: React.FC<ToastProps> = ({
     [font?.fontFamilyBold, font?.fontFamilyRegular, titleStyle, messageStyle]
   );
 
-  // Compute per-toast style overrides
-  const toastStyleOverride = useMemo(() => {
-    const overrides: Record<string, any> = {};
-    if (message.backgroundColor) {
-      overrides.backgroundColor = message.backgroundColor;
-    }
-    if (message.borderRadius !== undefined) {
-      overrides.borderRadius = message.borderRadius;
-    }
-    if (message.padding) {
-      if (message.padding.vertical !== undefined) {
-        overrides.paddingVertical = message.padding.vertical;
-      }
-      if (message.padding.horizontal !== undefined) {
-        overrides.paddingHorizontal = message.padding.horizontal;
-      }
-    }
-    return overrides;
-  }, [message.backgroundColor, message.borderRadius, message.padding]);
-
+  /**
+   * Initiates toast dismissal animation.
+   * Safe to call multiple times (guarded by isDismissing ref).
+   * Ensures onRemove is only called after animation completes.
+   */
   const runDismiss = useCallback(() => {
     if (isDismissing.current) return;
     isDismissing.current = true;
@@ -128,11 +162,20 @@ const Toast: React.FC<ToastProps> = ({
     translate,
   ]);
 
+  /**
+   * Handles user press on the toast.
+   * Calls message.onPress if provided, then dismisses.
+   */
   const handlePress = useCallback(() => {
     message.onPress?.();
     runDismiss();
   }, [message, runDismiss]);
 
+  /**
+   * Entry animation and auto-dismiss setup.
+   * Plays enter animation immediately, then schedules auto-dismiss if enabled.
+   * Cleanup removes the timeout to prevent memory leaks.
+   */
   useEffect(() => {
     translate.setValue(initialTranslation);
 
@@ -170,25 +213,29 @@ const Toast: React.FC<ToastProps> = ({
     opacity,
   ]);
 
+  /**
+   * Compute complete toast style from utilities and overrides.
+   * Uses buildToastStyle to manage complex style hierarchy.
+   */
+  const alignmentStyle = useMemo(
+    () =>
+      getToastAlignment(
+        horizontalPosition,
+        placement,
+        marginHorizontal,
+        screenWidth
+      ),
+    [horizontalPosition, placement, marginHorizontal, screenWidth]
+  );
+
+  const animationStyle = useMemo(
+    () => ({ opacity, transform: [{ translateY: translate }] }),
+    [opacity, translate]
+  );
+
   const containerStyle = useMemo(
-    () => [
-      styles.toast,
-      getHorizontalStyle(horizontalPosition),
-      { backgroundColor },
-      { opacity, transform: [{ translateY: translate }] },
-      toastStyleOverride,
-      toastStyle,
-      message.style,
-    ],
-    [
-      backgroundColor,
-      horizontalPosition,
-      opacity,
-      toastStyle,
-      translate,
-      toastStyleOverride,
-      message.style,
-    ]
+    () => buildToastStyle(config, message, alignmentStyle, animationStyle),
+    [config, message, alignmentStyle, animationStyle]
   );
 
   return (
@@ -197,15 +244,15 @@ const Toast: React.FC<ToastProps> = ({
         accessibilityRole="button"
         accessibilityLabel={message.title ?? message.message}
         onPress={handlePress}
-        style={styles.pressable}
+        style={toastStyles.pressable}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         {message.icon ? (
-          <View style={styles.icon} pointerEvents="none">
+          <View style={toastStyles.icon} pointerEvents="none">
             {message.icon}
           </View>
         ) : null}
-        <View style={styles.content} pointerEvents="none">
+        <View style={toastStyles.content} pointerEvents="none">
           {message.title && (
             <Text
               style={textStyles.title}
@@ -229,57 +276,3 @@ const Toast: React.FC<ToastProps> = ({
 };
 
 export default React.memo(Toast);
-
-const styles = StyleSheet.create({
-  toast: {
-    minWidth: 200,
-    maxWidth: 420,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 12 },
-    shadowRadius: 16,
-    elevation: 8,
-    backgroundColor: '#1f2937',
-  },
-  centerAlign: {
-    alignSelf: 'center',
-    width: '100%',
-  },
-  leftAlign: {
-    alignSelf: 'flex-start',
-    marginEnd: 16,
-  },
-  rightAlign: {
-    alignSelf: 'flex-end',
-    marginStart: 16,
-  },
-  pressable: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    minHeight: 44,
-  },
-  icon: {
-    marginRight: 12,
-    marginTop: 2,
-    flexShrink: 0,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  message: {
-    color: '#fff',
-    fontSize: 14,
-    lineHeight: 20,
-  },
-});

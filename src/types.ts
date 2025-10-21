@@ -96,6 +96,8 @@ export interface ToastConfig {
     vertical?: number;
     horizontal?: number;
   };
+  /** Global horizontal margin for toast cards (default: 16). Only applies to top/bottom positions. */
+  marginHorizontal?: number;
   /** Shadow customization for toast cards. */
   shadow?: {
     color?: string;
