@@ -1,6 +1,6 @@
 {
   "name": "react-native-rooster",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Fully-customisable toast notifications for React Native apps. Lightweight, animated, and built for delightful UX.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
