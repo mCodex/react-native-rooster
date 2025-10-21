@@ -17,6 +17,18 @@
 
 ---
 
+## 🎬 Live Demo
+
+<div align="center">
+
+![react-native-rooster demo](./example.gif)
+
+**See Rooster in action** • [Run locally](#-local-development) • [Explore the example app](./example)
+
+</div>
+
+---
+
 ## Why Rooster?
 
 ⚡ **1-2ms renders** | 🎨 **Fully customizable** | ♿ **WCAG 2.1 AA accessible** | 📱 **Responsive** | 🔐 **100% TypeScript**

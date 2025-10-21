@@ -1,7 +1,7 @@
 {
   "name": "react-native-rooster",
   "version": "3.2.1",
-  "description": "Fully-customisable toast notifications for React Native apps. Lightweight, animated, and built for delightful UX.",
+  "description": "High-performance, fully-customizable and accessible toast notifications for React Native. WCAG 2.1 AA compliant, fully typed, zero config.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
