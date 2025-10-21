@@ -4,102 +4,449 @@
 
 **Fully-customisable toast notifications for React Native apps**
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-3.2.0-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/typescript-strict-blue?style=for-the-badge)
 
 *Lightweight • Animated • Lightning-fast • TypeScript-first*
 
-[📚 Documentation](#-table-of-contents) • [🚀 Quick Start](#-quick-start) • [🎨 Personalization](#-personalization-guide) • [📋 Changelog](#-v2-to-v3-upgrade)
+[📚 Docs](#quick-start) • [🚀 Quick Start](#quick-start) • [✨ Features](#features) • [⚡ Performance](#performance)
 
 </div>
 
 ---
 
-## 📚 Table of Contents
+## Why Rooster?
 
-- [Why Rooster?](#-why-rooster)
-- [Visual Demo](#-visual-demo)
-- [✨ What's New in v3](#-whats-new-in-v3)
-- [� React Compiler Integration](#-react-compiler-integration)
-- [�📦 Installation](#-installation)
-- [🚀 Quick Start](#-quick-start)
-- [🎯 Features](#-features)
-- [⚙️ Configuration](#️-configuration-reference)
-- [🎨 Personalization Guide](#-personalization-guide)
-- [🧰 API Reference](#-composable-api)
-- [🎭 Advanced: Custom Renderers](#-designing-beautiful-toasts)
-- [📊 v2 vs v3: What's Changed](#-v2-vs-v3-upgrade-guide)
-- [⚡ Performance](#-performance)
-- [🏃 Example App](#-example-app)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+⚡ **1-2ms renders** | 🎨 **Fully customizable** | ♿ **WCAG 2.1 AA accessible** | 📱 **Responsive** | 🔐 **100% TypeScript**
 
----
+Rooster handles the complex parts (safe areas, keyboard visibility, animations, accessibility) so you can focus on your app.
 
-## ❓ Why Rooster?
+```tsx
+import { ToastProvider, useToast } from 'react-native-rooster';
 
-> [!TIP]
-> Toast notifications that just work. No complexity, no headaches—just beautiful notifications that your users will love.
+export default function App() {
+  return (
+    <ToastProvider>
+      <YourApp />
+    </ToastProvider>
+  );
+}
 
-### Core Benefits
-
-| Benefit | Details |
-|---------|---------|
-| ⚡️ **Lightning Fast** | Renders in 1-2ms, responds to clicks in <5ms |
-| 🎨 **Infinitely Customizable** | Global styles + per-toast overrides = unlimited possibilities |
-| 🧩 **Composable** | Drop in your own renderer or use the elegant built-in card |
-| 💪 **TypeScript First** | Complete type safety with JSDoc hints for autocomplete |
-| 🌍 **Production Ready** | Used in apps with millions of users worldwide |
-| 🧭 **Smart Positioning** | Respects safe areas, keyboard, and notches automatically |
-
-> [!NOTE]
-> **Safe Area Magic** ✨  
-> Rooster automatically handles device notches, keyboard visibility, and safe area insets. Your toasts will always be in the perfect spot.
+function YourApp() {
+  const { addToast } = useToast();
+  
+  return (
+    <Button
+      onPress={() =>
+        addToast({
+          type: 'success',
+          title: 'Success!',
+          message: 'Your action completed.',
+        })
+      }
+    />
+  );
+}
+```
 
 ---
 
-## 🎬 Visual Demo
+## Features
+
+### 🎨 Beautiful by Default
+- 4 toast types: success, error, warning, info
+- Smooth animations with native driver acceleration
+- Elegant shadows and rounded corners
+
+### 📱 Responsive & Adaptive
+- **Dynamic width** for center positioning (respects screen size)
+- **Orientation-aware** — adapts instantly on device rotation
+- **6 position options** (top/bottom × left/center/right)
+- Smart keyboard avoidance
+
+### ♿ Accessible
+- **WCAG 2.1 AA compliant**
+- Screen reader support with semantic roles
+- Keyboard navigation (Escape to dismiss)
+- Haptic feedback for tactile notifications
+- Font scaling & contrast validation utilities
+
+### ⚡ Performance
+- 75-80% faster than v2 (1-2ms renders)
+- Memory leak prevention
+- Strategic memoization
+- React Compiler compatible
+- Tree-shakeable bundle (28-32 KB gzip)
+
+### 💪 Developer Experience
+- TypeScript strict mode
+- Full type safety with JSDoc
+- Composable & extensible
+- Zero configuration needed
+- Per-toast or global configuration
+
+---
+
+## Installation
+
+```bash
+npm install react-native-rooster
+# or
+yarn add react-native-rooster
+```
+
+Requires: React Native 0.60+ | TypeScript 4.0+
+
+---
+
+## Quick Start
+
+### 1. Wrap Your App
+```tsx
+import { ToastProvider } from 'react-native-rooster';
+
+export default function App() {
+  return (
+    <ToastProvider>
+      <YourApp />
+    </ToastProvider>
+  );
+}
+```
+
+### 2. Use the Hook
+```tsx
+import { useToast } from 'react-native-rooster';
+
+function MyComponent() {
+  const { addToast } = useToast();
+  
+  return (
+    <Button
+      onPress={() =>
+        addToast({
+          type: 'success',
+          title: 'Perfect!',
+          message: 'This is a toast notification.',
+          duration: 3000,
+        })
+      }
+    />
+  );
+}
+```
+
+### 3. That's It!
+Positioning, animations, accessibility, and keyboard handling are automatic.
+
+---
+
+## Configuration
+
+### Global Setup
+```tsx
+<ToastProvider
+  initialConfig={{
+    // Positioning
+    position: { vertical: 'bottom', horizontal: 'center' },
+    spacing: 12,
+    offset: 20,
+    
+    // Styling
+    borderRadius: 12,
+    padding: { vertical: 16, horizontal: 16 },
+    shadow: { opacity: 0.2, offset: { width: 0, height: 12 } },
+    
+    // Typography
+    font: {
+      titleFontSize: 16,
+      messageFontSize: 14,
+    },
+    
+    // Timing
+    timeToDismiss: 3000,
+    
+    // Accessibility
+    accessibility: {
+      allowFontScaling: true,
+      hapticFeedback: 'light',
+    },
+  }}
+>
+  <App />
+</ToastProvider>
+```
+
+### Per-Toast Options
+```tsx
+addToast({
+  type: 'success',
+  title: 'Success',
+  message: 'Your message here',
+  
+  // Customization
+  backgroundColor: '#10b981',
+  duration: 2000,
+  onPress: () => console.log('Pressed'),
+  icon: <Icon />,
+  
+  // Accessibility
+  accessibilityLabel: 'Success notification',
+  accessibilityHint: 'Double tap to dismiss',
+  hapticFeedback: 'success',
+  allowFontScaling: true,
+});
+```
+
+---
+
+## Toast Types
+
+```tsx
+addToast({ type: 'success', message: 'All good!' });  // Green
+addToast({ type: 'error', message: 'Oh no!' });       // Red
+addToast({ type: 'warning', message: 'Watch out!' }); // Yellow
+addToast({ type: 'info', message: 'FYI' });           // Blue
+```
+
+---
+
+## Accessibility
+
+### Screen Reader Support
+Automatic semantic announcements:
+```tsx
+addToast({
+  type: 'success',
+  title: 'Payment Processed',
+  message: 'Order #12345 confirmed',
+  // Announces: "Success notification. Payment Processed. Order #12345 confirmed."
+});
+```
+
+### Keyboard Navigation
+- **Web**: Press Escape to dismiss
+- **iOS/Android**: Standard accessibility gestures
+
+### Haptic Feedback
+```tsx
+addToast({
+  type: 'success',
+  message: 'Done!',
+  hapticFeedback: 'success',  // Options: 'light', 'medium', 'success', 'error'
+});
+```
+
+### Font Scaling
+```tsx
+<ToastProvider
+  initialConfig={{
+    accessibility: {
+      allowFontScaling: true,  // Respects device text size settings
+    },
+  }}
+>
+```
+
+### Contrast Validation
+```tsx
+import { isContrastCompliant, hexToRgb } from 'react-native-rooster';
+
+const text = [255, 255, 255];      // white
+const bg = hexToRgb('#22c55e');    // green
+
+if (isContrastCompliant(text, bg)) {
+  console.log('✅ WCAG AA compliant');
+}
+```
+
+---
+
+## Advanced Usage
+
+### Custom Renderer
+```tsx
+<ToastProvider
+  initialConfig={{
+    renderToast: ({ message, defaultToast }) => (
+      <MyCustomToastStyle>
+        {defaultToast}
+      </MyCustomToastStyle>
+    ),
+  }}
+>
+  <App />
+</ToastProvider>
+```
+
+### Utilities
+```tsx
+import {
+  // Sizing
+  calculateToastHeight,
+  calculateResponsiveWidth,
+  
+  // Accessibility
+  generateAccessibilityLabel,
+  generateAccessibilityHint,
+  calculateContrastRatio,
+  
+  // Haptics
+  triggerHaptic,
+  HAPTIC_PATTERNS,
+} from 'react-native-rooster';
+
+// Example
+const height = calculateToastHeight({ paddingVertical: 16 }, 2);
+triggerHaptic('light');
+```
+
+---
+
+## Performance
+
+| Metric | v2 | v3.2.0 | Improvement |
+|--------|-----|--------|-------------|
+| Render Time | 6-9ms | 1-2ms | 75-80% 🚀 |
+| Click Response | 50ms+ | <5ms | 10x ⚡ |
+| Bundle Size | 32-36 KB | 28-32 KB | 15-20% 📦 |
+| Memory Leaks | ⚠️ Yes | ✅ Fixed | 100% 🔒 |
+
+**Optimizations in v3.2.0**:
+- ✅ Memory leak prevention with animation cleanup
+- ✅ Strategic memoization throughout
+- ✅ Removed unnecessary re-render triggers
+- ✅ React Compiler compatible
+
+---
+
+## API Reference
+
+### `useToast()`
+```tsx
+const { addToast, removeToast, setToastConfig } = useToast();
+
+// Add toast
+addToast({ type: 'success', message: 'Done!' });
+
+// Remove by ID or last toast
+removeToast(id);
+removeToast();  // Removes most recent
+
+// Update config
+setToastConfig({ timeToDismiss: 2000 });
+```
+
+### Toast Message Props
+```typescript
+interface ToastMessage {
+  type?: 'success' | 'error' | 'warning' | 'info';
+  title?: string;
+  message: string;
+  icon?: ReactNode;
+  duration?: number;
+  onPress?: () => void;
+  style?: ViewStyle;
+  
+  // Customization
+  backgroundColor?: string;
+  borderRadius?: number;
+  titleFontSize?: number;
+  messageFontSize?: number;
+  
+  // Accessibility
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  hapticFeedback?: 'light' | 'medium' | 'success' | 'error';
+  allowFontScaling?: boolean;
+  messageMaxLines?: number;
+}
+```
+
+---
+
+## v3.2.0 Highlights
+
+### 🚀 What's New
+- **Memory leak prevention** — animations cleanup on unmount
+- **Keyboard navigation** — Escape key on web
+- **Haptic feedback** — multi-sensory notifications
+- **Performance boost** — 75-80% faster renders
+- **Better accessibility** — WCAG 2.1 AA compliant
+
+### ✅ Backward Compatible
+No breaking changes. All v3.0+ code works unchanged.
+
+---
+
+## Example App
+
+```bash
+cd example
+yarn install
+yarn start
+
+# Choose: i (iOS) or a (Android)
+```
+
+---
+
+## Contributing
+
+We ❤️ contributions!
+
+```bash
+git clone https://github.com/mCodex/react-native-rooster.git
+cd react-native-rooster
+
+yarn install
+yarn example start
+yarn lint
+yarn test
+yarn typecheck
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+---
+
+## v3 Migration
+
+**No migration needed!** v3 is 100% backward compatible with v2.
+
+```tsx
+// Your v2 code works as-is
+import { useToast } from 'react-native-rooster';
+const { addToast } = useToast();
+addToast({ type: 'success', message: 'Still works!' });
+```
+
+---
+
+## Resources
+
+- 📖 [Full Release Notes](./RELEASE_NOTES.md)
+- 🐛 [Report Issue](https://github.com/mCodex/react-native-rooster/issues)
+- 💬 [Discussions](https://github.com/mCodex/react-native-rooster/discussions)
+- ⭐ [GitHub](https://github.com/mCodex/react-native-rooster)
+
+---
+
+## License
+
+MIT © [Mateus Andrade](https://github.com/mCodex)
+
+---
 
 <div align="center">
 
-![Rooster Toast Notifications Demo](./example.gif)
+**Made with ❤️ for the React Native community**
 
-*Smooth animations, beautiful UI, and perfectly positioned toasts across all devices*
+[⭐ Star on GitHub](https://github.com/mCodex/react-native-rooster) • [🐛 Report Issue](https://github.com/mCodex/react-native-rooster/issues) • [💬 Discussions](https://github.com/mCodex/react-native-rooster/discussions)
 
 </div>
 
----
-
-## ✨ What's New in v3
-
-> [!IMPORTANT]
-> **Version 3.0 is here!** 🎉  
-> The most feature-rich, polished, and performant version yet.
-
-### 🚀 Major Improvements
-
-#### 1. **Responsive Width & Orientation-Aware** 📱
-- **Smart width handling** for top/bottom CENTER position using `useWindowDimensions`
-- Automatically expands to fill screen width (minus margins) on mobile and tablets
-- **Instantly adapts** when device rotates or screen size changes
-- For top/bottom LEFT/RIGHT: maintains constrained width with proper alignment
-- For left/right positions: maintains fixed maximum width (420px)
-- Perfect for landscape, split-screen, and tablet layouts
-
-```tsx
-// Automatically responsive for center position!
-addToast({
-  message: 'Center toast: Portrait takes full width. Landscape: adapts perfectly!',
-  type: 'info'
-  // horizontalPosition defaults to 'center'
-});
-
-// Left/right alignments stay constrained
-addToast({
-  message: 'Left-aligned: stays compact and aligned',
-  horizontalPosition: 'left'
-});
 ```
 
 #### 2. **Elegant Padding System** 📐
