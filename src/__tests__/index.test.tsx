@@ -12,23 +12,23 @@ jest.mock('react-native-safe-area-context', () => ({
 
 jest.mock('../components/ToastContainer', () => {
   const ReactNative = require('react-native');
-  const React = require('react');
+  const ReactModule = require('react');
 
   return ({
     messages,
   }: {
     messages: Array<{ id: string; title?: string; message: string }>;
   }) => (
-    <React.Fragment>
+    <ReactModule.Fragment>
       {messages.map((toast) => (
-        <React.Fragment key={toast.id}>
+        <ReactModule.Fragment key={toast.id}>
           {toast.title ? (
             <ReactNative.Text>{toast.title}</ReactNative.Text>
           ) : null}
           <ReactNative.Text>{toast.message}</ReactNative.Text>
-        </React.Fragment>
+        </ReactModule.Fragment>
       ))}
-    </React.Fragment>
+    </ReactModule.Fragment>
   );
 });
 

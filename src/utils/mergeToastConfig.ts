@@ -44,6 +44,27 @@ const mergeToastConfig = (
     }
   }
 
+  if (base.padding || patch.padding) {
+    merged.padding = {
+      ...(base.padding ?? {}),
+      ...(patch.padding ?? {}),
+    };
+  }
+
+  if (base.shadow || patch.shadow) {
+    merged.shadow = {
+      ...(base.shadow ?? {}),
+      ...(patch.shadow ?? {}),
+    };
+  }
+
+  if (base.accessibility || patch.accessibility) {
+    merged.accessibility = {
+      ...(base.accessibility ?? {}),
+      ...(patch.accessibility ?? {}),
+    };
+  }
+
   return merged;
 };
 

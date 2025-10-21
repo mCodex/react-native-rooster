@@ -19,6 +19,12 @@ export const DEFAULT_TOAST_CONFIG: ToastConfig = {
     horizontal: 'center',
   },
   offset: 20,
+  font: {
+    fontFamilyRegular: null,
+    fontFamilyBold: null,
+    messageFontSize: 14,
+    titleFontSize: 16,
+  },
   animation: {
     initialTranslation: 24,
     appearDuration: 220,

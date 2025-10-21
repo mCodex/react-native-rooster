@@ -7,6 +7,7 @@
 ![Version](https://img.shields.io/badge/version-3.2.0-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/typescript-strict-blue?style=for-the-badge)
+![Coverage](https://img.shields.io/badge/coverage-92.18%25-brightgreen?style=for-the-badge)
 
 *Lightweight • Animated • Lightning-fast • TypeScript-first*
 
