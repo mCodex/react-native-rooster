@@ -1,6 +1,11 @@
 import { createContext } from 'react';
+
 import type { ToastContextProps } from '../types';
 
-const ToastContext = createContext<ToastContextProps>({} as ToastContextProps);
+/**
+ * Internal context backing the `useToast` hook.
+ * Defaults to undefined so consumers receive a descriptive error.
+ */
+const ToastContext = createContext<ToastContextProps | undefined>(undefined);
 
 export default ToastContext;

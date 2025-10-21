@@ -1,26 +1,37 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Keyboard, KeyboardEvent } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Keyboard, Platform } from 'react-native';
+import type { KeyboardEvent } from 'react-native';
 
+/**
+ * Tracks the visible keyboard height to avoid covering bottom-aligned toasts.
+ * The hook returns a single value wrapped in an array to preserve the legacy signature.
+ */
 const useKeyboard = (): [number] => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  const onKeyboardDidShow = useCallback((e: KeyboardEvent): void => {
-    setKeyboardHeight(e.endCoordinates.height + 20);
+  const handleKeyboardShow = useCallback((event: KeyboardEvent) => {
+    const height = event.endCoordinates?.height ?? 0;
+    setKeyboardHeight(height);
   }, []);
 
-  const onKeyboardDidHide = useCallback((): void => {
+  const handleKeyboardHide = useCallback(() => {
     setKeyboardHeight(0);
   }, []);
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
-    Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
-    return (): void => {
-      Keyboard.removeAllListeners('keyboardDidShow');
-      Keyboard.removeAllListeners('keyboardDidHide');
+    const showSub = Keyboard.addListener(showEvent, handleKeyboardShow);
+    const hideSub = Keyboard.addListener(hideEvent, handleKeyboardHide);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
     };
-  }, []);
+  }, [handleKeyboardShow, handleKeyboardHide]);
 
   return [keyboardHeight];
 };

@@ -1,81 +1,92 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import ToastContainer from 'components/ToastContainer';
-import ToastContext from 'contexts/ToastContext';
-import type { ToastMessage, ToastConfig, ToastProviderProps } from '../types';
+import ToastContainer from '../components/ToastContainer';
+import { DEFAULT_TOAST_CONFIG } from '../constants/defaultConfig';
+import ToastContext from '../contexts/ToastContext';
+import type { ToastConfig, ToastMessage, ToastProviderProps } from '../types';
+import createToastId from '../utils/createToastId';
+import mergeToastConfig from '../utils/mergeToastConfig';
 
-const ToastProvider: React.FC<ToastProviderProps> = ({ 
+/**
+ * Top-level provider responsible for storing toast messages and configuration.
+ */
+const ToastProvider: React.FC<ToastProviderProps> = ({
   children,
-  initialConfig
+  initialConfig,
 }) => {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
-  const [config, setConfig] = useState<ToastConfig>({
-    bgColor: {
-      error: '#d92027',
-      success: '#35d0ba',
-      warning: '#ff9100',
-      info: '#7890f0',
-    },
-    timeToDismiss: 3000,
-    ...initialConfig,
-  });
+  const [config, setConfig] = useState<ToastConfig>(() =>
+    mergeToastConfig(DEFAULT_TOAST_CONFIG, initialConfig ?? {})
+  );
+
+  useEffect(() => {
+    if (initialConfig) {
+      setConfig((current: ToastConfig) =>
+        mergeToastConfig(current, initialConfig)
+      );
+    }
+  }, [initialConfig]);
 
   const addToast = useCallback(
-    ({ type, title, message }: Omit<IToastMessage, 'id'>) => {
-      const id = Math.random().toString(36).substring(7);
-
-      const toast = {
-        id,
+    ({
+      type,
+      title,
+      message,
+      icon,
+      duration,
+      onPress,
+    }: Omit<ToastMessage, 'id'>) => {
+      const toast: ToastMessage = {
+        id: createToastId(),
         type,
         title,
         message,
+        icon,
+        duration,
+        onPress,
       };
 
-      setMessages((prevState) => prevState.concat([toast]));
+      setMessages((current: ToastMessage[]) => current.concat(toast));
     },
-    [],
+    []
   );
 
-  const removeToast = useCallback(
-    (id?: string) => {
-      // Use requestAnimationFrame to ensure removal happens during the next frame
-      // This prevents any visual glitches or blinking during state updates
-      requestAnimationFrame(() => {
-        if (id) {
-          setMessages((state) => state.filter((s) => s.id !== id));
-        } else if (messages.length > 0) {
-          // Use slice instead of spread operator
-          const messagesClone = messages.slice(0, messages.length - 1);
-          setMessages(messagesClone);
-        }
-      });
-    },
-    [messages],
-  );
-
-  const setToastConfig = useCallback((updatedConfig: IConfig) => {
-    setConfig((state) => {
-      // merge top-level and deep bgColor using Object.assign instead of spread
-      const merged: IConfig = Object.assign({}, state, updatedConfig);
-      if (updatedConfig.bgColor) {
-        merged.bgColor = Object.assign({}, state.bgColor, updatedConfig.bgColor);
+  const removeToast = useCallback((id?: string) => {
+    setMessages((current: ToastMessage[]) => {
+      if (id) {
+        return current.filter((toast: ToastMessage) => toast.id !== id);
       }
-      return merged;
+
+      if (current.length <= 1) {
+        return [];
+      }
+
+      return current.slice(0, -1);
     });
   }, []);
 
-  const contextValues = useMemo(
+  const setToastConfig = useCallback((partialConfig: Partial<ToastConfig>) => {
+    setConfig((current: ToastConfig) =>
+      mergeToastConfig(current, partialConfig)
+    );
+  }, []);
+
+  const contextValue = useMemo(
     () => ({ addToast, removeToast, setToastConfig }),
-    [addToast, removeToast, setToastConfig],
+    [addToast, removeToast, setToastConfig]
   );
 
   return (
     <SafeAreaProvider>
-    <ToastContext.Provider value={contextValues}>
-      {children}
-      <ToastContainer messages={messages} toastConfig={config} />
-    </ToastContext.Provider>
+      <ToastContext.Provider value={contextValue}>
+        {children}
+        <ToastContainer
+          messages={messages}
+          toastConfig={config}
+          onRemove={(id: string) => removeToast(id)}
+        />
+      </ToastContext.Provider>
     </SafeAreaProvider>
   );
 };

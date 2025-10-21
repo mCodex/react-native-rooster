@@ -1,129 +1,161 @@
 {
   "name": "react-native-rooster",
   "version": "2.0.1",
-  "type": "module",
-  "description": "Your toast solution for react-native apps",
-  "main": "build/index.js",
-  "react-native": "build/index.js",
-  "module": "build/index.es.js",
-  "jsnext:main": "build/index.es.js",
-  "types": "build/index.d.ts",
-  "typings": "build/index.d.ts",
+  "description": "Fully-customisable toast notifications for React Native apps. Lightweight, animated, and built for delightful UX.",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "import": "./build/index.es.js",
-      "require": "./build/index.js",
-      "default": "./build/index.js"
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
     },
     "./package.json": "./package.json"
   },
-  "sideEffects": false,
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "react-native.config.js",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "example": "yarn workspace react-native-rooster-example",
+    "test": "jest",
+    "typecheck": "tsc",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "clean": "del-cli lib",
+    "prepare": "bob build",
+    "release": "release-it --only-version"
+  },
   "keywords": [
     "react-native",
-    "react-native-rooster",
     "ios",
-    "android",
-    "toast"
+    "android"
   ],
-  "author": "mCodex",
-  "license": "MIT",
-  "homepage": "https://mcodex.dev/react-native-rooster/",
-  "bugs": {
-    "url": "https://github.com/mcodex/react-native-rooster/issues"
-  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mcodex/react-native-rooster.git"
+    "url": "git+https://github.com/mCodex/react-native-rooster.git"
   },
-  "scripts": {
-    "build": "rimraf -rf build && rollup -c",
-    "prepublish": "yarn build",
-    "test": "jest --coverage",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "validate": "yarn type-check && yarn lint && yarn test"
+  "author": "Mateus Andrade <mat.andrade@live.com> (https://github.com/mCodex)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mCodex/react-native-rooster/issues"
+  },
+  "homepage": "https://github.com/mCodex/react-native-rooster#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/compat": "^1.4.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.38.0",
+    "@evilmartians/lefthook": "^2.0.0",
+    "@react-native/babel-preset": "0.82.1",
+    "@react-native/eslint-config": "^0.82.1",
+    "@release-it/conventional-changelog": "^10.0.1",
+    "@testing-library/react-native": "^12.5.2",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.2.2",
+    "commitlint": "^20.1.0",
+    "del-cli": "^7.0.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
+    "prettier": "^3.6.2",
+    "react": "19.1.0",
+    "react-native": "0.82.1",
+    "react-native-builder-bob": "^0.40.13",
+    "react-native-safe-area-context": "^4.12.5",
+    "react-test-renderer": "19.1.0",
+    "release-it": "^19.0.5",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-safe-area-context": "*"
+    "react-native-safe-area-context": ">=5.6.0"
   },
-  "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.27.1",
-    "@babel/preset-env": "^7.27.2",
-    "@babel/preset-react": "^7.27.1",
-    "@babel/preset-typescript": "^7.27.1",
-    "@eslint/compat": "^1.2.9",
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.26.0",
-    "@rollup/plugin-alias": "^5.1.1",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^28.0.3",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@testing-library/jest-native": "^5.4.3",
-    "@testing-library/react-hooks": "^8.0.1",
-    "@testing-library/react-native": "^13.2.0",
-    "@types/jest": "^29.5.14",
-    "@types/react": "^19.1.4",
-    "@types/react-native": "^0.73.0",
-    "@types/react-test-renderer": "^19.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.32.1",
-    "@typescript-eslint/parser": "^8.32.1",
-    "babel-jest": "^29.7.0",
-    "esbuild": "^0.25.4",
-    "eslint": "^9.26.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-import-resolver-typescript": "^4.3.4",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.4.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "globals": "^16.1.0",
-    "jest": "^29.7.0",
-    "prettier": "^3.5.3",
-    "react": "^19.1.0",
-    "react-native": "^0.79.2",
-    "react-test-renderer": "^19.1.0",
-    "rimraf": "^6.0.1",
-    "rollup": "^4.40.2",
-    "rollup-plugin-dts": "^6.2.1",
-    "rollup-plugin-esbuild": "^6.2.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-typescript2": "^0.36.0",
-    "ts-jest": "^29.3.2",
-    "tslib": "^2.8.1",
-    "typescript": "^5.8.3"
-  },
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@3.6.1",
   "jest": {
     "preset": "react-native",
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-native/extend-expect"
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
     ],
-    "moduleDirectories": [
-      "node_modules",
-      "src"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
+    "testPathIgnorePatterns": [
+      "<rootDir>/old_src/"
     ]
   },
-  "standard": {
-    "ignore": [
-      "node_modules/",
-      "build/"
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
-  "dependencies": {
-    "react-native-safe-area-context": "^5.4.0"
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
+    }
+  },
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "create-react-native-library": {
+    "languages": "js",
+    "type": "library",
+    "version": "0.54.7"
   }
 }
