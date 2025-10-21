@@ -9,5 +9,7 @@ export type {
   ToastContextProps,
   ToastProviderProps,
   ToastPlacement,
+  ToastHorizontalPosition,
+  ToastPosition,
   ToastType,
 } from './types';

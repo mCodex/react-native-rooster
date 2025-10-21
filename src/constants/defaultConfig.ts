@@ -13,6 +13,11 @@ export const DEFAULT_TOAST_CONFIG: ToastConfig = {
   timeToDismiss: 3000,
   spacing: 12,
   placement: 'bottom',
+  horizontalPosition: 'center',
+  position: {
+    vertical: 'bottom',
+    horizontal: 'center',
+  },
   offset: 20,
   animation: {
     initialTranslation: 24,

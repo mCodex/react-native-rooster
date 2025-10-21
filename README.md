@@ -91,7 +91,7 @@ export default function App() {
 
 - 🌈 **Themes & fonts** – override per-variant colours and fonts.
 - 🪄 **Enter/exit animations** – configure easing, duration, and offset.
-- 🧭 **Placement control** – render from the top or bottom and tweak spacing/off-sets.
+- 🧭 **Flexible positioning** – align the stack top/bottom and left/center/right with safe-area awareness.
 - 🔔 **Per-toast behaviour** – set custom duration, icons, and press handlers.
 - 🧱 **Render override** – supply `renderToast` to swap the default card while keeping stack logic.
 - 🧪 **Strict TypeScript** – rich typings with `ToastMessage`, `ToastConfig`, and context helpers.
@@ -103,6 +103,8 @@ export default function App() {
 | `bgColor` | `Record<'success' \| 'error' \| 'warning' \| 'info', string>` | vibrant palette | Background colours per toast type. |
 | `timeToDismiss` | `number` | `3000` | Global auto-dismiss duration (ms). Set `0` to keep toasts until manual removal. |
 | `placement` | `'top' \| 'bottom'` | `'bottom'` | Screen edge for the stack. |
+| `horizontalPosition` | `'left' \| 'center' \| 'right'` | `'center'` | Horizontal alignment for the toast stack. |
+| `position` | `{ vertical?: 'top' \| 'bottom'; horizontal?: 'left' \| 'center' \| 'right' }` | `undefined` | Override both axes at once; takes precedence over `placement`/`horizontalPosition`. |
 | `spacing` | `number` | `12` | Gap between stacked toasts. |
 | `offset` | `number` | `20` | Additional inset from the safe area edge. |
 | `font.fontFamilyRegular` | `string` | `undefined` | Custom family for message text. |
@@ -138,7 +140,7 @@ export default function App() {
 ```
 
 > [!TIP]
-> Call `setToastConfig` from anywhere to merge runtime overrides, such as toggling placement when a modal opens.
+> Call `setToastConfig` from anywhere to merge runtime overrides, such as moving toasts to the top-right while a modal is open.
 
 ## 🧰 Composable API
 
@@ -151,6 +153,15 @@ setToastConfig(config: Partial<ToastConfig>): void
 - `addToast` accepts `title`, `message`, `type`, `icon`, `duration`, and `onPress`.
 - `removeToast()` with no arguments pops the most recent toast; supply an `id` to remove a specific one.
 - `setToastConfig` merges deeply with the current configuration – safe for incremental updates.
+
+> [!EXAMPLE]
+> To snap the stack to the top-right at runtime:
+>
+> ```tsx
+> setToastConfig({ position: { vertical: 'top', horizontal: 'right' } });
+> ```
+>
+> The provider stays mounted and existing toasts animate to their new home.
 
 ## 🎨 Designing Beautiful Toasts
 
@@ -186,7 +197,7 @@ yarn example start
 ```
 
 > [!NOTE]
-> The example mirrors the library source via workspaces. Any local edits appear immediately inside Expo.
+> The example mirrors the library source via workspaces and now includes live vertical/horizontal toggle controls.
 
 ## 🤝 Contributing
 
@@ -196,17 +207,5 @@ yarn example start
 
 > [!TIP]
 > Small fixes are welcome! If you are planning a bigger change, open an issue first so we can discuss the approach.
-
-## 🗣️ Community & Support
-
-- File issues on [GitHub](https://github.com/mCodex/react-native-rooster/issues).
-- Follow [@mCodex](https://github.com/mCodex) for release updates.
-- Got a success story? Share it through a discussion or tweet with #ReactNativeRooster.
-
-## 📄 License
-
-MIT © [Mateus Andrade](https://github.com/mCodex)
-
----
 
 Made with ❤️ using [create-react-native-library](https://github.com/callstack/react-native-builder-bob)

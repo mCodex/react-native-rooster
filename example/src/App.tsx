@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -8,14 +8,19 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ToastProvider, useToast } from 'react-native-rooster';
 import type { ToastType } from 'react-native-rooster';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ButtonConfig = {
   label: string;
   type: ToastType;
   persistent?: boolean;
+};
+
+type ToggleOption<T> = {
+  label: string;
+  value: T;
 };
 
 const BUTTONS: ButtonConfig[] = [
@@ -26,10 +31,42 @@ const BUTTONS: ButtonConfig[] = [
   { label: 'Persistent toast', type: 'info', persistent: true },
 ];
 
+const VERTICAL_OPTIONS: ToggleOption<'top' | 'bottom'>[] = [
+  { label: 'Top', value: 'top' },
+  { label: 'Bottom', value: 'bottom' },
+];
+
+const HORIZONTAL_OPTIONS: ToggleOption<'left' | 'center' | 'right'>[] = [
+  { label: 'Left', value: 'left' },
+  { label: 'Center', value: 'center' },
+  { label: 'Right', value: 'right' },
+];
+
 const ToastDemo: React.FC = () => {
-  const { addToast } = useToast();
+  const { addToast, setToastConfig } = useToast();
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
+  const [verticalPosition, setVerticalPosition] = useState<'top' | 'bottom'>(
+    'bottom'
+  );
+  const [horizontalPosition, setHorizontalPosition] = useState<
+    'left' | 'center' | 'right'
+  >('center');
+
+  const updatePosition = useCallback(
+    (
+      nextVertical: 'top' | 'bottom',
+      nextHorizontal: 'left' | 'center' | 'right'
+    ) => {
+      setToastConfig({
+        position: {
+          vertical: nextVertical,
+          horizontal: nextHorizontal,
+        },
+      });
+    },
+    [setToastConfig]
+  );
 
   const handlePress = useCallback(
     (config: ButtonConfig) => {
@@ -50,6 +87,22 @@ const ToastDemo: React.FC = () => {
       });
     },
     [addToast]
+  );
+
+  const handleVerticalChange = useCallback(
+    (option: ToggleOption<'top' | 'bottom'>) => {
+      setVerticalPosition(option.value);
+      updatePosition(option.value, horizontalPosition);
+    },
+    [horizontalPosition, updatePosition]
+  );
+
+  const handleHorizontalChange = useCallback(
+    (option: ToggleOption<'left' | 'center' | 'right'>) => {
+      setHorizontalPosition(option.value);
+      updatePosition(verticalPosition, option.value);
+    },
+    [updatePosition, verticalPosition]
   );
 
   return (
@@ -75,6 +128,44 @@ const ToastDemo: React.FC = () => {
           <Text style={styles.panelSubtitle}>
             Trigger different variants to see Rooster in action.
           </Text>
+
+          <View style={styles.settingsGroup}>
+            <Text style={styles.settingsLabel}>Vertical placement</Text>
+            <View style={styles.toggleRow}>
+              {VERTICAL_OPTIONS.map((option) => (
+                <Pressable
+                  key={option.value}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [
+                    styles.toggle,
+                    option.value === verticalPosition && styles.toggleActive,
+                    pressed && styles.togglePressed,
+                  ]}
+                  onPress={() => handleVerticalChange(option)}
+                >
+                  <Text style={styles.toggleText}>{option.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <Text style={styles.settingsLabel}>Horizontal alignment</Text>
+            <View style={styles.toggleRow}>
+              {HORIZONTAL_OPTIONS.map((option) => (
+                <Pressable
+                  key={option.value}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [
+                    styles.toggle,
+                    option.value === horizontalPosition && styles.toggleActive,
+                    pressed && styles.togglePressed,
+                  ]}
+                  onPress={() => handleHorizontalChange(option)}
+                >
+                  <Text style={styles.toggleText}>{option.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
 
           <View style={[styles.buttonGroup, isWide && styles.buttonGroupWide]}>
             {BUTTONS.map((button) => (
@@ -107,14 +198,6 @@ const ToastDemo: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-export default function App() {
-  return (
-    <ToastProvider>
-      <ToastDemo />
-    </ToastProvider>
-  );
-}
 
 const styles = StyleSheet.create({
   screen: {
@@ -186,6 +269,41 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'center',
   },
+  settingsGroup: {
+    gap: 12,
+  },
+  settingsLabel: {
+    color: '#d1d5db',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  toggle: {
+    flex: 1,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: '#202020',
+  },
+  toggleActive: {
+    backgroundColor: '#4338ca',
+    borderColor: '#6366f1',
+  },
+  togglePressed: {
+    opacity: 0.85,
+  },
+  toggleText: {
+    color: '#f9fafb',
+    fontSize: 13,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   buttonGroup: {
     gap: 12,
   },
@@ -240,3 +358,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+const App: React.FC = () => (
+  <ToastProvider>
+    <ToastDemo />
+  </ToastProvider>
+);
+
+export default App;

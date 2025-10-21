@@ -28,6 +28,22 @@ const mergeToastConfig = (
     };
   }
 
+  if (base.position || patch.position) {
+    merged.position = {
+      ...(base.position ?? {}),
+      ...(patch.position ?? {}),
+    };
+
+    if (!merged.position.vertical) {
+      merged.position.vertical = merged.placement ?? base.position?.vertical;
+    }
+
+    if (!merged.position.horizontal) {
+      merged.position.horizontal =
+        merged.horizontalPosition ?? base.position?.horizontal;
+    }
+  }
+
   return merged;
 };
 

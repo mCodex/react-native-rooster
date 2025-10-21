@@ -2,12 +2,18 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { LayoutChangeEvent } from 'react-native';
 
-import type { ToastConfig, ToastMessage, ToastPlacement } from '../types';
+import type {
+  ToastConfig,
+  ToastHorizontalPosition,
+  ToastMessage,
+  ToastPlacement,
+} from '../types';
 
 interface ToastProps {
   message: ToastMessage;
   config: ToastConfig;
   placement: ToastPlacement;
+  horizontalPosition: ToastHorizontalPosition;
   offset: number;
   index: number;
   onRemove: (id: string) => void;
@@ -20,6 +26,7 @@ const Toast: React.FC<ToastProps> = ({
   message,
   config,
   placement,
+  horizontalPosition,
   offset,
   index,
   onRemove,
@@ -143,16 +150,37 @@ const Toast: React.FC<ToastProps> = ({
     opacity,
   ]);
 
+  const horizontalStyle = useMemo(() => {
+    switch (horizontalPosition) {
+      case 'left':
+        return styles.horizontalLeft;
+      case 'right':
+        return styles.horizontalRight;
+      default:
+        return styles.horizontalCenter;
+    }
+  }, [horizontalPosition]);
+
   const animatedStyle = useMemo(
     () => [
       styles.toast,
+      horizontalStyle,
       { backgroundColor },
       placement === 'top' ? { top: offset } : { bottom: offset },
       { opacity, transform: [{ translateY: translate }] },
       toastStyle,
       { zIndex: 1000 - index },
     ],
-    [backgroundColor, index, offset, opacity, placement, toastStyle, translate]
+    [
+      backgroundColor,
+      horizontalStyle,
+      index,
+      offset,
+      opacity,
+      placement,
+      toastStyle,
+      translate,
+    ]
   );
 
   return (
@@ -184,8 +212,7 @@ export default React.memo(Toast);
 const styles = StyleSheet.create({
   toast: {
     position: 'absolute',
-    left: 16,
-    right: 16,
+    maxWidth: 420,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 12,
@@ -194,6 +221,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     shadowRadius: 16,
     elevation: 8,
+  },
+  horizontalCenter: {
+    left: 16,
+    right: 16,
+    alignSelf: 'center',
+  },
+  horizontalLeft: {
+    left: 16,
+    right: undefined,
+    alignSelf: 'flex-start',
+  },
+  horizontalRight: {
+    left: undefined,
+    right: 16,
+    alignSelf: 'flex-end',
   },
   pressable: {
     flexDirection: 'row',

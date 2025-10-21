@@ -7,6 +7,18 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
 /** Placement for the toast stack within the viewport. */
 export type ToastPlacement = 'top' | 'bottom';
 
+/** Horizontal alignment for toast cards. */
+export type ToastHorizontalPosition = 'left' | 'center' | 'right';
+
+/**
+ * Combined position controls. `vertical` defaults to the legacy `placement`,
+ * while `horizontal` enables aligning the stack left/right/center.
+ */
+export interface ToastPosition {
+  vertical?: ToastPlacement;
+  horizontal?: ToastHorizontalPosition;
+}
+
 /** Signature for easing functions used by react-native Animated. */
 export type ToastEasingFunction = (value: number) => number;
 
@@ -49,6 +61,10 @@ export interface ToastConfig {
   spacing?: number;
   /** Position of the toast stack (default: bottom). */
   placement?: ToastPlacement;
+  /** Horizontal alignment for the toast stack (default: center). */
+  horizontalPosition?: ToastHorizontalPosition;
+  /** Full position override combining vertical and horizontal preferences. */
+  position?: ToastPosition;
   /** Additional offset applied on top of the safe-area inset. */
   offset?: number;
   /** Animation tuning parameters for enter/exit transitions. */

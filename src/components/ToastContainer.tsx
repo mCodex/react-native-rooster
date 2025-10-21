@@ -3,7 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import useKeyboard from '../hooks/useKeyboard';
-import type { ToastConfig, ToastMessage } from '../types';
+import type {
+  ToastConfig,
+  ToastHorizontalPosition,
+  ToastMessage,
+  ToastPlacement,
+} from '../types';
 import Toast from './Toast';
 
 interface ToastContainerProps {
@@ -24,16 +29,21 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
   const [heights, setHeights] = useState<Record<string, number>>({});
 
   const spacing = toastConfig.spacing ?? 12;
-  const placement = toastConfig.placement ?? 'bottom';
+  const computedPlacement: ToastPlacement =
+    toastConfig.position?.vertical ?? toastConfig.placement ?? 'bottom';
+  const horizontalPosition: ToastHorizontalPosition =
+    toastConfig.position?.horizontal ??
+    toastConfig.horizontalPosition ??
+    'center';
   const offset = toastConfig.offset ?? 20;
 
   const baseOffset = useMemo(() => {
-    if (placement === 'top') {
+    if (computedPlacement === 'top') {
       return insets.top + offset;
     }
 
     return insets.bottom + offset + keyboardHeight;
-  }, [insets.bottom, insets.top, keyboardHeight, offset, placement]);
+  }, [insets.bottom, insets.top, keyboardHeight, offset, computedPlacement]);
 
   const handleMeasured = useCallback((id: string, height: number) => {
     setHeights((current: Record<string, number>) => {
@@ -61,7 +71,8 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
           key={message.id}
           message={message}
           config={toastConfig}
-          placement={placement}
+          placement={computedPlacement}
+          horizontalPosition={horizontalPosition}
           offset={currentOffset}
           index={index}
           onRemove={(id: string) => onRemove(id)}
@@ -89,7 +100,8 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
     heights,
     messages,
     onRemove,
-    placement,
+    computedPlacement,
+    horizontalPosition,
     spacing,
     toastConfig,
   ]);
@@ -104,7 +116,12 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
         pointerEvents="box-none"
         style={[
           styles.stack,
-          placement === 'top' ? styles.stackTop : styles.stackBottom,
+          computedPlacement === 'top' ? styles.stackTop : styles.stackBottom,
+          horizontalPosition === 'left'
+            ? styles.stackLeft
+            : horizontalPosition === 'right'
+              ? styles.stackRight
+              : styles.stackCenter,
         ]}
       >
         {content}
@@ -124,5 +141,14 @@ const styles = StyleSheet.create({
   },
   stackTop: {
     justifyContent: 'flex-start',
+  },
+  stackCenter: {
+    alignItems: 'center',
+  },
+  stackLeft: {
+    alignItems: 'flex-start',
+  },
+  stackRight: {
+    alignItems: 'flex-end',
   },
 });
