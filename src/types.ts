@@ -41,6 +41,17 @@ export interface ToastMessage {
   duration?: number;
   /** Optional press handler called before the toast dismiss animation runs. */
   onPress?: () => void;
+  /** Per-toast style override for the card wrapper. */
+  style?: StyleProp<ViewStyle>;
+  /** Per-toast background color override. */
+  backgroundColor?: string;
+  /** Per-toast border radius override (in pixels). */
+  borderRadius?: number;
+  /** Per-toast padding override. */
+  padding?: {
+    vertical?: number;
+    horizontal?: number;
+  };
 }
 
 /**
@@ -77,6 +88,20 @@ export interface ToastConfig {
     disappearDuration?: number;
     /** Easing function applied to both animations. */
     easing?: ToastEasingFunction;
+  };
+  /** Global border radius for toast cards (default: 12). */
+  borderRadius?: number;
+  /** Global padding for toast cards. */
+  padding?: {
+    vertical?: number;
+    horizontal?: number;
+  };
+  /** Shadow customization for toast cards. */
+  shadow?: {
+    color?: string;
+    opacity?: number;
+    offset?: { width: number; height: number };
+    radius?: number;
   };
   /**
    * Allows overriding the default wrapper styling used by the built-in toast card.

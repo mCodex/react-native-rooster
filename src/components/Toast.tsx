@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import type { LayoutChangeEvent } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
 import type {
   ToastConfig,
@@ -9,28 +9,37 @@ import type {
   ToastPlacement,
 } from '../types';
 
-interface ToastProps {
+/** Props used by the animated toast card. */
+export interface ToastProps {
+  /** The toast instance to display. */
   message: ToastMessage;
+  /** Active configuration provided by the container. */
   config: ToastConfig;
+  /** Vertical placement controlling entry direction. */
   placement: ToastPlacement;
+  /** Horizontal alignment selected by the container. */
   horizontalPosition: ToastHorizontalPosition;
-  offset: number;
-  index: number;
+  /** Removes the toast once its exit animation finishes. */
   onRemove: (id: string) => void;
-  onMeasured: (id: string, height: number) => void;
 }
 
-const ESTIMATED_TOAST_HEIGHT = 68;
+const getHorizontalStyle = (position: ToastHorizontalPosition): ViewStyle => {
+  switch (position) {
+    case 'left':
+      return styles.leftAlign;
+    case 'right':
+      return styles.rightAlign;
+    default:
+      return styles.centerAlign;
+  }
+};
 
 const Toast: React.FC<ToastProps> = ({
   message,
   config,
   placement,
   horizontalPosition,
-  offset,
-  index,
   onRemove,
-  onMeasured,
 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translate = useRef(new Animated.Value(0)).current;
@@ -51,7 +60,7 @@ const Toast: React.FC<ToastProps> = ({
 
   const backgroundColor = bgColor[message.type ?? 'info'];
 
-  const baseTextStyles = useMemo(
+  const textStyles = useMemo(
     () => ({
       title: [
         styles.title,
@@ -66,6 +75,26 @@ const Toast: React.FC<ToastProps> = ({
     }),
     [font?.fontFamilyBold, font?.fontFamilyRegular, titleStyle, messageStyle]
   );
+
+  // Compute per-toast style overrides
+  const toastStyleOverride = useMemo(() => {
+    const overrides: Record<string, any> = {};
+    if (message.backgroundColor) {
+      overrides.backgroundColor = message.backgroundColor;
+    }
+    if (message.borderRadius !== undefined) {
+      overrides.borderRadius = message.borderRadius;
+    }
+    if (message.padding) {
+      if (message.padding.vertical !== undefined) {
+        overrides.paddingVertical = message.padding.vertical;
+      }
+      if (message.padding.horizontal !== undefined) {
+        overrides.paddingHorizontal = message.padding.horizontal;
+      }
+    }
+    return overrides;
+  }, [message.backgroundColor, message.borderRadius, message.padding]);
 
   const runDismiss = useCallback(() => {
     if (isDismissing.current) return;
@@ -84,7 +113,7 @@ const Toast: React.FC<ToastProps> = ({
         easing,
         useNativeDriver: true,
       }),
-    ]).start(({ finished }: { finished: boolean }) => {
+    ]).start(({ finished }) => {
       if (finished) {
         onRemove(message.id);
       }
@@ -103,15 +132,6 @@ const Toast: React.FC<ToastProps> = ({
     message.onPress?.();
     runDismiss();
   }, [message, runDismiss]);
-
-  const handleLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      const measuredHeight =
-        event.nativeEvent.layout.height || ESTIMATED_TOAST_HEIGHT;
-      onMeasured(message.id, measuredHeight);
-    },
-    [message.id, onMeasured]
-  );
 
   useEffect(() => {
     translate.setValue(initialTranslation);
@@ -150,57 +170,58 @@ const Toast: React.FC<ToastProps> = ({
     opacity,
   ]);
 
-  const horizontalStyle = useMemo(() => {
-    switch (horizontalPosition) {
-      case 'left':
-        return styles.horizontalLeft;
-      case 'right':
-        return styles.horizontalRight;
-      default:
-        return styles.horizontalCenter;
-    }
-  }, [horizontalPosition]);
-
-  const animatedStyle = useMemo(
+  const containerStyle = useMemo(
     () => [
       styles.toast,
-      horizontalStyle,
+      getHorizontalStyle(horizontalPosition),
       { backgroundColor },
-      placement === 'top' ? { top: offset } : { bottom: offset },
       { opacity, transform: [{ translateY: translate }] },
+      toastStyleOverride,
       toastStyle,
-      { zIndex: 1000 - index },
+      message.style,
     ],
     [
       backgroundColor,
-      horizontalStyle,
-      index,
-      offset,
+      horizontalPosition,
       opacity,
-      placement,
       toastStyle,
       translate,
+      toastStyleOverride,
+      message.style,
     ]
   );
 
   return (
-    <Animated.View
-      pointerEvents="box-none"
-      style={animatedStyle}
-      onLayout={handleLayout}
-    >
+    <Animated.View pointerEvents="box-none" style={containerStyle}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={message.title ?? message.message}
         onPress={handlePress}
         style={styles.pressable}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        {message.icon ? <View style={styles.icon}>{message.icon}</View> : null}
+        {message.icon ? (
+          <View style={styles.icon} pointerEvents="none">
+            {message.icon}
+          </View>
+        ) : null}
         <View style={styles.content} pointerEvents="none">
-          {message.title ? (
-            <Text style={baseTextStyles.title}>{message.title}</Text>
-          ) : null}
-          <Text style={baseTextStyles.message}>{message.message}</Text>
+          {message.title && (
+            <Text
+              style={textStyles.title}
+              allowFontScaling={false}
+              numberOfLines={1}
+            >
+              {message.title}
+            </Text>
+          )}
+          <Text
+            style={textStyles.message}
+            allowFontScaling={false}
+            numberOfLines={2}
+          >
+            {message.message}
+          </Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -211,9 +232,9 @@ export default React.memo(Toast);
 
 const styles = StyleSheet.create({
   toast: {
-    position: 'absolute',
+    minWidth: 200,
     maxWidth: 420,
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 12,
     shadowColor: '#000',
@@ -221,32 +242,34 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     shadowRadius: 16,
     elevation: 8,
+    backgroundColor: '#1f2937',
   },
-  horizontalCenter: {
-    left: 16,
-    right: 16,
+  centerAlign: {
     alignSelf: 'center',
+    width: '100%',
   },
-  horizontalLeft: {
-    left: 16,
-    right: undefined,
+  leftAlign: {
     alignSelf: 'flex-start',
+    marginEnd: 16,
   },
-  horizontalRight: {
-    left: undefined,
-    right: 16,
+  rightAlign: {
     alignSelf: 'flex-end',
+    marginStart: 16,
   },
   pressable: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    minHeight: 44,
   },
   icon: {
     marginRight: 12,
     marginTop: 2,
+    flexShrink: 0,
   },
   content: {
     flex: 1,
+    justifyContent: 'center',
   },
   title: {
     color: '#fff',

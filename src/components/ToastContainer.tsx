@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useMemo, useCallback } from 'react';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import useKeyboard from '../hooks/useKeyboard';
@@ -11,13 +11,41 @@ import type {
 } from '../types';
 import Toast from './Toast';
 
-interface ToastContainerProps {
+/**
+ * Props used to render and manage the toast stack.
+ */
+export interface ToastContainerProps {
   messages: ToastMessage[];
   toastConfig: ToastConfig;
   onRemove: (id: string) => void;
 }
 
-const ESTIMATED_HEIGHT = 68;
+/**
+ * Computes the base host position (top/bottom) including safe-area and keyboard offsets.
+ */
+const getVerticalHostStyle = (
+  placement: ToastPlacement,
+  offset: number
+): ViewStyle =>
+  placement === 'top'
+    ? { top: offset, justifyContent: 'flex-start' }
+    : { bottom: offset, justifyContent: 'flex-end' };
+
+/**
+ * Maps horizontal alignment enum to container alignment styles.
+ */
+const getHorizontalAlignmentStyle = (
+  alignment: ToastHorizontalPosition
+): ViewStyle => {
+  switch (alignment) {
+    case 'left':
+      return { alignItems: 'flex-start' };
+    case 'right':
+      return { alignItems: 'flex-end' };
+    default:
+      return { alignItems: 'center' };
+  }
+};
 
 const ToastContainer: React.FC<ToastContainerProps> = ({
   messages,
@@ -25,11 +53,11 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
   onRemove,
 }) => {
   const [keyboardHeight] = useKeyboard();
+
   const insets = useSafeAreaInsets();
-  const [heights, setHeights] = useState<Record<string, number>>({});
 
   const spacing = toastConfig.spacing ?? 12;
-  const computedPlacement: ToastPlacement =
+  const placement: ToastPlacement =
     toastConfig.position?.vertical ?? toastConfig.placement ?? 'bottom';
   const horizontalPosition: ToastHorizontalPosition =
     toastConfig.position?.horizontal ??
@@ -37,51 +65,47 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
     'center';
   const offset = toastConfig.offset ?? 20;
 
-  const baseOffset = useMemo(() => {
-    if (computedPlacement === 'top') {
-      return insets.top + offset;
-    }
+  const baseOffset = useMemo(
+    () =>
+      placement === 'top'
+        ? insets.top + offset
+        : insets.bottom + offset + keyboardHeight,
+    [insets.bottom, insets.top, keyboardHeight, offset, placement]
+  );
 
-    return insets.bottom + offset + keyboardHeight;
-  }, [insets.bottom, insets.top, keyboardHeight, offset, computedPlacement]);
+  const hostPositionStyle = useMemo(
+    () => getVerticalHostStyle(placement, baseOffset),
+    [placement, baseOffset]
+  );
 
-  const handleMeasured = useCallback((id: string, height: number) => {
-    setHeights((current: Record<string, number>) => {
-      if (current[id] === height) {
-        return current;
-      }
+  const horizontalAlignmentStyle = useMemo(
+    () => getHorizontalAlignmentStyle(horizontalPosition),
+    [horizontalPosition]
+  );
 
-      return {
-        ...current,
-        [id]: height,
-      };
-    });
-  }, []);
-
-  const content = useMemo(() => {
-    let accumulatedOffset = baseOffset;
-
-    return messages.map((message: ToastMessage, index: number) => {
-      const height = heights[message.id] ?? ESTIMATED_HEIGHT;
-      const currentOffset = accumulatedOffset;
-      accumulatedOffset += height + spacing;
+  // Render toast item with optional custom renderer
+  const renderToastItem = useCallback(
+    (message: ToastMessage, index: number) => {
+      const spacingStyle =
+        index === 0 || spacing === 0 ? undefined : { marginTop: spacing };
 
       const defaultToast = (
         <Toast
           key={message.id}
           message={message}
           config={toastConfig}
-          placement={computedPlacement}
+          placement={placement}
           horizontalPosition={horizontalPosition}
-          offset={currentOffset}
-          index={index}
-          onRemove={(id: string) => onRemove(id)}
-          onMeasured={handleMeasured}
+          onRemove={onRemove}
         />
       );
 
       if (!toastConfig.renderToast) {
-        return defaultToast;
+        return (
+          <View key={message.id} pointerEvents="box-none" style={spacingStyle}>
+            {defaultToast}
+          </View>
+        );
       }
 
       const rendered = toastConfig.renderToast({
@@ -90,65 +114,72 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
         defaultToast,
       });
 
-      return React.isValidElement(rendered)
+      const element = React.isValidElement(rendered)
         ? React.cloneElement(rendered, { key: message.id })
         : defaultToast;
-    });
-  }, [
-    baseOffset,
-    handleMeasured,
-    heights,
-    messages,
-    onRemove,
-    computedPlacement,
-    horizontalPosition,
-    spacing,
-    toastConfig,
-  ]);
 
-  if (!messages.length) {
+      return (
+        <View key={message.id} pointerEvents="box-none" style={spacingStyle}>
+          {element}
+        </View>
+      );
+    },
+    [toastConfig, placement, horizontalPosition, onRemove, spacing]
+  );
+
+  const orderedMessages = useMemo(
+    () => (placement === 'top' ? messages : [...messages].reverse()),
+    [messages, placement]
+  );
+
+  const hasToasts = messages.length > 0;
+
+  const toastContent = useMemo(
+    () => (
+      <View
+        pointerEvents="box-none"
+        style={[StyleSheet.absoluteFill, styles.overlay]}
+      >
+        <View
+          pointerEvents="box-none"
+          style={[styles.host, hostPositionStyle, horizontalAlignmentStyle]}
+        >
+          {orderedMessages.map((message: ToastMessage, index: number) =>
+            renderToastItem(message, index)
+          )}
+        </View>
+      </View>
+    ),
+    [
+      orderedMessages,
+      hostPositionStyle,
+      horizontalAlignmentStyle,
+      renderToastItem,
+    ]
+  );
+
+  // Only render if toasts exist (prevents blocking clicks when not needed)
+  if (!hasToasts) {
     return null;
   }
 
-  return (
-    <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
-      <View
-        pointerEvents="box-none"
-        style={[
-          styles.stack,
-          computedPlacement === 'top' ? styles.stackTop : styles.stackBottom,
-          horizontalPosition === 'left'
-            ? styles.stackLeft
-            : horizontalPosition === 'right'
-              ? styles.stackRight
-              : styles.stackCenter,
-        ]}
-      >
-        {content}
-      </View>
-    </View>
-  );
+  return toastContent;
 };
 
 export default React.memo(ToastContainer);
 
 const styles = StyleSheet.create({
-  stack: {
-    flex: 1,
+  overlay: {
+    // Transparent overlay that only covers toast area
+    // pointerEvents="box-none" allows clicks to pass through
+    backgroundColor: 'transparent',
   },
-  stackBottom: {
-    justifyContent: 'flex-end',
-  },
-  stackTop: {
-    justifyContent: 'flex-start',
-  },
-  stackCenter: {
-    alignItems: 'center',
-  },
-  stackLeft: {
-    alignItems: 'flex-start',
-  },
-  stackRight: {
-    alignItems: 'flex-end',
+  host: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    width: '100%',
+    flexDirection: 'column',
   },
 });
