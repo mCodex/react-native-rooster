@@ -1,4 +1,5 @@
 module.exports = {
+  plugins: ['babel-plugin-react-compiler'],
   overrides: [
     {
       exclude: /\/node_modules\//,
