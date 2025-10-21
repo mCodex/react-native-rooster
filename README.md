@@ -5,8 +5,6 @@ Fully-customisable toast notifications for React Native apps. Lightweight, anima
 > [!TIP]
 > Ready to try it out? Jump straight to the [Quick Start](#-quick-start) and ship your first toast in under a minute.
 
-![react-native-rooster preview](./example/assets/icon.png)
-
 ## 📚 Table of Contents
 
 - [Why Rooster?](#-why-rooster)
