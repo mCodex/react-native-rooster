@@ -439,7 +439,6 @@ addToast({ type: 'success', message: 'Still works!' });
 
 ## Resources
 
-- 📖 [Full Release Notes](./RELEASE_NOTES.md)
 - 🐛 [Report Issue](https://github.com/mCodex/react-native-rooster/issues)
 - 💬 [Discussions](https://github.com/mCodex/react-native-rooster/discussions)
 - ⭐ [GitHub](https://github.com/mCodex/react-native-rooster)
