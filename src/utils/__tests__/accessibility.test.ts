@@ -352,10 +352,10 @@ describe('accessibility utilities', () => {
 
   describe('constants', () => {
     it('should have all toast types mapped to roles', () => {
-      expect(TOAST_TYPE_TO_ROLE.info).toBe('alert');
-      expect(TOAST_TYPE_TO_ROLE.success).toBe('status');
-      expect(TOAST_TYPE_TO_ROLE.warning).toBe('alert');
-      expect(TOAST_TYPE_TO_ROLE.error).toBe('alert');
+      expect(TOAST_TYPE_TO_ROLE.info).toBe('button');
+      expect(TOAST_TYPE_TO_ROLE.success).toBe('button');
+      expect(TOAST_TYPE_TO_ROLE.warning).toBe('button');
+      expect(TOAST_TYPE_TO_ROLE.error).toBe('button');
     });
 
     it('should have all toast types mapped to live regions', () => {

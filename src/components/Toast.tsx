@@ -196,7 +196,7 @@ const Toast: React.FC<ToastProps> = ({
 
     // Determine accessibility role (can be customized via config)
     const roleMap = config.accessibility?.roleMap;
-    const role = roleMap?.[type] ?? TOAST_TYPE_TO_ROLE[type] ?? 'alert';
+    const role = roleMap?.[type] ?? TOAST_TYPE_TO_ROLE[type] ?? 'button';
 
     // Determine live region (polite for non-urgent, assertive for urgent)
     const liveRegion = TOAST_TYPE_TO_LIVE_REGION[type] ?? 'polite';

@@ -16,15 +16,20 @@ import type { ToastType, ToastMessage } from '../types';
 
 /**
  * Toast type to accessibility role mapping.
- * Maps semantic toast types to appropriate ARIA roles for screen readers.
+ * Maps semantic toast types to appropriate roles supported by React Native.
+ * Note: React Native Pressable only supports: button, link, header, search, image,
+ * imagebutton, keyboardkey, text, adjustable, checkbox, combobox, menu, menuitem,
+ * progressbar, radio, scrollbar, spinbutton, switch, tab
+ *
+ * WCAG alert/status roles are announced via accessibilityLiveRegion instead.
  *
  * @constant
  */
 export const TOAST_TYPE_TO_ROLE: Record<ToastType, string> = {
-  info: 'alert',
-  success: 'status',
-  warning: 'alert',
-  error: 'alert',
+  info: 'button',
+  success: 'button',
+  warning: 'button',
+  error: 'button',
 };
 
 /**
