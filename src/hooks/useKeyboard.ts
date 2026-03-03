@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Keyboard, Platform } from 'react-native';
 import type { KeyboardEvent } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 
 /**
  * Tracks the visible keyboard height to avoid covering bottom-aligned toasts.

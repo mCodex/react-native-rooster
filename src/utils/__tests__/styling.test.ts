@@ -1,12 +1,12 @@
+import type { ToastConfig, ToastMessage } from '../../types';
 import {
   buildToastStyle,
+  containerStyles,
+  DEFAULT_FONT_SIZES,
   getBaseToastStyle,
   getToastCustomizationStyle,
-  DEFAULT_FONT_SIZES,
   toastStyles,
-  containerStyles,
 } from '../styling';
-import type { ToastConfig, ToastMessage } from '../../types';
 
 describe('styling utilities', () => {
   const baseConfig: ToastConfig = {
@@ -44,7 +44,7 @@ describe('styling utilities', () => {
         baseConfig,
         message,
         alignmentStyle,
-        animationStyle
+        animationStyle,
       );
 
       expect(Array.isArray(result)).toBe(true);
@@ -64,14 +64,14 @@ describe('styling utilities', () => {
         baseConfig,
         message,
         alignmentStyle,
-        animationStyle
+        animationStyle,
       );
 
       // Result is an array, should include bgColor
       expect(result).toContainEqual(
         expect.objectContaining({
           backgroundColor: baseConfig.bgColor.success,
-        })
+        }),
       );
     });
 
@@ -89,12 +89,12 @@ describe('styling utilities', () => {
         baseConfig,
         message,
         alignmentStyle,
-        animationStyle
+        animationStyle,
       );
 
       // Per-toast style should be in the array
       expect(result).toContainEqual(
-        expect.objectContaining({ borderWidth: 2 })
+        expect.objectContaining({ borderWidth: 2 }),
       );
     });
   });

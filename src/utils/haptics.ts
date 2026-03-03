@@ -10,7 +10,7 @@
  * @module utils/haptics
  */
 
-import { Vibration, Platform } from 'react-native';
+import { Platform, Vibration } from 'react-native';
 
 /**
  * Haptic feedback patterns for different toast events.

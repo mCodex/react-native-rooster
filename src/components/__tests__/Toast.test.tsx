@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
+import type { ToastConfig, ToastMessage } from '../../types';
 import Toast from '../Toast';
-import type { ToastMessage, ToastConfig } from '../../types';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -39,7 +39,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -58,7 +58,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -85,7 +85,7 @@ describe('Toast component', () => {
           placement="bottom"
           horizontalPosition="center"
           onRemove={mockOnRemove}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -105,7 +105,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -124,7 +124,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -143,7 +143,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -164,7 +164,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -184,7 +184,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -205,7 +205,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -222,7 +222,7 @@ describe('Toast component', () => {
           placement={placement}
           horizontalPosition="center"
           onRemove={mockOnRemove}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -244,7 +244,7 @@ describe('Toast component', () => {
           placement="bottom"
           horizontalPosition={pos as any}
           onRemove={mockOnRemove}
-        />
+        />,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -264,7 +264,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -283,7 +283,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -302,7 +302,7 @@ describe('Toast component', () => {
         placement="bottom"
         horizontalPosition="center"
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();

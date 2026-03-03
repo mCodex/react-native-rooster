@@ -12,7 +12,7 @@
  * @module utils/accessibility
  */
 
-import type { ToastType, ToastMessage } from '../types';
+import type { ToastMessage, ToastType } from '../types';
 
 /**
  * Toast type to accessibility role mapping.
@@ -125,7 +125,7 @@ export const generateAccessibilityLabel = (message: ToastMessage): string => {
  */
 export const generateAccessibilityHint = (
   type: ToastType = 'info',
-  isInteractive: boolean = false
+  isInteractive: boolean = false,
 ): string => {
   let hint = TOAST_TYPE_HINT_MAP[type];
 
@@ -161,7 +161,7 @@ export const generateAccessibilityHint = (
 export const isTextTruncated = (
   text: string,
   numberOfLines: number,
-  estimatedWidth: number = 300
+  estimatedWidth: number = 300,
 ): boolean => {
   if (!text || numberOfLines === 0) return false;
 
@@ -197,7 +197,7 @@ export const isTextTruncated = (
 export const generateAccessibilityAnnouncement = (
   message: ToastMessage,
   type: ToastType = 'info',
-  isInteractive: boolean = false
+  isInteractive: boolean = false,
 ): string => {
   const parts: string[] = [];
 
@@ -245,15 +245,13 @@ export const generateAccessibilityAnnouncement = (
  */
 export const calculateContrastRatio = (
   textColor: [number, number, number],
-  backgroundColor: [number, number, number]
+  backgroundColor: [number, number, number],
 ): number => {
   // Calculate relative luminance using WCAG formula
   const getLuminance = (rgb: [number, number, number]): number => {
     const luminanceValues = rgb.map((c) => {
       const sRGB = c / 255;
-      return sRGB <= 0.03928
-        ? sRGB / 12.92
-        : Math.pow((sRGB + 0.055) / 1.055, 2.4);
+      return sRGB <= 0.03928 ? sRGB / 12.92 : ((sRGB + 0.055) / 1.055) ** 2.4;
     });
     const r = luminanceValues[0] ?? 0;
     const g = luminanceValues[1] ?? 0;
@@ -307,7 +305,7 @@ export const isContrastCompliant = (
   textColor: [number, number, number],
   backgroundColor: [number, number, number],
   isLargeText: boolean = false,
-  level: 'AA' | 'AAA' = 'AA'
+  level: 'AA' | 'AAA' = 'AA',
 ): boolean => {
   const ratio = calculateContrastRatio(textColor, backgroundColor);
 
@@ -385,7 +383,7 @@ export const hexToRgb = (hex: string): [number, number, number] | null => {
 export const validateAccessibility = (
   message: ToastMessage,
   type: ToastType = 'info',
-  fontSize: number = 14
+  fontSize: number = 14,
 ): { isValid: boolean; issues: string[] } => {
   const issues: string[] = [];
 

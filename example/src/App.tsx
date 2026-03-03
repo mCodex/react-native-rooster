@@ -1,16 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import type React from 'react';
+import { useCallback, useState } from 'react';
 import {
   Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  View,
   useWindowDimensions,
+  View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ToastProvider, useToast } from 'react-native-rooster';
 import type { ToastType } from 'react-native-rooster';
+import { ToastProvider, useToast } from 'react-native-rooster';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ButtonConfig = {
   label: string;
@@ -49,7 +50,7 @@ const ToastDemo: React.FC = () => {
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
   const [verticalPosition, setVerticalPosition] = useState<'top' | 'bottom'>(
-    'bottom'
+    'bottom',
   );
   const [horizontalPosition, setHorizontalPosition] = useState<
     'left' | 'center' | 'right'
@@ -58,7 +59,7 @@ const ToastDemo: React.FC = () => {
   const updatePosition = useCallback(
     (
       nextVertical: 'top' | 'bottom',
-      nextHorizontal: 'left' | 'center' | 'right'
+      nextHorizontal: 'left' | 'center' | 'right',
     ) => {
       setToastConfig({
         position: {
@@ -67,7 +68,7 @@ const ToastDemo: React.FC = () => {
         },
       });
     },
-    [setToastConfig]
+    [setToastConfig],
   );
 
   const handlePress = useCallback(
@@ -99,7 +100,7 @@ const ToastDemo: React.FC = () => {
         message: 'Everything is fully customisable.',
       });
     },
-    [addToast]
+    [addToast],
   );
 
   const handleVerticalChange = useCallback(
@@ -107,7 +108,7 @@ const ToastDemo: React.FC = () => {
       setVerticalPosition(option.value);
       updatePosition(option.value, horizontalPosition);
     },
-    [horizontalPosition, updatePosition]
+    [horizontalPosition, updatePosition],
   );
 
   const handleHorizontalChange = useCallback(
@@ -115,7 +116,7 @@ const ToastDemo: React.FC = () => {
       setHorizontalPosition(option.value);
       updatePosition(verticalPosition, option.value);
     },
-    [updatePosition, verticalPosition]
+    [updatePosition, verticalPosition],
   );
 
   return (

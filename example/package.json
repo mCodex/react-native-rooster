@@ -9,18 +9,18 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@expo/metro-runtime": "~6.1.2",
-    "expo": "^54.0.17",
-    "expo-status-bar": "~3.0.8",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.4",
-    "react-native-safe-area-context": "^5.6.1",
+    "@expo/metro-runtime": "~55.0.6",
+    "expo": "^55.0.4",
+    "expo-status-bar": "~55.0.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.2",
+    "react-native-safe-area-context": "^5.7.0",
     "react-native-web": "~0.21.2"
   },
   "private": true,
   "devDependencies": {
-    "react-native-builder-bob": "^0.40.13",
-    "react-native-monorepo-config": "^0.2.2"
+    "react-native-builder-bob": "^0.40.18",
+    "react-native-monorepo-config": "^0.3.3"
   }
 }

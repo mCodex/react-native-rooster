@@ -1,4 +1,4 @@
-import { triggerHaptic, cancelHaptic, HAPTIC_PATTERNS } from '../haptics';
+import { cancelHaptic, HAPTIC_PATTERNS, triggerHaptic } from '../haptics';
 
 describe('haptics utilities', () => {
   describe('HAPTIC_PATTERNS', () => {

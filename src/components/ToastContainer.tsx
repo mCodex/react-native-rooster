@@ -1,13 +1,6 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import {
-  getVerticalPosition,
-  getHorizontalContainerAlignment,
-  getHostPaddingHorizontal,
-} from '../utils/positioning';
-import { containerStyles } from '../utils/styling';
 import useKeyboard from '../hooks/useKeyboard';
 import type {
   ToastConfig,
@@ -15,6 +8,12 @@ import type {
   ToastMessage,
   ToastPlacement,
 } from '../types';
+import {
+  getHorizontalContainerAlignment,
+  getHostPaddingHorizontal,
+  getVerticalPosition,
+} from '../utils/positioning';
+import { containerStyles } from '../utils/styling';
 import Toast from './Toast';
 
 /**
@@ -103,7 +102,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
       placement === 'top'
         ? insets.top + offset
         : insets.bottom + offset + keyboardHeight,
-    [insets.bottom, insets.top, keyboardHeight, offset, placement]
+    [insets.bottom, insets.top, keyboardHeight, offset, placement],
   );
 
   /**
@@ -115,7 +114,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
       ...getVerticalPosition(placement, baseOffset),
       ...getHorizontalContainerAlignment(horizontalPosition),
     }),
-    [placement, baseOffset, horizontalPosition]
+    [placement, baseOffset, horizontalPosition],
   );
 
   /**
@@ -127,7 +126,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
    */
   const hostPaddingHorizontal = useMemo(
     () => getHostPaddingHorizontal(placement, marginHorizontal),
-    [placement, marginHorizontal]
+    [placement, marginHorizontal],
   );
 
   /**
@@ -183,7 +182,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
         </View>
       );
     },
-    [toastConfig, placement, horizontalPosition, onRemove, spacing]
+    [toastConfig, placement, horizontalPosition, onRemove, spacing],
   );
 
   /**
@@ -195,7 +194,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
    */
   const orderedMessages = useMemo(
     () => (placement === 'top' ? messages : [...messages].reverse()),
-    [messages, placement]
+    [messages, placement],
   );
 
   // Performance: don't render overlay if no toasts
@@ -225,7 +224,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
         ]}
       >
         {orderedMessages.map((message: ToastMessage, index: number) =>
-          renderToastItem(message, index)
+          renderToastItem(message, index),
         )}
       </View>
     </View>

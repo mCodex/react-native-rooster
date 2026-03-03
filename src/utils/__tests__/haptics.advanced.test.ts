@@ -1,5 +1,5 @@
-import { triggerHaptic, cancelHaptic, HAPTIC_PATTERNS } from '../haptics';
-import { Vibration, Platform } from 'react-native';
+import { Platform, Vibration } from 'react-native';
+import { cancelHaptic, HAPTIC_PATTERNS, triggerHaptic } from '../haptics';
 
 jest.mock('react-native', () => ({
   Vibration: {

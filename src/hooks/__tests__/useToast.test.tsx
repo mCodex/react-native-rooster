@@ -1,7 +1,7 @@
-import React from 'react';
-import { render, act } from '@testing-library/react-native';
-import useToast from '../useToast';
+import { act, render } from '@testing-library/react-native';
+import type React from 'react';
 import ToastProvider from '../../providers/ToastProvider';
+import useToast from '../useToast';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -29,7 +29,7 @@ describe('useToast hook', () => {
 
     expect(caughtError).toBeTruthy();
     expect((caughtError as any)?.message).toContain(
-      'useToast must be used within a ToastProvider'
+      'useToast must be used within a ToastProvider',
     );
   });
 
@@ -48,7 +48,7 @@ describe('useToast hook', () => {
     render(
       <ToastProvider>
         <TestComponent />
-      </ToastProvider>
+      </ToastProvider>,
     );
   });
 
@@ -67,7 +67,7 @@ describe('useToast hook', () => {
       render(
         <ToastProvider>
           <TestComponent />
-        </ToastProvider>
+        </ToastProvider>,
       );
     }).not.toThrow();
   });
@@ -87,7 +87,7 @@ describe('useToast hook', () => {
       render(
         <ToastProvider>
           <TestComponent />
-        </ToastProvider>
+        </ToastProvider>,
       );
     }).not.toThrow();
   });
@@ -107,7 +107,7 @@ describe('useToast hook', () => {
       render(
         <ToastProvider>
           <TestComponent />
-        </ToastProvider>
+        </ToastProvider>,
       );
     }).not.toThrow();
   });
@@ -132,7 +132,7 @@ describe('useToast hook', () => {
       <ToastProvider>
         <TestComponent />
         <TestComponent />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     // Both should reference the same context object

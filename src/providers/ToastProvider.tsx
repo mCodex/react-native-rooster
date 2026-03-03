@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ToastContainer from '../components/ToastContainer';
@@ -17,13 +18,13 @@ const ToastProvider: React.FC<ToastProviderProps> = ({
 }) => {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
   const [config, setConfig] = useState<ToastConfig>(() =>
-    mergeToastConfig(DEFAULT_TOAST_CONFIG, initialConfig ?? {})
+    mergeToastConfig(DEFAULT_TOAST_CONFIG, initialConfig ?? {}),
   );
 
   useEffect(() => {
     if (initialConfig) {
       setConfig((current: ToastConfig) =>
-        mergeToastConfig(current, initialConfig)
+        mergeToastConfig(current, initialConfig),
       );
     }
   }, [initialConfig]);
@@ -53,13 +54,13 @@ const ToastProvider: React.FC<ToastProviderProps> = ({
 
   const setToastConfig = useCallback((partialConfig: Partial<ToastConfig>) => {
     setConfig((current: ToastConfig) =>
-      mergeToastConfig(current, partialConfig)
+      mergeToastConfig(current, partialConfig),
     );
   }, []);
 
   const contextValue = useMemo(
     () => ({ addToast, removeToast, setToastConfig }),
-    [addToast, removeToast, setToastConfig]
+    [addToast, removeToast, setToastConfig],
   );
 
   return (

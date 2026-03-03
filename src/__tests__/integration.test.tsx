@@ -1,7 +1,7 @@
+import { act, render } from '@testing-library/react-native';
 import React, { useImperativeHandle } from 'react';
-import { render, act } from '@testing-library/react-native';
-import ToastProvider from '../providers/ToastProvider';
 import useToast from '../hooks/useToast';
+import ToastProvider from '../providers/ToastProvider';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -39,12 +39,12 @@ describe('Toast notifications integration', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       // Add toast
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           message: 'Test message',
           type: 'info',
         });
@@ -54,7 +54,7 @@ describe('Toast notifications integration', () => {
 
       // Remove toast
       act(() => {
-        ref.current!.removeToast();
+        ref.current?.removeToast();
       });
 
       expect(ref.current).toBeTruthy();
@@ -66,11 +66,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           title: 'Success',
           message: 'Operation completed successfully',
           type: 'success',
@@ -86,11 +86,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           title: 'Error',
           message: 'Something went wrong',
           type: 'error',
@@ -106,11 +106,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           title: 'Warning',
           message: 'Please be careful',
           type: 'warning',
@@ -128,11 +128,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider initialConfig={{ timeToDismiss: 3000 }}>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.setToastConfig({ timeToDismiss: 5000 });
+        ref.current?.setToastConfig({ timeToDismiss: 5000 });
       });
 
       expect(UNSAFE_root).toBeTruthy();
@@ -149,11 +149,11 @@ describe('Toast notifications integration', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.setToastConfig({ timeToDismiss: 4000 });
+        ref.current?.setToastConfig({ timeToDismiss: 4000 });
       });
 
       // Both values should be present (merged)
@@ -173,11 +173,11 @@ describe('Toast notifications integration', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.setToastConfig({
+        ref.current?.setToastConfig({
           font: {
             messageFontSize: 15,
           },
@@ -195,11 +195,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           message: 'Accessible message',
           accessibilityLabel: 'Important alert',
           accessibilityHint: 'Double tap to view details',
@@ -216,11 +216,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           message: 'Haptic feedback toast',
           hapticFeedback: 'light',
         });
@@ -237,19 +237,19 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({
+        ref.current?.addToast({
           message: 'First message',
           type: 'info',
         });
-        ref.current!.addToast({
+        ref.current?.addToast({
           message: 'Second message',
           type: 'success',
         });
-        ref.current!.addToast({
+        ref.current?.addToast({
           message: 'Third message',
           type: 'error',
         });
@@ -264,12 +264,12 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
         for (let i = 0; i < 10; i++) {
-          ref.current!.addToast({
+          ref.current?.addToast({
             message: `Message ${i}`,
           });
         }
@@ -285,18 +285,18 @@ describe('Toast notifications integration', () => {
       render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
         for (let i = 0; i < 5; i++) {
-          ref.current!.addToast({ message: `Message ${i}` });
+          ref.current?.addToast({ message: `Message ${i}` });
         }
       });
 
       // Remove last toast
       act(() => {
-        ref.current!.removeToast();
+        ref.current?.removeToast();
       });
 
       expect(ref.current).toBeTruthy();
@@ -312,16 +312,16 @@ describe('Toast notifications integration', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({ message: 'First' });
+        ref.current?.addToast({ message: 'First' });
       });
 
       act(() => {
-        ref.current!.removeToast();
-        ref.current!.addToast({ message: 'Second' });
+        ref.current?.removeToast();
+        ref.current?.addToast({ message: 'Second' });
       });
 
       expect(UNSAFE_root).toBeTruthy();
@@ -335,11 +335,11 @@ describe('Toast notifications integration', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
-        ref.current!.addToast({ message: '' });
+        ref.current?.addToast({ message: '' });
       });
 
       expect(UNSAFE_root).toBeTruthy();
@@ -376,11 +376,11 @@ describe('Toast notifications integration', () => {
             }}
           >
             <Harness ref={ref} />
-          </ToastProvider>
+          </ToastProvider>,
         );
 
         act(() => {
-          ref.current!.addToast({
+          ref.current?.addToast({
             message: 'Fully configured toast',
             title: 'Test',
             type: 'success',
@@ -397,12 +397,12 @@ describe('Toast notifications integration', () => {
       render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
         for (let i = 0; i < 50; i++) {
-          ref.current!.addToast({
+          ref.current?.addToast({
             message: `Toast ${i}`,
           });
         }
@@ -417,12 +417,12 @@ describe('Toast notifications integration', () => {
       render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
         for (let i = 0; i < 20; i++) {
-          ref.current!.setToastConfig({
+          ref.current?.setToastConfig({
             timeToDismiss: 3000 + i,
           });
         }

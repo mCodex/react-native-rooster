@@ -1,17 +1,17 @@
-import {
-  generateAccessibilityLabel,
-  generateAccessibilityHint,
-  isTextTruncated,
-  generateAccessibilityAnnouncement,
-  calculateContrastRatio,
-  isContrastCompliant,
-  hexToRgb,
-  validateAccessibility,
-  TOAST_TYPE_TO_ROLE,
-  TOAST_TYPE_TO_LIVE_REGION,
-  TOAST_TYPE_HINT_MAP,
-} from '../accessibility';
 import type { ToastMessage } from '../../types';
+import {
+  calculateContrastRatio,
+  generateAccessibilityAnnouncement,
+  generateAccessibilityHint,
+  generateAccessibilityLabel,
+  hexToRgb,
+  isContrastCompliant,
+  isTextTruncated,
+  TOAST_TYPE_HINT_MAP,
+  TOAST_TYPE_TO_LIVE_REGION,
+  TOAST_TYPE_TO_ROLE,
+  validateAccessibility,
+} from '../accessibility';
 
 describe('accessibility utilities', () => {
   describe('generateAccessibilityLabel', () => {
@@ -79,16 +79,16 @@ describe('accessibility utilities', () => {
 
     it('should handle all toast types', () => {
       expect(generateAccessibilityHint('info', false)).toBe(
-        'Information notification'
+        'Information notification',
       );
       expect(generateAccessibilityHint('success', false)).toBe(
-        'Success notification'
+        'Success notification',
       );
       expect(generateAccessibilityHint('warning', false)).toBe(
-        'Warning notification'
+        'Warning notification',
       );
       expect(generateAccessibilityHint('error', false)).toBe(
-        'Error notification'
+        'Error notification',
       );
     });
   });
@@ -140,7 +140,7 @@ describe('accessibility utilities', () => {
       const result = generateAccessibilityAnnouncement(
         message,
         'success',
-        false
+        false,
       );
 
       expect(result).toContain('Success notification');
@@ -204,7 +204,7 @@ describe('accessibility utilities', () => {
         [255, 255, 255],
         [0, 0, 0],
         false,
-        'AA'
+        'AA',
       );
 
       expect(result).toBe(true);
@@ -215,7 +215,7 @@ describe('accessibility utilities', () => {
         [200, 200, 200],
         [200, 200, 200],
         false,
-        'AA'
+        'AA',
       );
 
       expect(result).toBe(false);
@@ -226,13 +226,13 @@ describe('accessibility utilities', () => {
         [200, 200, 200],
         [100, 100, 100],
         false,
-        'AA'
+        'AA',
       );
       const largeText = isContrastCompliant(
         [200, 200, 200],
         [100, 100, 100],
         true,
-        'AA'
+        'AA',
       );
 
       // Large text should be equal or more lenient
@@ -245,13 +245,13 @@ describe('accessibility utilities', () => {
         [200, 200, 200],
         [50, 50, 50],
         false,
-        'AA'
+        'AA',
       );
       const aaa = isContrastCompliant(
         [200, 200, 200],
         [50, 50, 50],
         false,
-        'AAA'
+        'AAA',
       );
 
       // Both should be booleans
@@ -333,7 +333,7 @@ describe('accessibility utilities', () => {
 
       expect(result.isValid).toBe(false);
       expect(result.issues).toContainEqual(
-        expect.stringContaining('below recommended minimum')
+        expect.stringContaining('below recommended minimum'),
       );
     });
 

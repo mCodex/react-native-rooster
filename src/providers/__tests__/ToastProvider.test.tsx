@@ -1,8 +1,8 @@
+import { act, render, waitFor } from '@testing-library/react-native';
 import React, { useImperativeHandle } from 'react';
-import { render, act, waitFor } from '@testing-library/react-native';
-import ToastProvider from '../ToastProvider';
 import useToast from '../../hooks/useToast';
 import type { ToastContextProps } from '../../types';
+import ToastProvider from '../ToastProvider';
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -49,7 +49,7 @@ describe('ToastProvider', () => {
       const { UNSAFE_root } = render(
         <ToastProvider>
           <Harness ref={React.createRef()} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       expect(UNSAFE_root).toBeTruthy();
@@ -61,7 +61,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -77,7 +77,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -108,7 +108,7 @@ describe('ToastProvider', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -134,7 +134,7 @@ describe('ToastProvider', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       // Should merge without errors
@@ -147,7 +147,7 @@ describe('ToastProvider', () => {
       render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -171,7 +171,7 @@ describe('ToastProvider', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -191,7 +191,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -212,7 +212,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -236,7 +236,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -264,7 +264,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -299,7 +299,7 @@ describe('ToastProvider', () => {
         <ToastProvider>
           <TestComponent />
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       // Both toasts visible
@@ -320,7 +320,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -347,7 +347,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -366,7 +366,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -386,7 +386,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -405,7 +405,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -429,7 +429,7 @@ describe('ToastProvider', () => {
       const { queryByText } = render(
         <ToastProvider>
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       act(() => {
@@ -461,7 +461,7 @@ describe('ToastProvider', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       expect(ref.current).toBeTruthy();
@@ -478,7 +478,7 @@ describe('ToastProvider', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       expect(ref.current).toBeTruthy();
@@ -497,7 +497,7 @@ describe('ToastProvider', () => {
           }}
         >
           <Harness ref={ref} />
-        </ToastProvider>
+        </ToastProvider>,
       );
 
       expect(ref.current).toBeTruthy();

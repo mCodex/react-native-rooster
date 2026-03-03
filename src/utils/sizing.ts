@@ -121,7 +121,7 @@ export const calculateSingleLineHeight = (fontSize: number): number => {
  */
 export const calculateToastHeight = (
   config: DimensionConfig,
-  messageLines: number = 2
+  messageLines: number = 2,
 ): number => {
   let height = config.paddingVertical * 2; // top + bottom padding
 
@@ -170,7 +170,7 @@ export const calculateMinimumWidth = (
   hasIcon: boolean,
   paddingHorizontal: number,
   iconWidth: number = 24,
-  iconMargin: number = 12
+  iconMargin: number = 12,
 ): number => {
   let width = paddingHorizontal * 2; // left + right padding
   width += 200; // minimum content width
@@ -210,7 +210,7 @@ export const calculateMinimumWidth = (
  */
 export const calculateResponsiveWidth = (
   screenWidth: number,
-  marginHorizontal: number
+  marginHorizontal: number,
 ): number => {
   return Math.max(200, screenWidth - marginHorizontal * 2);
 };
@@ -247,7 +247,7 @@ export const calculateResponsiveWidth = (
 export const getOptimalHeight = (
   config: DimensionConfig,
   messageLines: number = 2,
-  maxHeight: number = Infinity
+  maxHeight: number = Infinity,
 ): number => {
   const calculated = calculateToastHeight(config, messageLines);
   return Math.min(calculated, maxHeight);
@@ -273,7 +273,7 @@ export const getOptimalHeight = (
  * }); // => true
  */
 export const isValidDimensionConfig = (
-  config: Partial<DimensionConfig>
+  config: Partial<DimensionConfig>,
 ): config is DimensionConfig => {
   return (
     typeof config.paddingVertical === 'number' &&

@@ -11,8 +11,8 @@
  * @module utils/styling
  */
 
-import { StyleSheet } from 'react-native';
 import type { ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 import type { ToastConfig, ToastMessage } from '../types';
 
 /**
@@ -42,7 +42,7 @@ export const buildToastStyle = (
   config: ToastConfig,
   message: ToastMessage,
   alignmentStyle: ViewStyle,
-  animationStyle: { opacity: any; transform: any[] }
+  animationStyle: { opacity: any; transform: any[] },
 ): (ViewStyle | any)[] => [
   getBaseToastStyle(config),
   alignmentStyle,
@@ -122,7 +122,7 @@ export const getBaseToastStyle = (config: ToastConfig): ViewStyle => ({
  * // => {} (empty, safe to spread)
  */
 export const getToastCustomizationStyle = (
-  message: ToastMessage
+  message: ToastMessage,
 ): ViewStyle => {
   const overrides: Record<string, any> = {};
 

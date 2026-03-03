@@ -1,6 +1,6 @@
-import { render, act } from '@testing-library/react-native';
+import { act, render } from '@testing-library/react-native';
+import type { ToastConfig, ToastMessage } from '../../types';
 import ToastContainer from '../ToastContainer';
-import type { ToastMessage, ToastConfig } from '../../types';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -35,7 +35,7 @@ describe('ToastContainer component', () => {
         messages={[]}
         toastConfig={defaultConfig}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -53,7 +53,7 @@ describe('ToastContainer component', () => {
         messages={[message]}
         toastConfig={defaultConfig}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -71,7 +71,7 @@ describe('ToastContainer component', () => {
         messages={messages}
         toastConfig={defaultConfig}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -92,7 +92,7 @@ describe('ToastContainer component', () => {
           spacing: 20,
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -113,7 +113,7 @@ describe('ToastContainer component', () => {
           placement: 'top',
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -134,7 +134,7 @@ describe('ToastContainer component', () => {
           placement: 'bottom',
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -155,7 +155,7 @@ describe('ToastContainer component', () => {
           horizontalPosition: 'left',
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -176,7 +176,7 @@ describe('ToastContainer component', () => {
           horizontalPosition: 'right',
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -197,7 +197,7 @@ describe('ToastContainer component', () => {
           horizontalPosition: 'center',
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -218,7 +218,7 @@ describe('ToastContainer component', () => {
           offset: 40,
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -239,7 +239,7 @@ describe('ToastContainer component', () => {
           marginHorizontal: 24,
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -258,7 +258,7 @@ describe('ToastContainer component', () => {
         messages={messages}
         toastConfig={defaultConfig}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -282,7 +282,7 @@ describe('ToastContainer component', () => {
           },
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -308,7 +308,7 @@ describe('ToastContainer component', () => {
           },
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -320,7 +320,7 @@ describe('ToastContainer component', () => {
         messages={[]}
         toastConfig={defaultConfig}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     act(() => {
@@ -329,7 +329,7 @@ describe('ToastContainer component', () => {
           messages={[{ id: '1', message: 'New', type: 'info' }]}
           toastConfig={defaultConfig}
           onRemove={mockOnRemove}
-        />
+        />,
       );
     });
 
@@ -342,7 +342,7 @@ describe('ToastContainer component', () => {
           ]}
           toastConfig={defaultConfig}
           onRemove={mockOnRemove}
-        />
+        />,
       );
     });
 
@@ -352,7 +352,7 @@ describe('ToastContainer component', () => {
           messages={[]}
           toastConfig={defaultConfig}
           onRemove={mockOnRemove}
-        />
+        />,
       );
     });
 
@@ -374,7 +374,7 @@ describe('ToastContainer component', () => {
           toastStyle: { opacity: 0.9 },
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -395,7 +395,7 @@ describe('ToastContainer component', () => {
           renderToast: ({ message: _msg, defaultToast }) => defaultToast,
         }}
         onRemove={mockOnRemove}
-      />
+      />,
     );
 
     expect(UNSAFE_root).toBeTruthy();

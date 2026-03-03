@@ -1,48 +1,46 @@
-import ToastProvider from './providers/ToastProvider';
 import useToast from './hooks/useToast';
+import ToastProvider from './providers/ToastProvider';
 
 export { ToastProvider, useToast };
 
-// Export sizing utilities for advanced customization
-export {
-  calculateLineHeight,
-  calculateSingleLineHeight,
-  calculateToastHeight,
-  calculateMinimumWidth,
-  calculateResponsiveWidth,
-  getOptimalHeight,
-  isValidDimensionConfig,
-} from './utils/sizing';
-
-// Export accessibility utilities for WCAG 2.1 compliance
-export {
-  TOAST_TYPE_TO_ROLE,
-  TOAST_TYPE_TO_LIVE_REGION,
-  TOAST_TYPE_HINT_MAP,
-  generateAccessibilityLabel,
-  generateAccessibilityHint,
-  isTextTruncated,
-  generateAccessibilityAnnouncement,
-  calculateContrastRatio,
-  isContrastCompliant,
-  hexToRgb,
-  validateAccessibility,
-} from './utils/accessibility';
-
-// Export haptic feedback utilities
-export { HAPTIC_PATTERNS, triggerHaptic, cancelHaptic } from './utils/haptics';
-
 export type {
-  ToastMessage,
   ToastConfig,
   ToastContextProps,
-  ToastProviderProps,
-  ToastPlacement,
   ToastHorizontalPosition,
+  ToastMessage,
+  ToastPlacement,
   ToastPosition,
+  ToastProviderProps,
   ToastType,
 } from './types';
 
+// Export accessibility utilities for WCAG 2.1 compliance
+export {
+  calculateContrastRatio,
+  generateAccessibilityAnnouncement,
+  generateAccessibilityHint,
+  generateAccessibilityLabel,
+  hexToRgb,
+  isContrastCompliant,
+  isTextTruncated,
+  TOAST_TYPE_HINT_MAP,
+  TOAST_TYPE_TO_LIVE_REGION,
+  TOAST_TYPE_TO_ROLE,
+  validateAccessibility,
+} from './utils/accessibility';
+export type { HapticPattern } from './utils/haptics';
+// Export haptic feedback utilities
+export { cancelHaptic, HAPTIC_PATTERNS, triggerHaptic } from './utils/haptics';
+
 // Re-export utility types
 export type { DimensionConfig } from './utils/sizing';
-export type { HapticPattern } from './utils/haptics';
+// Export sizing utilities for advanced customization
+export {
+  calculateLineHeight,
+  calculateMinimumWidth,
+  calculateResponsiveWidth,
+  calculateSingleLineHeight,
+  calculateToastHeight,
+  getOptimalHeight,
+  isValidDimensionConfig,
+} from './utils/sizing';

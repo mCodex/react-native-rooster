@@ -3,25 +3,24 @@ import {
   Animated,
   Pressable,
   Text,
-  View,
   useWindowDimensions,
+  View,
 } from 'react-native';
-
-import { getToastAlignment, isVerticalPlacement } from '../utils/positioning';
-import { buildToastStyle, toastStyles } from '../utils/styling';
-import {
-  generateAccessibilityLabel,
-  generateAccessibilityHint,
-  TOAST_TYPE_TO_ROLE,
-  TOAST_TYPE_TO_LIVE_REGION,
-} from '../utils/accessibility';
-import { triggerHaptic } from '../utils/haptics';
 import type {
   ToastConfig,
   ToastHorizontalPosition,
   ToastMessage,
   ToastPlacement,
 } from '../types';
+import {
+  generateAccessibilityHint,
+  generateAccessibilityLabel,
+  TOAST_TYPE_TO_LIVE_REGION,
+  TOAST_TYPE_TO_ROLE,
+} from '../utils/accessibility';
+import { triggerHaptic } from '../utils/haptics';
+import { getToastAlignment, isVerticalPlacement } from '../utils/positioning';
+import { buildToastStyle, toastStyles } from '../utils/styling';
 
 /**
  * Props for the Toast component.
@@ -101,7 +100,12 @@ const Toast: React.FC<ToastProps> = ({
   const opacity = useRef(new Animated.Value(0)).current;
   const translate = useRef(new Animated.Value(0)).current;
   const isDismissing = useRef(false);
+  const isEntering = useRef(false);
+  const isPressing = useRef(false);
   const animatedSequenceRef = useRef<any>(null);
+  const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasBeenRemoved = useRef(false);
 
   // Destructure with defaults for animation and spacing config
   const {
@@ -222,10 +226,26 @@ const Toast: React.FC<ToastProps> = ({
    * Safe to call multiple times (guarded by isDismissing ref).
    * Ensures onRemove is only called after animation completes.
    * Properly cancels any running animations to prevent memory leaks.
+   * Handles rapid presses by immediately removing if already dismissing.
    */
   const runDismiss = useCallback(() => {
-    if (isDismissing.current) return;
+    // If already dismissing or removed, do nothing
+    if (isDismissing.current || hasBeenRemoved.current) {
+      return;
+    }
+
     isDismissing.current = true;
+
+    // Stop any running enter animation
+    if (animatedSequenceRef.current) {
+      animatedSequenceRef.current.stop?.();
+    }
+
+    // Clear any pending auto-dismiss timeout
+    if (dismissTimeoutRef.current) {
+      clearTimeout(dismissTimeoutRef.current);
+      dismissTimeoutRef.current = null;
+    }
 
     const dismissAnimation = Animated.parallel([
       Animated.timing(opacity, {
@@ -245,8 +265,10 @@ const Toast: React.FC<ToastProps> = ({
     // Store animation reference for cleanup
     animatedSequenceRef.current = dismissAnimation;
 
-    dismissAnimation.start(({ finished }) => {
-      if (finished) {
+    dismissAnimation.start(() => {
+      // Mark as removed and call onRemove only once
+      if (!hasBeenRemoved.current) {
+        hasBeenRemoved.current = true;
         onRemove(message.id);
       }
     });
@@ -264,22 +286,46 @@ const Toast: React.FC<ToastProps> = ({
    * Handles user press on the toast.
    * Calls message.onPress if provided, then dismisses.
    * Triggers haptic feedback if enabled in config.
+   * Handles rapid presses by ensuring dismissal occurs and preventing duplicate handling.
    */
   const handlePress = useCallback(() => {
-    // Trigger haptic feedback if enabled
-    if (config.accessibility?.hapticFeedback) {
-      triggerHaptic('light');
+    // Prevent multiple rapid presses
+    if (isPressing.current) return;
+    isPressing.current = true;
+
+    // Clear any existing press timeout
+    if (pressTimeoutRef.current) {
+      clearTimeout(pressTimeoutRef.current);
     }
-    message.onPress?.();
-    runDismiss();
+
+    try {
+      // Trigger haptic feedback if enabled
+      if (config.accessibility?.hapticFeedback) {
+        triggerHaptic('light');
+      }
+
+      // Call custom onPress handler
+      message.onPress?.();
+
+      // Always dismiss, even for rapid presses
+      runDismiss();
+    } finally {
+      // Reset pressing state after a short delay to allow for animation
+      pressTimeoutRef.current = setTimeout(() => {
+        isPressing.current = false;
+        pressTimeoutRef.current = null;
+      }, 100);
+    }
   }, [message, runDismiss, config.accessibility?.hapticFeedback]);
 
   /**
    * Entry animation and auto-dismiss setup.
    * Plays enter animation immediately, then schedules auto-dismiss if enabled.
    * Cleanup properly cancels animations and removes timeouts to prevent memory leaks.
+   * Tracks entering state to prevent conflicts with dismiss animations.
    */
   useEffect(() => {
+    isEntering.current = true;
     translate.setValue(initialTranslation);
 
     const enterAnimation = Animated.parallel([
@@ -297,22 +343,38 @@ const Toast: React.FC<ToastProps> = ({
       }),
     ]);
 
-    enterAnimation.start();
+    // Store animation reference for cleanup
+    animatedSequenceRef.current = enterAnimation;
+
+    enterAnimation.start(() => {
+      isEntering.current = false;
+    });
 
     let timer: NodeJS.Timeout | null = null;
 
     if (shouldAutoDismiss) {
       timer = setTimeout(runDismiss, effectiveDuration);
+      dismissTimeoutRef.current = timer;
     }
 
     return () => {
+      isEntering.current = false;
+      isPressing.current = false;
       // Clean up animation if component unmounts during animation
       if (animatedSequenceRef.current) {
         animatedSequenceRef.current.stop?.();
       }
-      // Clean up timer
+      // Clean up timers
       if (timer) {
         clearTimeout(timer);
+      }
+      if (dismissTimeoutRef.current) {
+        clearTimeout(dismissTimeoutRef.current);
+        dismissTimeoutRef.current = null;
+      }
+      if (pressTimeoutRef.current) {
+        clearTimeout(pressTimeoutRef.current);
+        pressTimeoutRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -323,6 +385,8 @@ const Toast: React.FC<ToastProps> = ({
     initialTranslation,
     runDismiss,
     shouldAutoDismiss,
+    opacity,
+    translate,
   ]);
 
   /**
@@ -335,19 +399,19 @@ const Toast: React.FC<ToastProps> = ({
         horizontalPosition,
         placement,
         marginHorizontal,
-        screenWidth
+        screenWidth,
       ),
-    [horizontalPosition, placement, marginHorizontal, screenWidth]
+    [horizontalPosition, placement, marginHorizontal, screenWidth],
   );
 
   const animationStyle = useMemo(
     () => ({ opacity, transform: [{ translateY: translate }] }),
-    [opacity, translate]
+    [opacity, translate],
   );
 
   const containerStyle = useMemo(
     () => buildToastStyle(config, message, alignmentStyle, animationStyle),
-    [config, message, alignmentStyle, animationStyle]
+    [config, message, alignmentStyle, animationStyle],
   );
 
   /**
@@ -366,7 +430,7 @@ const Toast: React.FC<ToastProps> = ({
         handlePress();
       }
     },
-    [handlePress]
+    [handlePress],
   );
 
   return (
@@ -375,7 +439,7 @@ const Toast: React.FC<ToastProps> = ({
       style={containerStyle}
       accessible={true}
       accessibilityLiveRegion={accessibilityProps.liveRegion}
-      // @ts-ignore - Web platform keyboard support
+      // @ts-expect-error - Web platform keyboard support
       onKeyDown={handleKeyDown}
     >
       <Pressable

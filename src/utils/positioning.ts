@@ -43,7 +43,7 @@ export const isVerticalPlacement = (placement: ToastPlacement): boolean =>
  */
 export const getVerticalPosition = (
   placement: ToastPlacement,
-  offset: number
+  offset: number,
 ): Pick<ViewStyle, 'top' | 'bottom' | 'justifyContent'> =>
   placement === 'top'
     ? { top: offset, justifyContent: 'flex-start' }
@@ -68,7 +68,7 @@ export const getVerticalPosition = (
  * // => { alignItems: 'flex-start' }
  */
 export const getHorizontalContainerAlignment = (
-  alignment: ToastHorizontalPosition
+  alignment: ToastHorizontalPosition,
 ): Pick<ViewStyle, 'alignItems'> => {
   switch (alignment) {
     case 'left':
@@ -118,7 +118,7 @@ export const getToastAlignment = (
   horizontalPosition: ToastHorizontalPosition,
   verticalPlacement: ToastPlacement,
   marginHorizontal: number,
-  screenWidth: number
+  screenWidth: number,
 ): ViewStyle => {
   const isTopBottom = isVerticalPlacement(verticalPlacement);
   const isCenterAlignment = horizontalPosition === 'center';
@@ -180,5 +180,5 @@ export const getToastAlignment = (
  */
 export const getHostPaddingHorizontal = (
   verticalPlacement: ToastPlacement,
-  marginHorizontal: number
+  marginHorizontal: number,
 ): number => (isVerticalPlacement(verticalPlacement) ? 0 : marginHorizontal);

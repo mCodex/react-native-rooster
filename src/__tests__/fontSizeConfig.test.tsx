@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
-import ToastProvider from '../providers/ToastProvider';
 import useToast from '../hooks/useToast';
+import ToastProvider from '../providers/ToastProvider';
 
 /**
  * Test suite for font size configuration via initialConfig
@@ -23,7 +23,7 @@ describe('Font Size Configuration', () => {
           }}
         >
           <TestComponent />
-        </ToastProvider>
+        </ToastProvider>,
       );
     }).not.toThrow();
   });
@@ -45,7 +45,7 @@ describe('Font Size Configuration', () => {
     const { UNSAFE_root } = render(
       <ToastProvider initialConfig={initialConfig}>
         <TestComponent />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     expect(UNSAFE_root).toBeTruthy();
@@ -62,7 +62,7 @@ describe('Font Size Configuration', () => {
       render(
         <ToastProvider>
           <TestComponent />
-        </ToastProvider>
+        </ToastProvider>,
       );
     }).not.toThrow();
   });

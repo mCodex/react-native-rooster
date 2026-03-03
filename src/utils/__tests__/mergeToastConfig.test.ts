@@ -1,6 +1,6 @@
 import { Easing } from 'react-native';
-import mergeToastConfig from '../mergeToastConfig';
 import type { ToastConfig } from '../../types';
+import mergeToastConfig from '../mergeToastConfig';
 
 describe('mergeToastConfig', () => {
   const baseConfig: ToastConfig = {

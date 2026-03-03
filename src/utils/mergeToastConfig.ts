@@ -3,7 +3,7 @@ import type { ToastConfig } from '../types';
 /** Deep-merges toast configuration objects without mutating either input. */
 const mergeToastConfig = (
   base: ToastConfig,
-  patch: Partial<ToastConfig>
+  patch: Partial<ToastConfig>,
 ): ToastConfig => {
   const merged: ToastConfig = {
     ...base,

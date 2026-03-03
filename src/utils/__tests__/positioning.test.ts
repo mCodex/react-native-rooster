@@ -1,9 +1,9 @@
 import {
-  isVerticalPlacement,
-  getVerticalPosition,
   getHorizontalContainerAlignment,
-  getToastAlignment,
   getHostPaddingHorizontal,
+  getToastAlignment,
+  getVerticalPosition,
+  isVerticalPlacement,
 } from '../positioning';
 
 describe('positioning utilities', () => {

@@ -1,8 +1,7 @@
+import { act, render, waitFor } from '@testing-library/react-native';
 import React, { useImperativeHandle } from 'react';
-import { render, act, waitFor } from '@testing-library/react-native';
-
-import ToastProvider from '../providers/ToastProvider';
 import useToast from '../hooks/useToast';
+import ToastProvider from '../providers/ToastProvider';
 import type { ToastContextProps } from '../types';
 
 jest.mock('react-native-safe-area-context', () => ({
@@ -56,7 +55,7 @@ describe('ToastProvider integration', () => {
     const { queryByText } = render(
       <ToastProvider>
         <Harness ref={ref} />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     act(() => {
@@ -79,7 +78,7 @@ describe('ToastProvider integration', () => {
     const { queryByText } = render(
       <ToastProvider>
         <Harness ref={ref} />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     act(() => {

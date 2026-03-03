@@ -1,12 +1,12 @@
 import {
   calculateLineHeight,
-  calculateSingleLineHeight,
-  calculateToastHeight,
   calculateMinimumWidth,
   calculateResponsiveWidth,
+  calculateSingleLineHeight,
+  calculateToastHeight,
+  type DimensionConfig,
   getOptimalHeight,
   isValidDimensionConfig,
-  type DimensionConfig,
 } from '../sizing';
 
 describe('sizing utilities', () => {
