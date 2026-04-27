@@ -1,6 +1,6 @@
 {
   "name": "react-native-rooster",
-  "version": "4.0.0",
+  "version": "3.2.5",
   "description": "Providerless, high-performance toast notifications for React Native. WCAG 2.2 AA, fully typed, zero runtime dependencies.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
