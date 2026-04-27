@@ -12,7 +12,6 @@ jest.mock('react-native-safe-area-context', () => ({
 
 jest.mock('../../components/ToastContainer', () => {
   const ReactNative = require('react-native');
-  const _React = require('react');
   return ({ ids }: { ids: string[] }) => (
     <ReactNative.View testID="container">
       {ids.map((id: string) => (
