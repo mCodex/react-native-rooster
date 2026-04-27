@@ -270,8 +270,10 @@ const setConfig = (partial: Partial<ToastConfig>) => {
 const updateMessage = (id: string, patch: Partial<ToastMessage>) => {
   const idx = state.messages.findIndex((m) => m.id === id);
   if (idx < 0) return;
+  const current = state.messages[idx];
+  if (!current) return;
   const next = state.messages.slice();
-  next[idx] = { ...next[idx], ...patch, id };
+  next[idx] = { ...current, ...patch, id };
   state.messages = next;
   queueMessageNotification(id);
 };

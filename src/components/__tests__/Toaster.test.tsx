@@ -38,12 +38,8 @@ describe('Toaster', () => {
 
   it('renders the container after the first toast is added', async () => {
     const { findByTestId } = render(<Toaster />);
-    act(() => {
+    await act(async () => {
       toastStore.add({ message: 'hello' });
-    });
-    await Promise.resolve();
-    act(() => {
-      jest.runOnlyPendingTimers();
     });
     expect(await findByTestId('container')).toBeTruthy();
   });

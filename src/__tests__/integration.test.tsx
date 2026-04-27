@@ -34,13 +34,7 @@ const Trigger = ({ onPress }: { onPress: () => void }) => (
 
 describe('integration: providerless v4 API', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
     toastStore.__resetForTests();
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
   });
 
   it('useToast inside a component pushes a toast that the Toaster renders', async () => {
@@ -60,25 +54,17 @@ describe('integration: providerless v4 API', () => {
       </>,
     );
 
-    act(() => {
+    await act(async () => {
       getByTestId('trigger').props.onClick?.() ??
         getByTestId('trigger').props.onPress?.();
-    });
-    await Promise.resolve();
-    act(() => {
-      jest.runOnlyPendingTimers();
     });
     expect(await findByText('from-hook')).toBeTruthy();
   });
 
   it('imperative `toast.success` works outside of any component', async () => {
     const { findByText } = render(<Toaster />);
-    act(() => {
+    await act(async () => {
       toast.success('saved');
-    });
-    await Promise.resolve();
-    act(() => {
-      jest.runOnlyPendingTimers();
     });
     expect(await findByText('saved')).toBeTruthy();
   });
@@ -94,18 +80,13 @@ describe('integration: providerless v4 API', () => {
   it('clear() removes all toasts', async () => {
     const { queryByTestId } = render(<Toaster />);
     let id = '';
-    act(() => {
+    await act(async () => {
       id = toast.show({ message: 'a' });
       toast.show({ message: 'b' });
     });
-    await Promise.resolve();
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
-    act(() => {
+    await act(async () => {
       toast.clear();
     });
-    await Promise.resolve();
     expect(queryByTestId(`toast-${id}`)).toBeNull();
   });
 });

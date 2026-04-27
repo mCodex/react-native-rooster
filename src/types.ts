@@ -11,6 +11,19 @@ export type ToastPlacement = 'top' | 'bottom';
 export type ToastHorizontalPosition = 'left' | 'center' | 'right';
 
 /**
+ * Haptic feedback intensities. `false` disables feedback entirely. Used by
+ * both per-toast `hapticFeedback` and global `accessibility.hapticFeedback`.
+ */
+export type HapticFeedback =
+  | false
+  | 'light'
+  | 'medium'
+  | 'heavy'
+  | 'success'
+  | 'warning'
+  | 'error';
+
+/**
  * Combined position controls. `vertical` defaults to the legacy `placement`,
  * while `horizontal` enables aligning the stack left/right/center.
  */
@@ -128,19 +141,12 @@ export interface ToastMessage {
    * @example
    * hapticFeedback: 'light'
    */
-  hapticFeedback?:
-    | false
-    | 'light'
-    | 'medium'
-    | 'heavy'
-    | 'success'
-    | 'warning'
-    | 'error';
+  hapticFeedback?: HapticFeedback;
 }
 
 /**
  * Runtime configuration merged into a single object stored in context.
- * Consumers can update values via {@link ToastContextProps.setToastConfig}.
+ * Consumers can update values via {@link ToastApi.setToastConfig}.
  *
  * Accessibility: Configuration supports screen readers, high contrast,
  * and respects device accessibility settings. See `accessibility` section below.
@@ -256,14 +262,7 @@ export interface ToastConfig {
      * @example
      * accessibility: { hapticFeedback: 'light' }
      */
-    hapticFeedback?:
-      | false
-      | 'light'
-      | 'medium'
-      | 'heavy'
-      | 'success'
-      | 'warning'
-      | 'error';
+    hapticFeedback?: HapticFeedback;
 
     /**
      * Text colors for each toast variant for contrast verification.
@@ -386,12 +385,6 @@ export interface ToastApi {
   info(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
 }
 
-/** @deprecated Renamed to {@link ToastApi} in v4. */
-export type ToastContextProps = Pick<
-  ToastApi,
-  'addToast' | 'removeToast' | 'setToastConfig'
->;
-
 /** Props accepted by the {@link Toaster} component. */
 export interface ToasterProps {
   /** Optional configuration applied on mount and merged into the global config. */
@@ -402,6 +395,3 @@ export interface ToasterProps {
    */
   children?: ReactNode;
 }
-
-/** @deprecated Renamed to {@link ToasterProps} in v4. */
-export type ToastProviderProps = ToasterProps;

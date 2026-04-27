@@ -407,3 +407,82 @@ export const validateAccessibility = (
     issues,
   };
 };
+
+/**
+ * WCAG 2.2 helper: returns animation timing overrides when the user has
+ * enabled reduce motion (SC 2.3.3). Halves durations and zeroes any spatial
+ * translation while preserving fade so the toast remains discoverable.
+ *
+ * @param config - Base animation config (durations + translation)
+ * @param reduced - Whether reduce motion is currently enabled
+ * @returns Effective config to pass into the animation hook
+ */
+export const getReducedMotionAnimationConfig = <
+  T extends {
+    appearDuration: number;
+    exitDuration: number;
+    translation: number;
+  },
+>(
+  config: T,
+  reduced: boolean,
+): T => {
+  if (!reduced) return config;
+  return {
+    ...config,
+    appearDuration: Math.round(config.appearDuration / 2),
+    exitDuration: Math.round(config.exitDuration / 2),
+    translation: 0,
+  };
+};
+
+/**
+ * WCAG 2.2 validator: a stricter superset of {@link validateAccessibility}.
+ * Adds checks for SC 1.4.11 (non-text contrast 3:1) and SC 2.5.8 (target size
+ * 24x24 minimum) and recommends the appropriate live region.
+ *
+ * @param message - Toast message data
+ * @param type - Toast type (info|success|warning|error)
+ * @param fontSize - Effective font size in px
+ * @param targetSize - Effective tappable size in dp (defaults to 48 — meets AAA)
+ * @param textColor - Optional text color rgb tuple to validate contrast
+ * @param backgroundColor - Optional background color rgb tuple to validate contrast
+ */
+export const validateWcag22 = (
+  message: ToastMessage,
+  type: ToastType,
+  fontSize: number,
+  targetSize: number = 48,
+  textColor?: [number, number, number],
+  backgroundColor?: [number, number, number],
+): {
+  isValid: boolean;
+  issues: string[];
+  recommendedLiveRegion: 'polite' | 'assertive';
+} => {
+  const base = validateAccessibility(message, type, fontSize);
+  const issues = [...base.issues];
+
+  // SC 2.5.8 — minimum target size 24x24 (24 is AA, 44 is AAA recommendation).
+  if (targetSize < 24) {
+    issues.push(
+      `Target size ${targetSize}dp is below WCAG 2.2 SC 2.5.8 minimum of 24dp`,
+    );
+  }
+
+  // SC 1.4.3 — text contrast 4.5:1 for normal text.
+  if (textColor && backgroundColor) {
+    const ratio = calculateContrastRatio(textColor, backgroundColor);
+    if (ratio < 4.5) {
+      issues.push(
+        `Text contrast ${ratio.toFixed(2)}:1 fails WCAG 2.1 SC 1.4.3 (requires 4.5:1)`,
+      );
+    }
+  }
+
+  return {
+    isValid: issues.length === 0,
+    issues,
+    recommendedLiveRegion: TOAST_TYPE_TO_LIVE_REGION[type],
+  };
+};

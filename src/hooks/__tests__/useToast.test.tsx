@@ -49,7 +49,7 @@ describe('useToast (providerless v4)', () => {
     expect(getByTestId('probe').children.join('')).toBe('ok');
   });
 
-  it('addToast pushes a toast that the Toaster renders', () => {
+  it('addToast pushes a toast that the Toaster renders', async () => {
     const { getByTestId, queryByTestId } = render(
       <>
         <Probe />
@@ -60,15 +60,9 @@ describe('useToast (providerless v4)', () => {
     expect(queryByTestId('container')).toBeNull();
 
     let id = '';
-    act(() => {
+    await act(async () => {
       id = toastStore.add({ message: 'hi' });
     });
-    // Microtask flush
-    return Promise.resolve().then(() => {
-      act(() => {
-        jest.runOnlyPendingTimers();
-      });
-      expect(getByTestId(`toast-${id}`)).toBeTruthy();
-    });
+    expect(getByTestId(`toast-${id}`)).toBeTruthy();
   });
 });

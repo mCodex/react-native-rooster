@@ -85,7 +85,17 @@ const ToastItem: React.FC<ToastItemProps> = ({
     try {
       const haptic =
         message?.hapticFeedback ?? config.accessibility?.hapticFeedback;
-      if (haptic) triggerHaptic(haptic === true ? 'light' : haptic);
+      if (haptic) {
+        // Map fuller toast haptic vocabulary onto the patterns supported by
+        // our haptics util.
+        const pattern =
+          haptic === 'heavy'
+            ? 'medium'
+            : haptic === 'warning'
+              ? 'error'
+              : haptic;
+        triggerHaptic(pattern);
+      }
       message?.onPress?.();
       dismiss();
     } finally {

@@ -1,7 +1,7 @@
 {
   "name": "react-native-rooster",
-  "version": "3.2.5",
-  "description": "High-performance, fully-customizable and accessible toast notifications for React Native. WCAG 2.1 AA compliant, fully typed, zero config.",
+  "version": "4.0.0",
+  "description": "Providerless, high-performance toast notifications for React Native. WCAG 2.2 AA, fully typed, zero runtime dependencies.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -9,6 +9,21 @@
       "source": "./src/index.tsx",
       "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
+    },
+    "./accessibility": {
+      "source": "./src/utils/accessibility.ts",
+      "types": "./lib/typescript/src/utils/accessibility.d.ts",
+      "default": "./lib/module/utils/accessibility.js"
+    },
+    "./haptics": {
+      "source": "./src/utils/haptics.ts",
+      "types": "./lib/typescript/src/utils/haptics.d.ts",
+      "default": "./lib/module/utils/haptics.js"
+    },
+    "./sizing": {
+      "source": "./src/utils/sizing.ts",
+      "types": "./lib/typescript/src/utils/sizing.d.ts",
+      "default": "./lib/module/utils/sizing.js"
     },
     "./package.json": "./package.json"
   },
