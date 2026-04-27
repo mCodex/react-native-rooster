@@ -134,6 +134,16 @@ interface TimerEntry {
 
 const timers = new Map<string, TimerEntry>();
 
+/**
+ * Optional dismiss-request handlers, keyed by toast id. When the auto-dismiss
+ * timer expires the store invokes the registered handler (typically the
+ * useToastAnimation hook) so it can play the exit animation before the toast
+ * is actually removed. If no handler is registered (e.g. in unit tests where
+ * no component is mounted) the timer falls back to calling `remove(id)`
+ * directly so test ergonomics are preserved.
+ */
+const dismissHandlers = new Map<string, () => void>();
+
 const clearTimer = (id: string) => {
   const entry = timers.get(id);
   if (entry) {
@@ -147,7 +157,14 @@ const startTimer = (id: string, duration: number) => {
   if (duration <= 0 || !Number.isFinite(duration)) return;
   const handle = setTimeout(() => {
     timers.delete(id);
-    remove(id);
+    const handler = dismissHandlers.get(id);
+    if (handler) {
+      // Hand off to the animation layer; it will call `remove(id)` once the
+      // exit animation completes so the toast never disappears abruptly.
+      handler();
+    } else {
+      remove(id);
+    }
   }, duration);
   timers.set(id, {
     handle,
@@ -237,12 +254,20 @@ const add = (input: Omit<ToastMessage, 'id'>): string => {
       state.queue = state.queue.concat(message);
       return message.id;
     }
-    // 'evict' — drop the oldest with a fast exit
-    const evicted = state.messages[0];
-    if (evicted) {
-      // Re-arm timer to fire (almost) immediately so the UI plays exit anim
-      clearTimer(evicted.id);
-      startTimer(evicted.id, FAST_EVICT_DURATION);
+    // 'evict' — ensure the visible stack stays bounded by `maxVisible`.
+    // Drop as many oldest toasts as needed in a single batched update.
+    const overflow = state.messages.length - max + 1; // make room for `message`
+    if (overflow > 0) {
+      const evicted = state.messages.slice(0, overflow);
+      // Cancel their timers; they exit immediately. The animation layer (if
+      // mounted) will pick up the removal via subscription.
+      for (let i = 0; i < evicted.length; i += 1) {
+        const e = evicted[i] as ToastMessage;
+        clearTimer(e.id);
+        // Schedule a fast-evict so any mounted ToastItem still has a chance
+        // to play its exit animation before being unmounted.
+        startTimer(e.id, FAST_EVICT_DURATION);
+      }
     }
   }
 
@@ -275,6 +300,7 @@ const remove = (id?: string) => {
   if (!state.byId.has(target)) return;
 
   clearTimer(target);
+  dismissHandlers.delete(target);
   setMessages(state.messages.filter((m) => m.id !== target));
   messageListeners.delete(target);
   promoteFromQueue();
@@ -290,6 +316,7 @@ const clear = () => {
     queueIdsNotification();
   }
   messageListeners.clear();
+  dismissHandlers.clear();
 };
 
 const setConfig = (partial: Partial<ToastConfig>) => {
@@ -365,6 +392,27 @@ const subscribeMessage = (id: string, listener: Listener): (() => void) => {
   };
 };
 
+/**
+ * Register an animation-aware dismiss handler for a toast id. The store calls
+ * this handler when the auto-dismiss timer expires so the consumer (typically
+ * `useToastAnimation`) can run an exit animation before the toast is removed.
+ *
+ * The handler is responsible for eventually calling `toastStore.remove(id)`.
+ * Returns an unsubscribe function. Only one handler per id is supported —
+ * registering a new one replaces any existing handler.
+ */
+const _registerDismissHandler = (
+  id: string,
+  handler: () => void,
+): (() => void) => {
+  dismissHandlers.set(id, handler);
+  return () => {
+    if (dismissHandlers.get(id) === handler) {
+      dismissHandlers.delete(id);
+    }
+  };
+};
+
 /* ------------------------------------------------------------------------- */
 /* Test reset (internal)                                                     */
 /* ------------------------------------------------------------------------- */
@@ -372,6 +420,7 @@ const subscribeMessage = (id: string, listener: Listener): (() => void) => {
 const __resetForTests = () => {
   for (const t of timers.values()) clearTimeout(t.handle);
   timers.clear();
+  dismissHandlers.clear();
   idsListeners.clear();
   configListeners.clear();
   messageListeners.clear();
@@ -397,6 +446,7 @@ const toastStore = {
   subscribeIds,
   subscribeConfig,
   subscribeMessage,
+  registerDismissHandler,
   __resetForTests,
 };
 
