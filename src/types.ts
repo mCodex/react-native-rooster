@@ -312,21 +312,96 @@ export interface ToastConfig {
      */
     roleMap?: Partial<Record<ToastType, string>>;
   };
+
+  /**
+   * Maximum simultaneously visible toasts. Default: 5.
+   * When exceeded, behaviour is controlled by {@link overflow}.
+   * Set to `Infinity` to disable the cap (matches v3 behaviour).
+   */
+  maxVisible?: number;
+
+  /**
+   * Behaviour when {@link maxVisible} is exceeded.
+   * - `'evict'` (default): drop the oldest toast with a fast exit.
+   * - `'queue'`: keep the new toast pending until a slot frees up.
+   */
+  overflow?: 'evict' | 'queue';
+
+  /**
+   * Stagger between simultaneous toast entrance animations, in ms.
+   * Default: 30. Each toast schedules its enter animation with `delay = index * staggerMs`.
+   */
+  staggerMs?: number;
+
+  /**
+   * When true (default), bottom-placed toasts auto-flip to top when they would
+   * obscure a currently focused input field. Implements WCAG 2.2 SC 2.4.11.
+   */
+  respectFocus?: boolean;
+
+  /**
+   * Disable auto-dismiss globally. Useful for accessibility flows where users
+   * always dismiss manually. Default: false.
+   */
+  disableAutoDismiss?: boolean;
+
+  /**
+   * Opt-in palette tweaks for higher contrast (WCAG 2.2 1.4.6 friendly).
+   * Default: false.
+   */
+  highContrast?: boolean;
+
+  /**
+   * Enable swipe-to-dismiss as an additive gesture. Tap-to-dismiss is always available.
+   * Implemented with React Native's built-in `PanResponder` (no extra peer deps).
+   * Default: false.
+   */
+  swipeToDismiss?: boolean;
 }
 
-/** Public API exposed through {@link useToast}. */
-export interface ToastContextProps {
+/**
+ * Public API returned from {@link useToast} and exposed on the imperative
+ * `toast` facade. The v3 names (`addToast`, `removeToast`, `setToastConfig`)
+ * are preserved verbatim; `show`, `dismiss`, and `configure` are aliases.
+ */
+export interface ToastApi {
   /** Push a new toast into the stack. */
-  addToast(message: Omit<ToastMessage, 'id'>): void;
+  addToast(message: Omit<ToastMessage, 'id'>): string;
+  /** Alias of {@link addToast}. */
+  show(message: Omit<ToastMessage, 'id'>): string;
   /** Remove a toast by id, or fall back to the most recent toast. */
   removeToast(id?: string): void;
-  /** Merge new configuration values with the current provider config. */
+  /** Alias of {@link removeToast}. */
+  dismiss(id?: string): void;
+  /** Remove all toasts immediately. */
+  clear(): void;
+  /** Merge new configuration values with the current global config. */
   setToastConfig(config: Partial<ToastConfig>): void;
+  /** Alias of {@link setToastConfig}. */
+  configure(config: Partial<ToastConfig>): void;
+  /** Convenience helpers for common types. */
+  success(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  error(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  warning(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  info(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
 }
 
-/** Props accepted by the {@link ToastProvider}. */
-export interface ToastProviderProps {
-  children: ReactNode;
-  /** Optional configuration applied on mount and used as defaults. */
-  initialConfig?: Partial<ToastConfig>;
+/** @deprecated Renamed to {@link ToastApi} in v4. */
+export type ToastContextProps = Pick<
+  ToastApi,
+  'addToast' | 'removeToast' | 'setToastConfig'
+>;
+
+/** Props accepted by the {@link Toaster} component. */
+export interface ToasterProps {
+  /** Optional configuration applied on mount and merged into the global config. */
+  config?: Partial<ToastConfig>;
+  /**
+   * Children are not required: `<Toaster />` is a sibling, not a wrapper.
+   * Accepted for the rare case of nesting it inside layout, but renders nothing.
+   */
+  children?: ReactNode;
 }
+
+/** @deprecated Renamed to {@link ToasterProps} in v4. */
+export type ToastProviderProps = ToasterProps;

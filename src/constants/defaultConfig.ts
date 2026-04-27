@@ -31,4 +31,11 @@ export const DEFAULT_TOAST_CONFIG: ToastConfig = {
     disappearDuration: 180,
     easing: Easing.out(Easing.cubic),
   },
+  maxVisible: 5,
+  overflow: 'evict',
+  staggerMs: 30,
+  respectFocus: true,
+  disableAutoDismiss: false,
+  highContrast: false,
+  swipeToDismiss: false,
 };

@@ -1,6 +1,8 @@
 import { act, render } from '@testing-library/react-native';
-import type React from 'react';
-import ToastProvider from '../../providers/ToastProvider';
+import { Text } from 'react-native';
+
+import Toaster from '../../components/Toaster';
+import toastStore from '../../store/toastStore';
 import useToast from '../useToast';
 
 jest.mock('react-native-safe-area-context', () => ({
@@ -9,133 +11,64 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('../../components/ToastContainer', () => {
-  return () => null;
+  const ReactNative = require('react-native');
+  const _React = require('react');
+  return ({ ids }: { ids: string[] }) => (
+    <ReactNative.View testID="container">
+      {ids.map((id: string) => (
+        <ReactNative.Text key={id} testID={`toast-${id}`}>
+          {id}
+        </ReactNative.Text>
+      ))}
+    </ReactNative.View>
+  );
 });
 
-describe('useToast hook', () => {
-  it('should throw error when used outside of ToastProvider', () => {
-    let caughtError: Error | null = null;
+const Probe = () => {
+  const api = useToast();
+  return (
+    <Text testID="probe">
+      {typeof api.addToast === 'function' ? 'ok' : 'no'}
+    </Text>
+  );
+};
 
-    const TestComponent = () => {
-      try {
-        useToast();
-      } catch (error: any) {
-        caughtError = error;
-      }
-      return null;
-    };
-
-    render(<TestComponent />);
-
-    expect(caughtError).toBeTruthy();
-    expect((caughtError as any)?.message).toContain(
-      'useToast must be used within a ToastProvider',
-    );
+describe('useToast (providerless v4)', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    toastStore.__resetForTests();
   });
 
-  it('should return toast context when used within provider', () => {
-    const TestComponent = () => {
-      const context = useToast();
-
-      expect(context).toBeDefined();
-      expect(typeof context.addToast).toBe('function');
-      expect(typeof context.removeToast).toBe('function');
-      expect(typeof context.setToastConfig).toBe('function');
-
-      return null;
-    };
-
-    render(
-      <ToastProvider>
-        <TestComponent />
-      </ToastProvider>,
-    );
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
-  it('should provide addToast function', () => {
-    const TestComponent = () => {
-      const { addToast } = useToast();
-
-      act(() => {
-        addToast({ message: 'Test message' });
-      });
-
-      return null;
-    };
-
-    expect(() => {
-      render(
-        <ToastProvider>
-          <TestComponent />
-        </ToastProvider>,
-      );
-    }).not.toThrow();
+  it('returns a stable singleton API without needing a provider', () => {
+    const { getByTestId } = render(<Probe />);
+    expect(getByTestId('probe').children.join('')).toBe('ok');
   });
 
-  it('should provide removeToast function', () => {
-    const TestComponent = () => {
-      const { removeToast } = useToast();
-
-      act(() => {
-        removeToast();
-      });
-
-      return null;
-    };
-
-    expect(() => {
-      render(
-        <ToastProvider>
-          <TestComponent />
-        </ToastProvider>,
-      );
-    }).not.toThrow();
-  });
-
-  it('should provide setToastConfig function', () => {
-    const TestComponent = () => {
-      const { setToastConfig } = useToast();
-
-      act(() => {
-        setToastConfig({ timeToDismiss: 5000 });
-      });
-
-      return null;
-    };
-
-    expect(() => {
-      render(
-        <ToastProvider>
-          <TestComponent />
-        </ToastProvider>,
-      );
-    }).not.toThrow();
-  });
-
-  it('should maintain consistent context reference', () => {
-    let firstContext: any;
-    let secondContext: any;
-
-    const TestComponent = () => {
-      const context = useToast();
-
-      if (!firstContext) {
-        firstContext = context;
-      } else if (!secondContext) {
-        secondContext = context;
-      }
-
-      return null;
-    };
-
-    render(
-      <ToastProvider>
-        <TestComponent />
-        <TestComponent />
-      </ToastProvider>,
+  it('addToast pushes a toast that the Toaster renders', () => {
+    const { getByTestId, queryByTestId } = render(
+      <>
+        <Probe />
+        <Toaster />
+      </>,
     );
 
-    // Both should reference the same context object
-    expect(firstContext).toBe(secondContext);
+    expect(queryByTestId('container')).toBeNull();
+
+    let id = '';
+    act(() => {
+      id = toastStore.add({ message: 'hi' });
+    });
+    // Microtask flush
+    return Promise.resolve().then(() => {
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
+      expect(getByTestId(`toast-${id}`)).toBeTruthy();
+    });
   });
 });

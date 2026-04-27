@@ -1,19 +1,17 @@
+import Toaster from './components/Toaster';
 import useToast from './hooks/useToast';
-import ToastProvider from './providers/ToastProvider';
-
-export { ToastProvider, useToast };
+import { configureToast, toast } from './toast';
 
 export type {
+  ToastApi,
   ToastConfig,
-  ToastContextProps,
+  ToasterProps,
   ToastHorizontalPosition,
   ToastMessage,
   ToastPlacement,
   ToastPosition,
-  ToastProviderProps,
   ToastType,
 } from './types';
-
 // Export accessibility utilities for WCAG 2.1 compliance
 export {
   calculateContrastRatio,
@@ -31,7 +29,6 @@ export {
 export type { HapticPattern } from './utils/haptics';
 // Export haptic feedback utilities
 export { cancelHaptic, HAPTIC_PATTERNS, triggerHaptic } from './utils/haptics';
-
 // Re-export utility types
 export type { DimensionConfig } from './utils/sizing';
 // Export sizing utilities for advanced customization
@@ -44,3 +41,4 @@ export {
   getOptimalHeight,
   isValidDimensionConfig,
 } from './utils/sizing';
+export { configureToast, Toaster, toast, useToast };
