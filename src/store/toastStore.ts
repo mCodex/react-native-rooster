@@ -401,7 +401,7 @@ const subscribeMessage = (id: string, listener: Listener): (() => void) => {
  * Returns an unsubscribe function. Only one handler per id is supported —
  * registering a new one replaces any existing handler.
  */
-const _registerDismissHandler = (
+const registerDismissHandler = (
   id: string,
   handler: () => void,
 ): (() => void) => {
