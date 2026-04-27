@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Animated } from 'react-native';
 
+import toastStore from '../store/toastStore';
 import type { ToastConfig, ToastMessage, ToastPlacement } from '../types';
 import useReducedMotion from './useReducedMotion';
 
@@ -18,9 +19,9 @@ interface UseToastAnimationResult {
   translateX: Animated.Value;
   /** Begins the dismiss animation. Idempotent and safe to call mid-flight. */
   dismiss: () => void;
-  /** Pause auto-dismiss timer (e.g. on focus/hover). */
+  /** Pause auto-dismiss timer (e.g. on focus/hover). Forwards to the store. */
   pauseAutoDismiss: () => void;
-  /** Resume auto-dismiss timer. */
+  /** Resume auto-dismiss timer. Forwards to the store. */
   resumeAutoDismiss: () => void;
 }
 
@@ -30,11 +31,15 @@ interface UseToastAnimationResult {
  * Responsibilities:
  * - Native-driver Animated.Values for opacity + translateY/X (no Reanimated).
  * - Enter animation with stagger via `delay = index * staggerMs`.
- * - Auto-dismiss timer (pausable for WCAG 2.2 SC 2.2.1).
  * - Exit animation that interrupts the enter animation cleanly when the user
  *   taps mid-flight, so the toast is always immediately dismissible.
  * - Reduced-motion path: fade-only with halved durations, zero translate.
- * - Disposes timers + animations on unmount; never leaks.
+ * - Disposes animations on unmount; never leaks.
+ *
+ * Auto-dismiss timing is owned exclusively by `toastStore` (single source of
+ * truth). The hook registers a dismiss-request handler so the store can ask
+ * the animation layer to play the exit animation — the toast is only removed
+ * from the store after that animation finishes.
  */
 const useToastAnimation = ({
   message,
@@ -50,10 +55,6 @@ const useToastAnimation = ({
   const translateX = useRef(new Animated.Value(0)).current;
 
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
-  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const remainingRef = useRef<number>(0);
-  const startedAtRef = useRef<number>(0);
-  const pausedRef = useRef(false);
   const dismissingRef = useRef(false);
   const removedRef = useRef(false);
 
@@ -73,29 +74,9 @@ const useToastAnimation = ({
     return baseTranslation * (placement === 'top' ? -1 : 1);
   }, [reduceMotion, baseTranslation, placement]);
 
-  const effectiveDuration = useMemo(() => {
-    if (config.disableAutoDismiss) return 0;
-    const value = message.duration ?? config.timeToDismiss;
-    if (typeof value !== 'number' || value <= 0) return 0;
-    return reduceMotion ? value * 2 : value;
-  }, [
-    config.disableAutoDismiss,
-    config.timeToDismiss,
-    message.duration,
-    reduceMotion,
-  ]);
-
-  const clearDismissTimer = useCallback(() => {
-    if (dismissTimerRef.current) {
-      clearTimeout(dismissTimerRef.current);
-      dismissTimerRef.current = null;
-    }
-  }, []);
-
   const dismiss = useCallback(() => {
     if (dismissingRef.current || removedRef.current) return;
     dismissingRef.current = true;
-    clearDismissTimer();
     animationRef.current?.stop();
 
     const exit = Animated.parallel([
@@ -122,7 +103,6 @@ const useToastAnimation = ({
       onRemove(message.id);
     });
   }, [
-    clearDismissTimer,
     disappearDuration,
     easing,
     initialTranslation,
@@ -132,53 +112,38 @@ const useToastAnimation = ({
     translateY,
   ]);
 
-  const startAutoDismiss = useCallback(
-    (duration: number) => {
-      clearDismissTimer();
-      if (duration <= 0) return;
-      remainingRef.current = duration;
-      startedAtRef.current = Date.now();
-      pausedRef.current = false;
-      dismissTimerRef.current = setTimeout(() => {
-        dismissTimerRef.current = null;
-        dismiss();
-      }, duration);
-    },
-    [clearDismissTimer, dismiss],
-  );
-
   const pauseAutoDismiss = useCallback(() => {
-    if (pausedRef.current || !dismissTimerRef.current) return;
-    pausedRef.current = true;
-    const elapsed = Date.now() - startedAtRef.current;
-    remainingRef.current = Math.max(0, remainingRef.current - elapsed);
-    clearDismissTimer();
-  }, [clearDismissTimer]);
+    toastStore.pause(message.id);
+  }, [message.id]);
 
   const resumeAutoDismiss = useCallback(() => {
-    if (!pausedRef.current) return;
-    pausedRef.current = false;
-    if (remainingRef.current > 0) {
-      startAutoDismiss(remainingRef.current);
-    }
-  }, [startAutoDismiss]);
+    toastStore.resume(message.id);
+  }, [message.id]);
 
-  // Run enter animation + schedule auto-dismiss exactly once on mount. Read
-  // animation parameters from a ref so the entrance only plays once even if
-  // config props change — re-running would cancel the animation mid-flight.
+  // Register a dismiss-request handler so the store-owned auto-dismiss timer
+  // triggers the exit animation instead of unmounting the toast abruptly.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: registration must run once on mount
+  useEffect(() => {
+    const unregister = toastStore.registerDismissHandler(message.id, () => {
+      dismiss();
+    });
+    return unregister;
+  }, [message.id]);
+
+  // Run enter animation exactly once on mount. Read animation parameters from
+  // a ref so the entrance only plays once even if config props change —
+  // re-running would cancel the animation mid-flight.
   const enterParamsRef = useRef({
     appearDuration,
     delay: index * staggerMs,
     easing,
     initialTranslation,
-    effectiveDuration,
   });
   enterParamsRef.current = {
     appearDuration,
     delay: index * staggerMs,
     easing,
     initialTranslation,
-    effectiveDuration,
   };
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: enter animation must run only once on mount
@@ -206,14 +171,9 @@ const useToastAnimation = ({
     animationRef.current = enter;
     enter.start();
 
-    if (params.effectiveDuration > 0) {
-      startAutoDismiss(params.effectiveDuration + params.delay);
-    }
-
     return () => {
       animationRef.current?.stop();
       animationRef.current = null;
-      clearDismissTimer();
     };
   }, []);
 

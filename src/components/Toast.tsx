@@ -155,7 +155,10 @@ const ToastItem: React.FC<ToastItemProps> = ({
       };
     }
     const type = message.type ?? 'info';
-    const isInteractive = !!message.onPress;
+    // Toasts are always tap-dismissible regardless of `onPress`, so the a11y
+    // hint should always advertise that. `onPress` is purely a callback hook,
+    // not a gate for interactivity.
+    const isInteractive = true;
     const label =
       message.accessibilityLabel ?? generateAccessibilityLabel(message);
     const hint =
