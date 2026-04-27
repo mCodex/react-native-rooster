@@ -81,7 +81,10 @@ describe('mergeToastConfig', () => {
           info: '#7890f0',
         },
       };
-      const result = mergeToastConfig(baseConfig, patch as any);
+      const result = mergeToastConfig(
+        baseConfig,
+        patch as Partial<typeof baseConfig>,
+      );
 
       expect(result.bgColor).toEqual(patch.bgColor);
     });
@@ -287,15 +290,15 @@ describe('mergeToastConfig', () => {
       const config = {
         ...baseConfig,
         accessibility: {
-          hapticFeedback: false,
+          hapticFeedback: false as const,
         },
-      } as any;
+      };
       const patch = {
         accessibility: {
           hapticFeedback: 'light' as const,
         },
       };
-      const result = mergeToastConfig(config, patch as any);
+      const result = mergeToastConfig(config, patch);
 
       expect(result.accessibility?.hapticFeedback).toBe('light');
     });

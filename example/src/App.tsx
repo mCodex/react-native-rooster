@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import type { ToastType } from 'react-native-rooster';
-import { ToastProvider, useToast } from 'react-native-rooster';
+import { Toaster, toast, useToast } from 'react-native-rooster';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ButtonConfig = {
@@ -18,6 +18,7 @@ type ButtonConfig = {
   type: ToastType;
   persistent?: boolean;
   customFontSize?: boolean;
+  stressTest?: boolean;
 };
 
 type ToggleOption<T> = {
@@ -32,6 +33,7 @@ const BUTTONS: ButtonConfig[] = [
   { label: 'Error toast', type: 'error' },
   { label: 'Large Font Toast', type: 'success', customFontSize: true },
   { label: 'Persistent toast', type: 'info', persistent: true },
+  { label: 'Stress test (8x)', type: 'info', stressTest: true },
 ];
 
 const VERTICAL_OPTIONS: ToggleOption<'top' | 'bottom'>[] = [
@@ -73,6 +75,20 @@ const ToastDemo: React.FC = () => {
 
   const handlePress = useCallback(
     (config: ButtonConfig) => {
+      if (config.stressTest) {
+        // Imperative API works outside hooks too — fire 8 toasts in a row.
+        for (let i = 0; i < 8; i += 1) {
+          toast.show({
+            type: (['info', 'success', 'warning', 'error'] as ToastType[])[
+              i % 4
+            ],
+            title: `Toast #${i + 1}`,
+            message: 'Multiple toasts queue smoothly without dropping frames.',
+          });
+        }
+        return;
+      }
+
       if (config.persistent) {
         addToast({
           type: config.type,
@@ -382,17 +398,22 @@ const styles = StyleSheet.create({
 });
 
 const App: React.FC = () => (
-  <ToastProvider
-    initialConfig={{
-      font: {
-        // Customize font sizes globally (optional)
-        titleFontSize: 17,
-        messageFontSize: 14,
-      },
-    }}
-  >
+  <>
     <ToastDemo />
-  </ToastProvider>
+    <Toaster
+      config={{
+        font: {
+          // Customize font sizes globally (optional)
+          titleFontSize: 17,
+          messageFontSize: 14,
+        },
+        // v4: opt-in swipe-to-dismiss using PanResponder.
+        swipeToDismiss: true,
+        maxVisible: 5,
+        overflow: 'evict',
+      }}
+    />
+  </>
 );
 
 export default App;

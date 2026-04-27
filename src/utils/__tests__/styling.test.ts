@@ -2,7 +2,6 @@ import type { ToastConfig, ToastMessage } from '../../types';
 import {
   buildToastStyle,
   containerStyles,
-  DEFAULT_FONT_SIZES,
   getBaseToastStyle,
   getToastCustomizationStyle,
   toastStyles,
@@ -193,10 +192,13 @@ describe('styling utilities', () => {
         titleFontSize: 18,
       };
 
-      const result = getToastCustomizationStyle(message);
+      const result = getToastCustomizationStyle(message) as Record<
+        string,
+        unknown
+      >;
 
-      expect((result as any).messageFontSize).toBe(16);
-      expect((result as any).titleFontSize).toBe(18);
+      expect(result.messageFontSize).toBe(16);
+      expect(result.titleFontSize).toBe(18);
     });
 
     it('should extract padding overrides', () => {
@@ -239,22 +241,15 @@ describe('styling utilities', () => {
         messageFontSize: 15,
       };
 
-      const result = getToastCustomizationStyle(message);
+      const result = getToastCustomizationStyle(message) as Record<
+        string,
+        unknown
+      >;
 
       expect(Object.keys(result).length).toBe(3);
       expect(result.backgroundColor).toBe('#00ff00');
       expect(result.borderRadius).toBe(16);
-      expect((result as any).messageFontSize).toBe(15);
-    });
-  });
-
-  describe('DEFAULT_FONT_SIZES', () => {
-    it('should have title font size', () => {
-      expect(DEFAULT_FONT_SIZES.title).toBe(16);
-    });
-
-    it('should have message font size', () => {
-      expect(DEFAULT_FONT_SIZES.message).toBe(14);
+      expect(result.messageFontSize).toBe(15);
     });
   });
 
@@ -278,13 +273,13 @@ describe('styling utilities', () => {
 
     it('should have title style', () => {
       expect(toastStyles.title).toBeDefined();
-      expect(toastStyles.title.fontSize).toBe(DEFAULT_FONT_SIZES.title);
+      expect(toastStyles.title.fontSize).toBe(16);
       expect(toastStyles.title.fontWeight).toBe('600');
     });
 
     it('should have message style', () => {
       expect(toastStyles.message).toBeDefined();
-      expect(toastStyles.message.fontSize).toBe(DEFAULT_FONT_SIZES.message);
+      expect(toastStyles.message.fontSize).toBe(14);
     });
   });
 

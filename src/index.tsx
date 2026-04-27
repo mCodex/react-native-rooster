@@ -1,46 +1,32 @@
-import useToast from './hooks/useToast';
-import ToastProvider from './providers/ToastProvider';
-
-export { ToastProvider, useToast };
+/**
+ * Public entry point for `react-native-rooster`.
+ *
+ * The package re-exports a small, tree-shakeable surface:
+ *
+ * | Export | Kind | Use it for |
+ * | --- | --- | --- |
+ * | {@link Toaster} | Component | Mount once near the root of your app. |
+ * | {@link useToast} | Hook | Recommended way to access the toast API from components. |
+ * | {@link toast} | Singleton | Imperative facade for code outside the React tree. |
+ * | {@link configureToast} | Function | Shorthand for `toast.configure(...)`. |
+ *
+ * Combined with `"sideEffects": false`, bundlers strip everything you don't
+ * use — there are no subpath imports to remember.
+ *
+ * @packageDocumentation
+ */
+export { default as Toaster } from './components/Toaster';
+export { default as useToast } from './hooks/useToast';
+export { configureToast, toast } from './toast';
 
 export type {
+  HapticFeedback,
+  ToastApi,
   ToastConfig,
-  ToastContextProps,
+  ToasterProps,
   ToastHorizontalPosition,
   ToastMessage,
   ToastPlacement,
   ToastPosition,
-  ToastProviderProps,
   ToastType,
 } from './types';
-
-// Export accessibility utilities for WCAG 2.1 compliance
-export {
-  calculateContrastRatio,
-  generateAccessibilityAnnouncement,
-  generateAccessibilityHint,
-  generateAccessibilityLabel,
-  hexToRgb,
-  isContrastCompliant,
-  isTextTruncated,
-  TOAST_TYPE_HINT_MAP,
-  TOAST_TYPE_TO_LIVE_REGION,
-  TOAST_TYPE_TO_ROLE,
-  validateAccessibility,
-} from './utils/accessibility';
-export type { HapticPattern } from './utils/haptics';
-// Export haptic feedback utilities
-export { cancelHaptic, HAPTIC_PATTERNS, triggerHaptic } from './utils/haptics';
-
-// Re-export utility types
-export type { DimensionConfig } from './utils/sizing';
-// Export sizing utilities for advanced customization
-export {
-  calculateLineHeight,
-  calculateMinimumWidth,
-  calculateResponsiveWidth,
-  calculateSingleLineHeight,
-  calculateToastHeight,
-  getOptimalHeight,
-  isValidDimensionConfig,
-} from './utils/sizing';

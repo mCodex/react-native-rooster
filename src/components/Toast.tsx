@@ -1,15 +1,23 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   Animated,
+  type NativeSyntheticEvent,
+  PanResponder,
+  type PanResponderGestureState,
   Pressable,
+  type StyleProp,
   Text,
+  type TextStyle,
   useWindowDimensions,
   View,
 } from 'react-native';
+
+import useToastAnimation from '../hooks/useToastAnimation';
+import toastStore from '../store/toastStore';
+import { useToastMessage } from '../store/useToastSelector';
 import type {
   ToastConfig,
   ToastHorizontalPosition,
-  ToastMessage,
   ToastPlacement,
 } from '../types';
 import {
@@ -19,419 +27,233 @@ import {
   TOAST_TYPE_TO_ROLE,
 } from '../utils/accessibility';
 import { triggerHaptic } from '../utils/haptics';
-import { getToastAlignment, isVerticalPlacement } from '../utils/positioning';
+import { getToastAlignment } from '../utils/positioning';
 import { buildToastStyle, toastStyles } from '../utils/styling';
 
-/**
- * Props for the Toast component.
- *
- * @interface ToastProps
- * @property message - The toast message to display with optional customizations
- * @property config - Global toast configuration and styling defaults
- * @property placement - Vertical position ('top' or 'bottom')
- * @property horizontalPosition - Horizontal alignment ('left', 'center', or 'right')
- * @property onRemove - Callback to remove the toast after animation completes
- *
- * @example
- * <Toast
- *   message={{ id: '1', message: 'Hello' }}
- *   config={config}
- *   placement="bottom"
- *   horizontalPosition="center"
- *   onRemove={handleRemove}
- * />
- */
-export interface ToastProps {
-  message: ToastMessage;
+export interface ToastItemProps {
+  /** Toast id used to subscribe to the store. */
+  id: string;
+  /** Position in the visible stack (used for stagger + spacing). */
+  index: number;
+  /** Active global config (passed from container to avoid duplicate subscribes). */
   config: ToastConfig;
   placement: ToastPlacement;
   horizontalPosition: ToastHorizontalPosition;
+  /** Called once the exit animation has completed. */
   onRemove: (id: string) => void;
 }
 
+const SWIPE_VELOCITY_THRESHOLD = 0.6;
+const SWIPE_DISTANCE_RATIO = 0.4;
+
 /**
- * Toast component - displays individual toast notifications with animations.
- *
- * Features:
- * - Enter/exit animations (customizable duration and easing)
- * - Per-toast customizations (colors, padding, font sizes, styles)
- * - Respects press handlers and auto-dismiss timeouts
- * - Accessible (proper roles and labels for screen readers)
- * - Touch feedback with hitSlop for comfortable interaction
- * - **Responsive width**: For top/bottom positions, automatically expands to fill screen width minus margins
- * - **Orientation-aware**: Automatically adapts when device orientation changes
- * - **Customizable typography**: Global font sizes or per-toast overrides
- *
- * Width Behavior:
- * - **Top/Bottom positions**: Responsive width that respects `marginHorizontal`
- *   - Width = screenWidth - (2 × marginHorizontal)
- *   - Automatically updates on orientation change
- * - **Left/Right positions**: Fixed maximum width (420px) for consistency
- *
- * Typography Behavior:
- * - Default font sizes: title 16px, message 14px
- * - Override globally: Set `config.font.titleFontSize` and `config.font.messageFontSize`
- * - Override per-toast: Set `message.titleFontSize` and `message.messageFontSize`
- * - Per-toast overrides take precedence over global config
- *
- * Animation behavior:
- * - Enters: Slides in from placement edge while fading in
- * - Auto-dismisses: After configured timeout (if duration > 0)
- * - Press-dismiss: Immediately starts exit animation
- * - Exit: Slides back out while fading, removes from DOM when finished
- *
- * @example
- * <Toast
- *   message={{ id: '1', message: 'Success!', type: 'success', messageFontSize: 16 }}
- *   config={toastConfig}
- *   placement="bottom"
- *   horizontalPosition="center"
- *   onRemove={(id) => console.log(`Toast ${id} removed`)}
- * />
+ * Individual toast view. Subscribes to its own slice of the store so sibling
+ * toasts don't re-render when this one updates. All animations run on the
+ * native driver via {@link useToastAnimation}.
  */
-const Toast: React.FC<ToastProps> = ({
-  message,
+const ToastItem: React.FC<ToastItemProps> = ({
+  id,
+  index,
   config,
   placement,
   horizontalPosition,
   onRemove,
 }) => {
+  const message = useToastMessage(id);
   const { width: screenWidth } = useWindowDimensions();
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translate = useRef(new Animated.Value(0)).current;
-  const isDismissing = useRef(false);
-  const isEntering = useRef(false);
-  const isPressing = useRef(false);
-  const animatedSequenceRef = useRef<any>(null);
-  const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hasBeenRemoved = useRef(false);
 
-  // Destructure with defaults for animation and spacing config
   const {
-    animation,
-    font,
-    titleStyle,
-    messageStyle,
-    marginHorizontal = 16,
-  } = config;
+    opacity,
+    translateY,
+    translateX,
+    dismiss,
+    pauseAutoDismiss,
+    resumeAutoDismiss,
+  } = useToastAnimation({
+    message: message ?? { id, message: '' },
+    config,
+    placement,
+    index,
+    onRemove,
+  });
 
-  const easing = animation?.easing;
-  const appearDuration = animation?.appearDuration ?? 220;
-  const disappearDuration = animation?.disappearDuration ?? 180;
-  const initialTranslation =
-    (animation?.initialTranslation ?? 24) *
-    (isVerticalPlacement(placement) && placement === 'top' ? -1 : 1);
+  const isPressing = useRef(false);
 
-  const effectiveDuration = message.duration ?? config.timeToDismiss;
-  const shouldAutoDismiss =
-    typeof effectiveDuration === 'number' && effectiveDuration > 0;
-
-  // Memoize font styling only when font config changes
-  const textStyles = useMemo(() => {
-    // Determine effective font sizes (per-toast > global > default)
-    const effectiveTitleFontSize =
-      message.titleFontSize ?? font?.titleFontSize ?? 16; // Default title size
-
-    const effectiveMessageFontSize =
-      message.messageFontSize ?? font?.messageFontSize ?? 14; // Default message size
-
-    const titleStyles: any[] = [];
-    const messageStyles: any[] = [];
-
-    // Build title styles with explicit font size
-    titleStyles.push({
-      color: '#fff',
-      fontSize: effectiveTitleFontSize,
-      fontWeight: '600',
-      marginBottom: 4,
-    });
-
-    if (font?.fontFamilyBold) {
-      titleStyles.push({ fontFamily: font.fontFamilyBold });
+  const handlePress = useCallback(() => {
+    if (isPressing.current) return;
+    isPressing.current = true;
+    try {
+      triggerHaptic(
+        message?.hapticFeedback ?? config.accessibility?.hapticFeedback,
+      );
+      message?.onPress?.();
+      dismiss();
+    } finally {
+      setTimeout(() => {
+        isPressing.current = false;
+      }, 100);
     }
-
-    if (titleStyle) {
-      titleStyles.push(titleStyle);
-    }
-
-    // Build message styles with explicit font size
-    messageStyles.push({
-      color: '#fff',
-      fontSize: effectiveMessageFontSize,
-    });
-
-    if (font?.fontFamilyRegular) {
-      messageStyles.push({ fontFamily: font.fontFamilyRegular });
-    }
-
-    if (messageStyle) {
-      messageStyles.push(messageStyle);
-    }
-
-    return {
-      title: titleStyles,
-      message: messageStyles,
-    };
   }, [
-    font?.fontFamilyBold,
-    font?.fontFamilyRegular,
-    font?.titleFontSize,
-    font?.messageFontSize,
-    message.titleFontSize,
-    message.messageFontSize,
-    titleStyle,
-    messageStyle,
+    config.accessibility?.hapticFeedback,
+    dismiss,
+    message?.hapticFeedback,
+    message?.onPress,
   ]);
 
-  // Memoize accessibility props derived from message and config
-  const accessibilityProps = useMemo(() => {
-    const type = message.type ?? 'info';
-    const isInteractive = !!message.onPress;
+  /* ------------------------- Swipe-to-dismiss (opt-in) ------------------- */
 
-    // Use custom label if provided, otherwise generate from title/message
+  const panResponder = useMemo(() => {
+    if (!config.swipeToDismiss) return null;
+    return PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_evt, g) =>
+        Math.abs(g.dx) > 6 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderGrant: () => {
+        toastStore.pause(id);
+      },
+      onPanResponderMove: Animated.event([null, { dx: translateX }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: (_evt, g: PanResponderGestureState) => {
+        const past =
+          Math.abs(g.dx) > screenWidth * SWIPE_DISTANCE_RATIO ||
+          Math.abs(g.vx) > SWIPE_VELOCITY_THRESHOLD;
+        if (past) {
+          const direction = g.dx >= 0 ? 1 : -1;
+          Animated.timing(translateX, {
+            toValue: direction * screenWidth,
+            duration: 160,
+            useNativeDriver: true,
+          }).start(() => dismiss());
+        } else {
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+          toastStore.resume(id);
+        }
+      },
+      onPanResponderTerminate: () => {
+        Animated.spring(translateX, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+        toastStore.resume(id);
+      },
+    });
+  }, [config.swipeToDismiss, dismiss, id, screenWidth, translateX]);
+
+  /* ------------------------------ A11y ----------------------------------- */
+
+  const accessibilityProps = useMemo(() => {
+    if (!message) {
+      return {
+        label: '',
+        hint: '',
+        role: 'button' as string,
+        liveRegion: 'polite' as 'polite' | 'assertive',
+      };
+    }
+    const type = message.type ?? 'info';
+    // Toasts are always tap-dismissible regardless of `onPress`, so the a11y
+    // hint should always advertise that. `onPress` is purely a callback hook,
+    // not a gate for interactivity.
+    const isInteractive = true;
     const label =
       message.accessibilityLabel ?? generateAccessibilityLabel(message);
-
-    // Use custom hint if provided, otherwise generate from type and interaction
     const hint =
       message.accessibilityHint ??
       generateAccessibilityHint(type, isInteractive);
-
-    // Determine accessibility role (can be customized via config)
     const roleMap = config.accessibility?.roleMap;
     const role = roleMap?.[type] ?? TOAST_TYPE_TO_ROLE[type] ?? 'button';
-
-    // Determine live region (polite for non-urgent, assertive for urgent)
     const liveRegion = TOAST_TYPE_TO_LIVE_REGION[type] ?? 'polite';
-
-    return {
-      label,
-      hint,
-      role,
-      liveRegion,
-    };
+    return { label, hint, role, liveRegion };
   }, [message, config.accessibility?.roleMap]);
 
-  // Determine font scaling setting (per-toast override, then global config, then default false)
   const allowFontScaling =
-    message.allowFontScaling ?? config.accessibility?.allowFontScaling ?? false;
-
-  // Determine message max lines (per-toast override, then global config, then default 2)
+    message?.allowFontScaling ??
+    config.accessibility?.allowFontScaling ??
+    false;
   const messageMaxLines =
-    message.messageMaxLines ?? config.accessibility?.messageMaxLines ?? 2;
+    message?.messageMaxLines ?? config.accessibility?.messageMaxLines ?? 2;
 
-  /**
-   * Initiates toast dismissal animation.
-   * Safe to call multiple times (guarded by isDismissing ref).
-   * Ensures onRemove is only called after animation completes.
-   * Properly cancels any running animations to prevent memory leaks.
-   * Handles rapid presses by immediately removing if already dismissing.
-   */
-  const runDismiss = useCallback(() => {
-    // If already dismissing or removed, do nothing
-    if (isDismissing.current || hasBeenRemoved.current) {
-      return;
-    }
+  /* ------------------------------ Styles --------------------------------- */
 
-    isDismissing.current = true;
+  const textStyles = useMemo(() => {
+    const titleSize =
+      message?.titleFontSize ?? config.font?.titleFontSize ?? 16;
+    const messageSize =
+      message?.messageFontSize ?? config.font?.messageFontSize ?? 14;
 
-    // Stop any running enter animation
-    if (animatedSequenceRef.current) {
-      animatedSequenceRef.current.stop?.();
-    }
+    const title: StyleProp<TextStyle>[] = [
+      {
+        color: '#fff',
+        fontSize: titleSize,
+        fontWeight: '600',
+        marginBottom: 4,
+      },
+    ];
+    if (config.font?.fontFamilyBold)
+      title.push({ fontFamily: config.font.fontFamilyBold });
+    if (config.titleStyle) title.push(config.titleStyle);
 
-    // Clear any pending auto-dismiss timeout
-    if (dismissTimeoutRef.current) {
-      clearTimeout(dismissTimeoutRef.current);
-      dismissTimeoutRef.current = null;
-    }
+    const messageStyle: StyleProp<TextStyle>[] = [
+      { color: '#fff', fontSize: messageSize },
+    ];
+    if (config.font?.fontFamilyRegular)
+      messageStyle.push({ fontFamily: config.font.fontFamilyRegular });
+    if (config.messageStyle) messageStyle.push(config.messageStyle);
 
-    const dismissAnimation = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: disappearDuration,
-        easing,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translate, {
-        toValue: initialTranslation,
-        duration: disappearDuration,
-        easing,
-        useNativeDriver: true,
-      }),
-    ]);
-
-    // Store animation reference for cleanup
-    animatedSequenceRef.current = dismissAnimation;
-
-    dismissAnimation.start(() => {
-      // Mark as removed and call onRemove only once
-      if (!hasBeenRemoved.current) {
-        hasBeenRemoved.current = true;
-        onRemove(message.id);
-      }
-    });
+    return { title, message: messageStyle };
   }, [
-    disappearDuration,
-    easing,
-    initialTranslation,
-    message.id,
-    onRemove,
-    opacity,
-    translate,
+    message?.titleFontSize,
+    message?.messageFontSize,
+    config.font?.titleFontSize,
+    config.font?.messageFontSize,
+    config.font?.fontFamilyBold,
+    config.font?.fontFamilyRegular,
+    config.titleStyle,
+    config.messageStyle,
   ]);
 
-  /**
-   * Handles user press on the toast.
-   * Calls message.onPress if provided, then dismisses.
-   * Triggers haptic feedback if enabled in config.
-   * Handles rapid presses by ensuring dismissal occurs and preventing duplicate handling.
-   */
-  const handlePress = useCallback(() => {
-    // Prevent multiple rapid presses
-    if (isPressing.current) return;
-    isPressing.current = true;
-
-    // Clear any existing press timeout
-    if (pressTimeoutRef.current) {
-      clearTimeout(pressTimeoutRef.current);
-    }
-
-    try {
-      // Trigger haptic feedback if enabled
-      if (config.accessibility?.hapticFeedback) {
-        triggerHaptic('light');
-      }
-
-      // Call custom onPress handler
-      message.onPress?.();
-
-      // Always dismiss, even for rapid presses
-      runDismiss();
-    } finally {
-      // Reset pressing state after a short delay to allow for animation
-      pressTimeoutRef.current = setTimeout(() => {
-        isPressing.current = false;
-        pressTimeoutRef.current = null;
-      }, 100);
-    }
-  }, [message, runDismiss, config.accessibility?.hapticFeedback]);
-
-  /**
-   * Entry animation and auto-dismiss setup.
-   * Plays enter animation immediately, then schedules auto-dismiss if enabled.
-   * Cleanup properly cancels animations and removes timeouts to prevent memory leaks.
-   * Tracks entering state to prevent conflicts with dismiss animations.
-   */
-  useEffect(() => {
-    isEntering.current = true;
-    translate.setValue(initialTranslation);
-
-    const enterAnimation = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: appearDuration,
-        easing,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translate, {
-        toValue: 0,
-        speed: 18,
-        bounciness: 9,
-        useNativeDriver: true,
-      }),
-    ]);
-
-    // Store animation reference for cleanup
-    animatedSequenceRef.current = enterAnimation;
-
-    enterAnimation.start(() => {
-      isEntering.current = false;
-    });
-
-    let timer: NodeJS.Timeout | null = null;
-
-    if (shouldAutoDismiss) {
-      timer = setTimeout(runDismiss, effectiveDuration);
-      dismissTimeoutRef.current = timer;
-    }
-
-    return () => {
-      isEntering.current = false;
-      isPressing.current = false;
-      // Clean up animation if component unmounts during animation
-      if (animatedSequenceRef.current) {
-        animatedSequenceRef.current.stop?.();
-      }
-      // Clean up timers
-      if (timer) {
-        clearTimeout(timer);
-      }
-      if (dismissTimeoutRef.current) {
-        clearTimeout(dismissTimeoutRef.current);
-        dismissTimeoutRef.current = null;
-      }
-      if (pressTimeoutRef.current) {
-        clearTimeout(pressTimeoutRef.current);
-        pressTimeoutRef.current = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    appearDuration,
-    easing,
-    effectiveDuration,
-    initialTranslation,
-    runDismiss,
-    shouldAutoDismiss,
-    opacity,
-    translate,
-  ]);
-
-  /**
-   * Compute complete toast style from utilities and overrides.
-   * Uses buildToastStyle to manage complex style hierarchy.
-   */
   const alignmentStyle = useMemo(
     () =>
       getToastAlignment(
         horizontalPosition,
         placement,
-        marginHorizontal,
+        config.marginHorizontal ?? 16,
         screenWidth,
       ),
-    [horizontalPosition, placement, marginHorizontal, screenWidth],
+    [horizontalPosition, placement, config.marginHorizontal, screenWidth],
   );
 
   const animationStyle = useMemo(
-    () => ({ opacity, transform: [{ translateY: translate }] }),
-    [opacity, translate],
+    () => ({
+      opacity,
+      transform: [{ translateY }, { translateX }],
+    }),
+    [opacity, translateY, translateX],
   );
 
-  const containerStyle = useMemo(
-    () => buildToastStyle(config, message, alignmentStyle, animationStyle),
-    [config, message, alignmentStyle, animationStyle],
-  );
+  const containerStyle = useMemo(() => {
+    if (!message) return [alignmentStyle, animationStyle];
+    return buildToastStyle(config, message, alignmentStyle, animationStyle);
+  }, [config, message, alignmentStyle, animationStyle]);
 
-  /**
-   * Handles keyboard events for accessibility (Web only).
-   * Allows dismissing toast with Escape key for keyboard-only users.
-   * Note: This only works on web platform via custom implementation.
-   */
   const handleKeyDown = useCallback(
-    (event: any) => {
-      // Handle Escape key to dismiss toast (accessibility)
-      if (
-        event.nativeEvent?.key === 'Escape' ||
-        event.nativeEvent?.keyCode === 27
-      ) {
-        event.preventDefault?.();
-        handlePress();
+    (event: NativeSyntheticEvent<{ key?: string; keyCode?: number }>) => {
+      const native = event.nativeEvent;
+      if (native?.key === 'Escape' || native?.keyCode === 27) {
+        (
+          event as unknown as { preventDefault?: () => void }
+        ).preventDefault?.();
+        dismiss();
       }
     },
-    [handlePress],
+    [dismiss],
   );
+
+  if (!message) return null;
 
   return (
     <Animated.View
@@ -439,16 +261,27 @@ const Toast: React.FC<ToastProps> = ({
       style={containerStyle}
       accessible={true}
       accessibilityLiveRegion={accessibilityProps.liveRegion}
-      // @ts-expect-error - Web platform keyboard support
+      // biome-ignore lint/suspicious/noTsIgnore: tsc strict build flags @ts-expect-error as unused for RN-Web onKeyDown
+      // @ts-ignore - Web platform keyboard support
       onKeyDown={handleKeyDown}
+      {...(panResponder ? panResponder.panHandlers : {})}
     >
       <Pressable
-        accessibilityRole={accessibilityProps.role}
+        accessibilityRole={accessibilityProps.role as never}
         accessibilityLabel={accessibilityProps.label}
         accessibilityHint={accessibilityProps.hint}
         onPress={handlePress}
+        onFocus={pauseAutoDismiss}
+        onBlur={resumeAutoDismiss}
+        // biome-ignore lint/suspicious/noTsIgnore: tsc strict build flags @ts-expect-error as unused for RN-Web onHoverIn
+        // @ts-ignore - RN Web hover events
+        onHoverIn={pauseAutoDismiss}
+        // biome-ignore lint/suspicious/noTsIgnore: tsc strict build flags @ts-expect-error as unused for RN-Web onHoverOut
+        // @ts-ignore - RN Web hover events
+        onHoverOut={resumeAutoDismiss}
         style={toastStyles.pressable}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        // WCAG 2.2 SC 2.5.8 — minimum tap target 24x24, we exceed via hitSlop.
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
       >
         {message.icon ? (
           <View style={toastStyles.icon} pointerEvents="none">
@@ -456,7 +289,7 @@ const Toast: React.FC<ToastProps> = ({
           </View>
         ) : null}
         <View style={toastStyles.content} pointerEvents="none">
-          {message.title && (
+          {message.title ? (
             <Text
               style={textStyles.title}
               allowFontScaling={allowFontScaling}
@@ -464,11 +297,11 @@ const Toast: React.FC<ToastProps> = ({
             >
               {message.title}
             </Text>
-          )}
+          ) : null}
           <Text
             style={textStyles.message}
             allowFontScaling={allowFontScaling}
-            numberOfLines={messageMaxLines}
+            numberOfLines={messageMaxLines || undefined}
           >
             {message.message}
           </Text>
@@ -478,4 +311,4 @@ const Toast: React.FC<ToastProps> = ({
   );
 };
 
-export default React.memo(Toast);
+export default React.memo(ToastItem);

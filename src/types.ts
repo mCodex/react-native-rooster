@@ -11,6 +11,19 @@ export type ToastPlacement = 'top' | 'bottom';
 export type ToastHorizontalPosition = 'left' | 'center' | 'right';
 
 /**
+ * Haptic feedback intensities. `false` disables feedback entirely. Used by
+ * both per-toast `hapticFeedback` and global `accessibility.hapticFeedback`.
+ */
+export type HapticFeedback =
+  | false
+  | 'light'
+  | 'medium'
+  | 'heavy'
+  | 'success'
+  | 'warning'
+  | 'error';
+
+/**
  * Combined position controls. `vertical` defaults to the legacy `placement`,
  * while `horizontal` enables aligning the stack left/right/center.
  */
@@ -62,85 +75,39 @@ export interface ToastMessage {
 
   // Accessibility Properties
   /**
-   * Custom accessibility label for screen readers.
-   * If not provided, automatically generated from title and message.
-   * Maximum 150 characters recommended for optimal screen reader experience.
-   *
-   * @example
-   * accessibilityLabel="Payment successful. Your order #12345 is confirmed."
+   * Custom accessibility label for screen readers. If omitted, generated
+   * automatically from `title` + `message` (capped at 150 chars).
    */
   accessibilityLabel?: string;
 
   /**
-   * Additional context announced after accessibilityLabel.
-   * Typically describes available actions or toast purpose.
-   * Automatically includes "Double tap to dismiss" if onPress is provided.
-   * Maximum 100 characters recommended.
-   *
-   * @example
-   * accessibilityHint="Tap to view order details"
+   * Additional context spoken after the label. Defaults to a type-specific
+   * hint, optionally followed by "Double tap to dismiss" when interactive.
    */
   accessibilityHint?: string;
 
   /**
-   * Allows user font scaling preferences to affect toast text size.
-   * Default: false (respects app-level default).
-   *
-   * When true, respects the device's "Text Size" accessibility setting,
-   * allowing low-vision users to increase text size as needed.
-   * When false, toast uses exact specified or default font sizes.
-   *
-   * Recommended: true for better accessibility.
-   *
-   * @example
-   * allowFontScaling: true
+   * Honor the device's font-scaling accessibility setting. Default: `false`.
+   * Recommended `true` for WCAG 2.1 SC 1.4.4 compliance.
    */
   allowFontScaling?: boolean;
 
   /**
-   * Maximum number of lines for message text.
-   * Default: 2
-   *
-   * Set to 0 for unlimited lines (use with caution - may create
-   * excessively tall toasts). Screen reader text is not truncated
-   * regardless of this setting.
-   *
-   * Note: Text truncation in UI doesn't affect screen reader output.
+   * Maximum number of lines for the message. Default: `2`. `0` for unlimited.
+   * Screen-reader output is never truncated.
    */
   messageMaxLines?: number;
 
   /**
-   * Whether to enable haptic feedback on toast appearance.
-   * Default: false
-   *
-   * Values:
-   * - false: No haptic feedback
-   * - 'light': Subtle notification (iOS: impactOccurred; Android: performHapticFeedback)
-   * - 'medium': Standard notification
-   * - 'heavy': Strong notification
-   * - 'success': Success pattern (iOS only)
-   * - 'warning': Warning pattern (iOS only)
-   * - 'error': Error pattern (iOS only)
-   *
-   * Improves tactile feedback for users, especially useful when
-   * visual notification might be missed.
-   *
-   * @example
-   * hapticFeedback: 'light'
+   * Haptic feedback fired when the toast is pressed. Default: disabled.
+   * See {@link HapticFeedback} for available intensities.
    */
-  hapticFeedback?:
-    | false
-    | 'light'
-    | 'medium'
-    | 'heavy'
-    | 'success'
-    | 'warning'
-    | 'error';
+  hapticFeedback?: HapticFeedback;
 }
 
 /**
  * Runtime configuration merged into a single object stored in context.
- * Consumers can update values via {@link ToastContextProps.setToastConfig}.
+ * Consumers can update values via {@link ToastApi.setToastConfig}.
  *
  * Accessibility: Configuration supports screen readers, high contrast,
  * and respects device accessibility settings. See `accessibility` section below.
@@ -217,116 +184,218 @@ export interface ToastConfig {
 
   // Accessibility Configuration
   /**
-   * Global accessibility settings for all toasts.
-   * Per-toast settings override these defaults.
+   * Global accessibility settings for all toasts. Per-toast values override
+   * these defaults.
    */
   accessibility?: {
-    /**
-     * Enable font scaling based on device accessibility settings.
-     * Default: false (for consistent visual design)
-     *
-     * When true, respects the device's "Text Size" accessibility setting,
-     * allowing users to adjust toast text size via device settings.
-     * Recommended for better WCAG 2.1 compliance.
-     *
-     * @example
-     * accessibility: { allowFontScaling: true }
-     */
+    /** Honor the device font-scaling preference (WCAG 1.4.4). Default: `false`. */
     allowFontScaling?: boolean;
 
-    /**
-     * Default maximum lines for toast message text.
-     * Default: 2
-     *
-     * Per-toast messageMaxLines overrides this value.
-     * Set to 0 for unlimited lines (caution: may create tall toasts).
-     */
+    /** Default `messageMaxLines` for every toast. Default: `2`. */
     messageMaxLines?: number;
 
-    /**
-     * Enable haptic feedback on toast appearance by default.
-     * Default: false
-     *
-     * Per-toast hapticFeedback overrides this value.
-     * Can be 'light', 'medium', 'heavy', 'success', 'warning', 'error', or false.
-     *
-     * Improves tactile feedback for users, especially beneficial for
-     * notifications that might be missed visually.
-     *
-     * @example
-     * accessibility: { hapticFeedback: 'light' }
-     */
-    hapticFeedback?:
-      | false
-      | 'light'
-      | 'medium'
-      | 'heavy'
-      | 'success'
-      | 'warning'
-      | 'error';
+    /** Default {@link HapticFeedback} intensity. Default: disabled. */
+    hapticFeedback?: HapticFeedback;
 
     /**
-     * Text colors for each toast variant for contrast verification.
-     * Used to validate WCAG 2.1 AA color contrast compliance.
-     *
-     * Format: RGB array [r, g, b] with values 0-255
-     * or hex string '#RRGGBB'
-     *
-     * @example
-     * accessibility: {
-     *   textColors: {
-     *     success: [255, 255, 255], // white text
-     *     error: [255, 255, 255],
-     *     warning: [0, 0, 0],
-     *     info: [255, 255, 255],
-     *   }
-     * }
+     * Optional text colors per toast type for advanced contrast tooling.
+     * Accepts an `[r, g, b]` tuple or `#RRGGBB` string.
      */
     textColors?: Partial<Record<ToastType, [number, number, number] | string>>;
 
     /**
-     * Enable automatic accessibility announcements when toast appears.
-     * Default: true (recommended for better UX)
-     *
-     * When true, uses accessibilityLiveRegion to announce toast
-     * to screen reader users immediately upon appearance.
+     * Whether toasts auto-announce via `accessibilityLiveRegion` on appear.
+     * Default: `true`.
      */
     announceOnAppear?: boolean;
 
     /**
-     * Accessibility role for each toast type override.
-     * Default: { info: 'alert', success: 'status', warning: 'alert', error: 'alert' }
-     *
-     * Maps toast types to ARIA roles:
-     * - 'alert': Announces immediately with assertive priority
-     * - 'status': Announces with polite priority (lower interruption)
-     * - 'button': Toast is interactive
-     *
-     * @example
-     * accessibility: {
-     *   roleMap: {
-     *     success: 'status',
-     *     error: 'alert',
-     *   }
-     * }
+     * Override the `accessibilityRole` for each toast type. Falls back to a
+     * Pressable-supported role (`button`).
      */
     roleMap?: Partial<Record<ToastType, string>>;
   };
+
+  /**
+   * Maximum simultaneously visible toasts. Default: 5.
+   * When exceeded, behaviour is controlled by {@link overflow}.
+   * Set to `Infinity` to disable the cap (matches v3 behaviour).
+   */
+  maxVisible?: number;
+
+  /**
+   * Behaviour when {@link maxVisible} is exceeded.
+   * - `'evict'` (default): drop the oldest toast with a fast exit.
+   * - `'queue'`: keep the new toast pending until a slot frees up.
+   */
+  overflow?: 'evict' | 'queue';
+
+  /**
+   * Stagger between simultaneous toast entrance animations, in ms.
+   * Default: 30. Each toast schedules its enter animation with `delay = index * staggerMs`.
+   */
+  staggerMs?: number;
+
+  /**
+   * When true (default), bottom-placed toasts auto-flip to top when they would
+   * obscure a currently focused input field. Implements WCAG 2.2 SC 2.4.11.
+   */
+  respectFocus?: boolean;
+
+  /**
+   * Disable auto-dismiss globally. Useful for accessibility flows where users
+   * always dismiss manually. Default: false.
+   */
+  disableAutoDismiss?: boolean;
+
+  /**
+   * Opt-in palette tweaks for higher contrast (WCAG 2.2 1.4.6 friendly).
+   * Default: false.
+   */
+  highContrast?: boolean;
+
+  /**
+   * Enable swipe-to-dismiss as an additive gesture. Tap-to-dismiss is always available.
+   * Implemented with React Native's built-in `PanResponder` (no extra peer deps).
+   * Default: false.
+   */
+  swipeToDismiss?: boolean;
 }
 
-/** Public API exposed through {@link useToast}. */
-export interface ToastContextProps {
-  /** Push a new toast into the stack. */
-  addToast(message: Omit<ToastMessage, 'id'>): void;
-  /** Remove a toast by id, or fall back to the most recent toast. */
+/**
+ * Public API returned from {@link useToast} and exposed on the imperative
+ * `toast` facade. The v3 names (`addToast`, `removeToast`, `setToastConfig`)
+ * are preserved verbatim; `show`, `dismiss`, and `configure` are aliases.
+ */
+export interface ToastApi {
+  /**
+   * Push a new toast onto the stack and return its generated `id`.
+   *
+   * @param message - Toast payload (everything except `id`, which is generated).
+   * @returns The unique id assigned to the toast — pass it to {@link removeToast}
+   * to dismiss precisely.
+   *
+   * @example
+   * ```ts
+   * const id = toast.addToast({ type: 'info', message: 'Uploading…', duration: 0 });
+   * ```
+   */
+  addToast(message: Omit<ToastMessage, 'id'>): string;
+  /**
+   * Alias of {@link ToastApi.addToast} — named for ergonomic call sites such
+   * as `toast.show(…)`.
+   */
+  show(message: Omit<ToastMessage, 'id'>): string;
+  /**
+   * Remove a toast by id. When called without an argument, the most recently
+   * added toast is dismissed.
+   *
+   * @param id - Optional toast id returned by any add* method.
+   *
+   * @example
+   * ```ts
+   * toast.removeToast();      // dismiss latest
+   * toast.removeToast(myId);  // dismiss a specific toast
+   * ```
+   */
   removeToast(id?: string): void;
-  /** Merge new configuration values with the current provider config. */
+  /** Alias of {@link ToastApi.removeToast}. */
+  dismiss(id?: string): void;
+  /**
+   * Remove every visible and queued toast immediately.
+   *
+   * @example
+   * ```ts
+   * navigation.addListener('blur', () => toast.clear());
+   * ```
+   */
+  clear(): void;
+  /**
+   * Merge new values into the global configuration. Existing toasts already
+   * on screen keep their original config; new toasts use the merged result.
+   *
+   * @param config - Partial config; only the provided keys are overwritten.
+   *
+   * @example
+   * ```ts
+   * toast.setToastConfig({ timeToDismiss: 5000, maxVisible: 3 });
+   * ```
+   */
   setToastConfig(config: Partial<ToastConfig>): void;
+  /** Alias of {@link ToastApi.setToastConfig}. */
+  configure(config: Partial<ToastConfig>): void;
+  /**
+   * Show a `success` toast.
+   *
+   * @param message - Either a plain string (used as `message`) or a
+   * {@link ToastMessage}-shaped object without `id`/`type`.
+   * @returns The generated toast id.
+   *
+   * @example
+   * ```ts
+   * toast.success('Saved!');
+   * toast.success({ title: 'Done', message: 'Profile updated' });
+   * ```
+   */
+  success(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  /**
+   * Show an `error` toast (announced as `assertive` to screen readers).
+   *
+   * @example
+   * ```ts
+   * toast.error('Network error');
+   * toast.error({ title: 'Oops', message: 'Try again', duration: 5000 });
+   * ```
+   */
+  error(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  /**
+   * Show a `warning` toast (announced as `assertive`).
+   *
+   * @example
+   * ```ts
+   * toast.warning('Battery low');
+   * ```
+   */
+  warning(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  /**
+   * Show an `info` toast (announced as `polite`).
+   *
+   * @example
+   * ```ts
+   * toast.info('You are now online');
+   * ```
+   */
+  info(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
 }
 
-/** Props accepted by the {@link ToastProvider}. */
-export interface ToastProviderProps {
-  children: ReactNode;
-  /** Optional configuration applied on mount and used as defaults. */
-  initialConfig?: Partial<ToastConfig>;
+/**
+ * Props accepted by the {@link Toaster} component.
+ *
+ * `<Toaster />` is a **sibling**, not a wrapper — mount it once near the root
+ * of your tree. Mounting more than one instance triggers a development
+ * warning; only the first mount is honored.
+ */
+export interface ToasterProps {
+  /**
+   * Initial configuration applied on mount and merged into the global config.
+   * Updates to this prop after mount are diffed and merged automatically.
+   *
+   * @example
+   * ```tsx
+   * <Toaster
+   *   config={{
+   *     timeToDismiss: 4000,
+   *     placement: 'top',
+   *     maxVisible: 3,
+   *     swipeToDismiss: true,
+   *   }}
+   * />
+   * ```
+   */
+  config?: Partial<ToastConfig>;
+  /**
+   * Children are not required: `<Toaster />` is a sibling, not a wrapper.
+   * Accepted for the rare case of nesting it inside layout, but renders nothing.
+   */
+  children?: ReactNode;
 }
