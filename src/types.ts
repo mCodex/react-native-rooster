@@ -268,30 +268,130 @@ export interface ToastConfig {
  * are preserved verbatim; `show`, `dismiss`, and `configure` are aliases.
  */
 export interface ToastApi {
-  /** Push a new toast into the stack. */
+  /**
+   * Push a new toast onto the stack and return its generated `id`.
+   *
+   * @param message - Toast payload (everything except `id`, which is generated).
+   * @returns The unique id assigned to the toast — pass it to {@link removeToast}
+   * to dismiss precisely.
+   *
+   * @example
+   * ```ts
+   * const id = toast.addToast({ type: 'info', message: 'Uploading…', duration: 0 });
+   * ```
+   */
   addToast(message: Omit<ToastMessage, 'id'>): string;
-  /** Alias of {@link addToast}. */
+  /**
+   * Alias of {@link ToastApi.addToast} — named for ergonomic call sites such
+   * as `toast.show(…)`.
+   */
   show(message: Omit<ToastMessage, 'id'>): string;
-  /** Remove a toast by id, or fall back to the most recent toast. */
+  /**
+   * Remove a toast by id. When called without an argument, the most recently
+   * added toast is dismissed.
+   *
+   * @param id - Optional toast id returned by any add* method.
+   *
+   * @example
+   * ```ts
+   * toast.removeToast();      // dismiss latest
+   * toast.removeToast(myId);  // dismiss a specific toast
+   * ```
+   */
   removeToast(id?: string): void;
-  /** Alias of {@link removeToast}. */
+  /** Alias of {@link ToastApi.removeToast}. */
   dismiss(id?: string): void;
-  /** Remove all toasts immediately. */
+  /**
+   * Remove every visible and queued toast immediately.
+   *
+   * @example
+   * ```ts
+   * navigation.addListener('blur', () => toast.clear());
+   * ```
+   */
   clear(): void;
-  /** Merge new configuration values with the current global config. */
+  /**
+   * Merge new values into the global configuration. Existing toasts already
+   * on screen keep their original config; new toasts use the merged result.
+   *
+   * @param config - Partial config; only the provided keys are overwritten.
+   *
+   * @example
+   * ```ts
+   * toast.setToastConfig({ timeToDismiss: 5000, maxVisible: 3 });
+   * ```
+   */
   setToastConfig(config: Partial<ToastConfig>): void;
-  /** Alias of {@link setToastConfig}. */
+  /** Alias of {@link ToastApi.setToastConfig}. */
   configure(config: Partial<ToastConfig>): void;
-  /** Convenience helpers for common types. */
+  /**
+   * Show a `success` toast.
+   *
+   * @param message - Either a plain string (used as `message`) or a
+   * {@link ToastMessage}-shaped object without `id`/`type`.
+   * @returns The generated toast id.
+   *
+   * @example
+   * ```ts
+   * toast.success('Saved!');
+   * toast.success({ title: 'Done', message: 'Profile updated' });
+   * ```
+   */
   success(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  /**
+   * Show an `error` toast (announced as `assertive` to screen readers).
+   *
+   * @example
+   * ```ts
+   * toast.error('Network error');
+   * toast.error({ title: 'Oops', message: 'Try again', duration: 5000 });
+   * ```
+   */
   error(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  /**
+   * Show a `warning` toast (announced as `assertive`).
+   *
+   * @example
+   * ```ts
+   * toast.warning('Battery low');
+   * ```
+   */
   warning(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
+  /**
+   * Show an `info` toast (announced as `polite`).
+   *
+   * @example
+   * ```ts
+   * toast.info('You are now online');
+   * ```
+   */
   info(message: string | Omit<ToastMessage, 'id' | 'type'>): string;
 }
 
-/** Props accepted by the {@link Toaster} component. */
+/**
+ * Props accepted by the {@link Toaster} component.
+ *
+ * `<Toaster />` is a **sibling**, not a wrapper — mount it once near the root
+ * of your tree. Mounting more than one instance triggers a development
+ * warning; only the first mount is honored.
+ */
 export interface ToasterProps {
-  /** Optional configuration applied on mount and merged into the global config. */
+  /**
+   * Initial configuration applied on mount and merged into the global config.
+   * Updates to this prop after mount are diffed and merged automatically.
+   *
+   * @example
+   * ```tsx
+   * <Toaster
+   *   config={{
+   *     timeToDismiss: 4000,
+   *     placement: 'top',
+   *     maxVisible: 3,
+   *     swipeToDismiss: true,
+   *   }}
+   * />
+   * ```
+   */
   config?: Partial<ToastConfig>;
   /**
    * Children are not required: `<Toaster />` is a sibling, not a wrapper.

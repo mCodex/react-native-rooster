@@ -67,6 +67,51 @@ export default function App() {
 
 `<Toaster />` renders nothing until the first toast is added (lazy mount).
 
+### Recommended: the `useToast` hook
+
+For most React Native apps written today (function components + hooks), the `useToast` hook is the most ergonomic entry point. It returns the **same singleton API** as the imperative `toast` object, but lives inside the React tree so destructured methods feel natural in event handlers.
+
+```tsx
+import { useToast } from 'react-native-rooster';
+import { Pressable, Text, View } from 'react-native';
+
+function SaveButton() {
+  // The hook returns a stable reference. It does NOT subscribe to toast
+  // state, so this component never re-renders when toasts change.
+  const { success, error } = useToast();
+
+  const onPress = async () => {
+    try {
+      await api.save();
+      success('Saved!');
+    } catch (e) {
+      error({ title: 'Oops', message: 'Try again', duration: 5000 });
+    }
+  };
+
+  return (
+    <Pressable onPress={onPress}>
+      <Text>Save</Text>
+    </Pressable>
+  );
+}
+```
+
+**Why prefer the hook?**
+
+- ✅ Stable reference — safe to put in `useCallback`/`useEffect` dep arrays without causing re-runs.
+- ✅ Zero re-renders — the hook does not subscribe to store updates.
+- ✅ Full TypeScript autocomplete on every method, including the `success` / `error` / `warning` / `info` shortcuts.
+- ✅ Same `id` is returned from each method, so you can dismiss precisely:
+  ```tsx
+  const { addToast, dismiss } = useToast();
+  const id = addToast({ message: 'Uploading…', duration: 0 });
+  // later, when upload completes:
+  dismiss(id);
+  ```
+
+> **Tip:** `useToast()` and the imperative `toast` are interchangeable — they share the same store. Use the hook inside components and the imperative facade in services / interceptors / reducers.
+
 ### Imperative usage (no hook required)
 
 ```ts

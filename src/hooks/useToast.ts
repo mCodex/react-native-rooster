@@ -2,25 +2,40 @@ import { toast } from '../toast';
 import type { ToastApi } from '../types';
 
 /**
- * Access the toast API.
+ * React hook returning the toast API.
  *
- * In v4 there is no provider — the hook returns a stable singleton bound to
- * the internal store. Calling `useToast()` does not subscribe to any state
- * and therefore never causes the calling component to re-render.
+ * Recommended entry point for **function components**. The hook returns a
+ * stable singleton bound to the internal store — it does not subscribe to any
+ * state, so the calling component **never re-renders** when toasts are added,
+ * removed, or updated.
  *
- * The v3 method names (`addToast`, `removeToast`, `setToastConfig`) are
- * preserved verbatim. `show`, `dismiss`, `configure`, `clear`, and the
- * type-specific helpers (`success`, `error`, `warning`, `info`) are aliases
- * provided for ergonomics.
+ * @returns The {@link ToastApi} object. Reference is stable across renders
+ * and identical to the imperative {@link toast} export.
  *
- * @example
- * const { addToast } = useToast();
- * addToast({ type: 'success', message: 'Saved!' });
- *
- * @example
- * const { success, error } = useToast();
+ * @example Show a success toast
+ * ```tsx
+ * const { success } = useToast();
  * success('Saved!');
- * error({ title: 'Oops', message: 'Try again' });
+ * ```
+ *
+ * @example Capture an id and dismiss later
+ * ```tsx
+ * const { addToast, dismiss } = useToast();
+ * const id = addToast({ message: 'Uploading…', duration: 0 });
+ * // …later
+ * dismiss(id);
+ * ```
+ *
+ * @example Configure at runtime
+ * ```tsx
+ * const { configure } = useToast();
+ * useEffect(() => {
+ *   configure({ timeToDismiss: 5000, maxVisible: 3 });
+ * }, [configure]);
+ * ```
+ *
+ * @see {@link toast} — same API, callable from outside React.
+ * @see {@link Toaster} — the mount point you must render once.
  */
 const useToast = (): ToastApi => toast;
 

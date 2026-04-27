@@ -18,15 +18,32 @@ const setToastConfig: ToastApi['setToastConfig'] = (config) =>
 const clear: ToastApi['clear'] = () => toastStore.clear();
 
 /**
- * Imperative facade for use outside the React tree (services, interceptors,
- * sagas, plain helpers). All methods mirror {@link useToast}.
+ * Imperative facade for use **outside the React tree** — services, fetch
+ * interceptors, sagas, error boundaries, redux reducers, plain helpers.
  *
- * @example
+ * All methods mirror the {@link useToast} hook and operate on the same
+ * internal store, so toasts triggered here appear in the same `<Toaster />`
+ * mounted in your app.
+ *
+ * @example From an axios interceptor
+ * ```ts
  * import { toast } from 'react-native-rooster';
  *
- * toast.success('Saved!');
- * toast.error({ title: 'Oops', message: 'Try again' });
- * toast.configure({ position: { vertical: 'top' } });
+ * axios.interceptors.response.use(
+ *   (r) => r,
+ *   (err) => {
+ *     toast.error({ title: 'Network error', message: err.message });
+ *     return Promise.reject(err);
+ *   },
+ * );
+ * ```
+ *
+ * @example One-off configuration at app startup
+ * ```ts
+ * toast.configure({ timeToDismiss: 4000, placement: 'top' });
+ * ```
+ *
+ * @see {@link useToast} — same API as a React hook.
  */
 export const toast: ToastApi = {
   addToast,
@@ -42,7 +59,18 @@ export const toast: ToastApi = {
   info: (m) => addToast(normalizeInput(m, 'info')),
 };
 
-/** Convenience alias of {@link toast.configure}. */
+/**
+ * Convenience alias of {@link ToastApi.configure}.
+ *
+ * @param config - Partial configuration merged into the global config.
+ *
+ * @example
+ * ```ts
+ * import { configureToast } from 'react-native-rooster';
+ *
+ * configureToast({ timeToDismiss: 5000, maxVisible: 3 });
+ * ```
+ */
 export const configureToast = toast.configure;
 
 export default toast;

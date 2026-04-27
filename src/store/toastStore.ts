@@ -23,6 +23,8 @@ type Listener = () => void;
 interface InternalState {
   /** Currently visible toasts, in insertion order (oldest first). */
   messages: ToastMessage[];
+  /** O(1) id→message lookup, kept in sync with `messages`. */
+  byId: Map<string, ToastMessage>;
   /** Stable reference to the visible message ids. */
   ids: string[];
   /** Pending toasts waiting for a slot when overflow === 'queue'. */
@@ -35,6 +37,7 @@ const FAST_EVICT_DURATION = 120;
 
 const createState = (): InternalState => ({
   messages: [],
+  byId: new Map(),
   ids: [],
   queue: [],
   config: DEFAULT_TOAST_CONFIG,
@@ -51,21 +54,15 @@ const configListeners = new Set<Listener>();
 const messageListeners = new Map<string, Set<Listener>>();
 
 const notifyIds = () => {
-  idsListeners.forEach((l) => {
-    l();
-  });
+  for (const l of idsListeners) l();
 };
 const notifyConfig = () => {
-  configListeners.forEach((l) => {
-    l();
-  });
+  for (const l of configListeners) l();
 };
 const notifyMessage = (id: string) => {
   const listeners = messageListeners.get(id);
-  if (listeners)
-    listeners.forEach((l) => {
-      l();
-    });
+  if (!listeners) return;
+  for (const l of listeners) l();
 };
 
 /* ------------------------------------------------------------------------- */
@@ -93,9 +90,13 @@ const flush = () => {
     notifyConfig();
   }
   if (pendingMessageNotify.size > 0) {
-    const ids = Array.from(pendingMessageNotify);
-    pendingMessageNotify.clear();
-    ids.forEach(notifyMessage);
+    // Drain in-place — avoids the intermediate Array.from() allocation.
+    const ids = pendingMessageNotify;
+    const drained: string[] = [];
+    for (const id of ids) drained.push(id);
+    ids.clear();
+    for (let i = 0; i < drained.length; i += 1)
+      notifyMessage(drained[i] as string);
   }
 };
 
@@ -160,8 +161,12 @@ const startTimer = (id: string, duration: number) => {
 /* Helpers                                                                   */
 /* ------------------------------------------------------------------------- */
 
-const computeIds = (messages: ToastMessage[]): string[] =>
-  messages.map((m) => m.id);
+const computeIds = (messages: ToastMessage[]): string[] => {
+  const out = new Array<string>(messages.length);
+  for (let i = 0; i < messages.length; i += 1)
+    out[i] = (messages[i] as ToastMessage).id;
+  return out;
+};
 
 const idsEqual = (a: string[], b: string[]): boolean => {
   if (a === b) return true;
@@ -170,8 +175,19 @@ const idsEqual = (a: string[], b: string[]): boolean => {
   return true;
 };
 
+/** Rebuild the byId index from a fresh messages array. */
+const rebuildIndex = (messages: ToastMessage[]): Map<string, ToastMessage> => {
+  const map = new Map<string, ToastMessage>();
+  for (let i = 0; i < messages.length; i += 1) {
+    const m = messages[i] as ToastMessage;
+    map.set(m.id, m);
+  }
+  return map;
+};
+
 const setMessages = (next: ToastMessage[]) => {
   state.messages = next;
+  state.byId = rebuildIndex(next);
   const nextIds = computeIds(next);
   if (!idsEqual(state.ids, nextIds)) {
     state.ids = nextIds;
@@ -186,11 +202,24 @@ const effectiveDurationFor = (message: ToastMessage): number => {
 
 const promoteFromQueue = () => {
   const max = state.config.maxVisible ?? Number.POSITIVE_INFINITY;
-  while (state.queue.length > 0 && state.messages.length < max) {
+  if (state.queue.length === 0 || state.messages.length >= max) return;
+
+  // Batch every promotion into a single setMessages() call so listeners
+  // are notified once and ids are allocated once.
+  const promoted: typeof state.queue = [];
+  while (
+    state.queue.length > 0 &&
+    state.messages.length + promoted.length < max
+  ) {
     const next = state.queue.shift();
     if (!next) break;
-    state.messages = state.messages.concat(next);
-    setMessages(state.messages);
+    promoted.push(next);
+  }
+  if (promoted.length === 0) return;
+
+  setMessages(state.messages.concat(promoted));
+  for (let i = 0; i < promoted.length; i += 1) {
+    const next = promoted[i] as (typeof promoted)[number];
     startTimer(next.id, effectiveDurationFor(next));
   }
 };
@@ -211,11 +240,9 @@ const add = (input: Omit<ToastMessage, 'id'>): string => {
     // 'evict' — drop the oldest with a fast exit
     const evicted = state.messages[0];
     if (evicted) {
-      const original = effectiveDurationFor(evicted);
       // Re-arm timer to fire (almost) immediately so the UI plays exit anim
       clearTimer(evicted.id);
       startTimer(evicted.id, FAST_EVICT_DURATION);
-      void original;
     }
   }
 
@@ -233,14 +260,19 @@ const remove = (id?: string) => {
   }
   if (!target) return;
 
-  // Strip from queue first (cheaper, no timer)
-  const queueIndex = state.queue.findIndex((m) => m.id === target);
-  if (queueIndex >= 0) {
-    state.queue = state.queue.filter((m) => m.id !== target);
-    return;
+  // Strip from queue first (cheaper, no timer). Single pass.
+  if (state.queue.length > 0) {
+    const queueIndex = state.queue.findIndex((m) => m.id === target);
+    if (queueIndex >= 0) {
+      const nextQueue = state.queue.slice();
+      nextQueue.splice(queueIndex, 1);
+      state.queue = nextQueue;
+      return;
+    }
   }
 
-  if (!state.messages.some((m) => m.id === target)) return;
+  // O(1) membership check via index.
+  if (!state.byId.has(target)) return;
 
   clearTimer(target);
   setMessages(state.messages.filter((m) => m.id !== target));
@@ -249,10 +281,9 @@ const remove = (id?: string) => {
 };
 
 const clear = () => {
-  state.messages.forEach((m) => {
-    clearTimer(m.id);
-  });
+  for (const m of state.messages) clearTimer(m.id);
   state.messages = [];
+  state.byId.clear();
   state.queue = [];
   if (state.ids.length > 0) {
     state.ids = [];
@@ -268,13 +299,16 @@ const setConfig = (partial: Partial<ToastConfig>) => {
 };
 
 const updateMessage = (id: string, patch: Partial<ToastMessage>) => {
-  const idx = state.messages.findIndex((m) => m.id === id);
-  if (idx < 0) return;
-  const current = state.messages[idx];
+  const current = state.byId.get(id);
   if (!current) return;
+  // Locate index without a second linear scan when possible.
+  const idx = state.messages.indexOf(current);
+  if (idx < 0) return;
+  const updated: ToastMessage = { ...current, ...patch, id };
   const next = state.messages.slice();
-  next[idx] = { ...current, ...patch, id };
+  next[idx] = updated;
   state.messages = next;
+  state.byId.set(id, updated);
   queueMessageNotification(id);
 };
 
@@ -299,8 +333,7 @@ const resume = (id: string) => {
 
 const getIds = (): string[] => state.ids;
 const getConfig = (): ToastConfig => state.config;
-const getMessage = (id: string): ToastMessage | undefined =>
-  state.messages.find((m) => m.id === id);
+const getMessage = (id: string): ToastMessage | undefined => state.byId.get(id);
 const getMessages = (): ToastMessage[] => state.messages;
 
 /* ------------------------------------------------------------------------- */
@@ -337,9 +370,7 @@ const subscribeMessage = (id: string, listener: Listener): (() => void) => {
 /* ------------------------------------------------------------------------- */
 
 const __resetForTests = () => {
-  timers.forEach((t) => {
-    clearTimeout(t.handle);
-  });
+  for (const t of timers.values()) clearTimeout(t.handle);
   timers.clear();
   idsListeners.clear();
   configListeners.clear();
