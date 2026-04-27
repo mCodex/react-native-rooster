@@ -10,6 +10,7 @@
     "erasableSyntaxOnly": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM"],
     "libReplacement": false,
