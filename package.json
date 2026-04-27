@@ -10,21 +10,6 @@
       "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
     },
-    "./accessibility": {
-      "source": "./src/utils/accessibility.ts",
-      "types": "./lib/typescript/src/utils/accessibility.d.ts",
-      "default": "./lib/module/utils/accessibility.js"
-    },
-    "./haptics": {
-      "source": "./src/utils/haptics.ts",
-      "types": "./lib/typescript/src/utils/haptics.d.ts",
-      "default": "./lib/module/utils/haptics.js"
-    },
-    "./sizing": {
-      "source": "./src/utils/sizing.ts",
-      "types": "./lib/typescript/src/utils/sizing.d.ts",
-      "default": "./lib/module/utils/sizing.js"
-    },
     "./package.json": "./package.json"
   },
   "files": [

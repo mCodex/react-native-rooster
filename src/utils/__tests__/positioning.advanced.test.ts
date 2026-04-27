@@ -64,8 +64,8 @@ describe('positioning advanced', () => {
     });
 
     it('should handle all horizontal positions with bottom', () => {
-      ['left', 'center', 'right'].forEach((position) => {
-        const style = getToastAlignment(position as any, 'bottom', 16, 800);
+      (['left', 'center', 'right'] as const).forEach((position) => {
+        const style = getToastAlignment(position, 'bottom', 16, 800);
 
         expect(style).toBeDefined();
         expect(style.alignSelf).toBeDefined();
@@ -73,8 +73,8 @@ describe('positioning advanced', () => {
     });
 
     it('should handle all horizontal positions with top', () => {
-      ['left', 'center', 'right'].forEach((position) => {
-        const style = getToastAlignment(position as any, 'top', 16, 800);
+      (['left', 'center', 'right'] as const).forEach((position) => {
+        const style = getToastAlignment(position, 'top', 16, 800);
 
         expect(style).toBeDefined();
         expect(style.alignSelf).toBeDefined();

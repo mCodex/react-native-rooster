@@ -75,71 +75,32 @@ export interface ToastMessage {
 
   // Accessibility Properties
   /**
-   * Custom accessibility label for screen readers.
-   * If not provided, automatically generated from title and message.
-   * Maximum 150 characters recommended for optimal screen reader experience.
-   *
-   * @example
-   * accessibilityLabel="Payment successful. Your order #12345 is confirmed."
+   * Custom accessibility label for screen readers. If omitted, generated
+   * automatically from `title` + `message` (capped at 150 chars).
    */
   accessibilityLabel?: string;
 
   /**
-   * Additional context announced after accessibilityLabel.
-   * Typically describes available actions or toast purpose.
-   * Automatically includes "Double tap to dismiss" if onPress is provided.
-   * Maximum 100 characters recommended.
-   *
-   * @example
-   * accessibilityHint="Tap to view order details"
+   * Additional context spoken after the label. Defaults to a type-specific
+   * hint, optionally followed by "Double tap to dismiss" when interactive.
    */
   accessibilityHint?: string;
 
   /**
-   * Allows user font scaling preferences to affect toast text size.
-   * Default: false (respects app-level default).
-   *
-   * When true, respects the device's "Text Size" accessibility setting,
-   * allowing low-vision users to increase text size as needed.
-   * When false, toast uses exact specified or default font sizes.
-   *
-   * Recommended: true for better accessibility.
-   *
-   * @example
-   * allowFontScaling: true
+   * Honor the device's font-scaling accessibility setting. Default: `false`.
+   * Recommended `true` for WCAG 2.1 SC 1.4.4 compliance.
    */
   allowFontScaling?: boolean;
 
   /**
-   * Maximum number of lines for message text.
-   * Default: 2
-   *
-   * Set to 0 for unlimited lines (use with caution - may create
-   * excessively tall toasts). Screen reader text is not truncated
-   * regardless of this setting.
-   *
-   * Note: Text truncation in UI doesn't affect screen reader output.
+   * Maximum number of lines for the message. Default: `2`. `0` for unlimited.
+   * Screen-reader output is never truncated.
    */
   messageMaxLines?: number;
 
   /**
-   * Whether to enable haptic feedback on toast appearance.
-   * Default: false
-   *
-   * Values:
-   * - false: No haptic feedback
-   * - 'light': Subtle notification (iOS: impactOccurred; Android: performHapticFeedback)
-   * - 'medium': Standard notification
-   * - 'heavy': Strong notification
-   * - 'success': Success pattern (iOS only)
-   * - 'warning': Warning pattern (iOS only)
-   * - 'error': Error pattern (iOS only)
-   *
-   * Improves tactile feedback for users, especially useful when
-   * visual notification might be missed.
-   *
-   * @example
-   * hapticFeedback: 'light'
+   * Haptic feedback fired when the toast is pressed. Default: disabled.
+   * See {@link HapticFeedback} for available intensities.
    */
   hapticFeedback?: HapticFeedback;
 }
@@ -223,91 +184,34 @@ export interface ToastConfig {
 
   // Accessibility Configuration
   /**
-   * Global accessibility settings for all toasts.
-   * Per-toast settings override these defaults.
+   * Global accessibility settings for all toasts. Per-toast values override
+   * these defaults.
    */
   accessibility?: {
-    /**
-     * Enable font scaling based on device accessibility settings.
-     * Default: false (for consistent visual design)
-     *
-     * When true, respects the device's "Text Size" accessibility setting,
-     * allowing users to adjust toast text size via device settings.
-     * Recommended for better WCAG 2.1 compliance.
-     *
-     * @example
-     * accessibility: { allowFontScaling: true }
-     */
+    /** Honor the device font-scaling preference (WCAG 1.4.4). Default: `false`. */
     allowFontScaling?: boolean;
 
-    /**
-     * Default maximum lines for toast message text.
-     * Default: 2
-     *
-     * Per-toast messageMaxLines overrides this value.
-     * Set to 0 for unlimited lines (caution: may create tall toasts).
-     */
+    /** Default `messageMaxLines` for every toast. Default: `2`. */
     messageMaxLines?: number;
 
-    /**
-     * Enable haptic feedback on toast appearance by default.
-     * Default: false
-     *
-     * Per-toast hapticFeedback overrides this value.
-     * Can be 'light', 'medium', 'heavy', 'success', 'warning', 'error', or false.
-     *
-     * Improves tactile feedback for users, especially beneficial for
-     * notifications that might be missed visually.
-     *
-     * @example
-     * accessibility: { hapticFeedback: 'light' }
-     */
+    /** Default {@link HapticFeedback} intensity. Default: disabled. */
     hapticFeedback?: HapticFeedback;
 
     /**
-     * Text colors for each toast variant for contrast verification.
-     * Used to validate WCAG 2.1 AA color contrast compliance.
-     *
-     * Format: RGB array [r, g, b] with values 0-255
-     * or hex string '#RRGGBB'
-     *
-     * @example
-     * accessibility: {
-     *   textColors: {
-     *     success: [255, 255, 255], // white text
-     *     error: [255, 255, 255],
-     *     warning: [0, 0, 0],
-     *     info: [255, 255, 255],
-     *   }
-     * }
+     * Optional text colors per toast type for advanced contrast tooling.
+     * Accepts an `[r, g, b]` tuple or `#RRGGBB` string.
      */
     textColors?: Partial<Record<ToastType, [number, number, number] | string>>;
 
     /**
-     * Enable automatic accessibility announcements when toast appears.
-     * Default: true (recommended for better UX)
-     *
-     * When true, uses accessibilityLiveRegion to announce toast
-     * to screen reader users immediately upon appearance.
+     * Whether toasts auto-announce via `accessibilityLiveRegion` on appear.
+     * Default: `true`.
      */
     announceOnAppear?: boolean;
 
     /**
-     * Accessibility role for each toast type override.
-     * Default: { info: 'alert', success: 'status', warning: 'alert', error: 'alert' }
-     *
-     * Maps toast types to ARIA roles:
-     * - 'alert': Announces immediately with assertive priority
-     * - 'status': Announces with polite priority (lower interruption)
-     * - 'button': Toast is interactive
-     *
-     * @example
-     * accessibility: {
-     *   roleMap: {
-     *     success: 'status',
-     *     error: 'alert',
-     *   }
-     * }
+     * Override the `accessibilityRole` for each toast type. Falls back to a
+     * Pressable-supported role (`button`).
      */
     roleMap?: Partial<Record<ToastType, string>>;
   };

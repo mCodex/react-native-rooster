@@ -1,92 +1,40 @@
-/**
- * Haptic feedback utilities for enhanced user experience.
- * Provides cross-platform vibration feedback for toast interactions.
- *
- * Platform support:
- * - iOS: Full haptic engine support via React Native Vibration API
- * - Android: Vibration API support (with fallback to default pattern)
- * - Web: No-op (gracefully skipped)
- *
- * @module utils/haptics
- */
-
 import { Platform, Vibration } from 'react-native';
 
-/**
- * Haptic feedback patterns for different toast events.
- * Durations in milliseconds.
- */
-export const HAPTIC_PATTERNS = {
-  /** Light tap feedback (UI feedback) */
-  light: [5] as const,
-  /** Medium feedback (notification arrival) */
-  medium: [20] as const,
-  /** Heavy/Success feedback (important action) */
-  success: [10, 20, 10] as const,
-  /** Error/Warning feedback */
-  error: [30, 20, 30] as const,
+import type { HapticFeedback } from '../types';
+
+/** Internal vibration patterns (ms). Web is a no-op. */
+const PATTERNS = {
+  light: 5,
+  medium: 20,
+  success: [10, 20, 10],
+  error: [30, 20, 30],
 } as const;
 
-export type HapticPattern = keyof typeof HAPTIC_PATTERNS;
+type Pattern = keyof typeof PATTERNS;
 
 /**
- * Triggers haptic feedback with the specified pattern.
- * Safely handles unsupported platforms.
- *
- * @param pattern - Haptic pattern to trigger ('light', 'medium', 'success', 'error')
- *
- * @example
- * // Trigger light tap when toast appears
- * triggerHaptic('light');
- *
- * @example
- * // Trigger success pattern for important notifications
- * triggerHaptic('success');
+ * Maps the public `HapticFeedback` vocabulary onto the small internal pattern
+ * set. Returns `null` when feedback is disabled or the platform is web.
  */
-export const triggerHaptic = (pattern: HapticPattern): void => {
-  try {
-    // Skip on web and unsupported platforms
-    if (Platform.OS === 'web') {
-      return;
-    }
-
-    const duration = HAPTIC_PATTERNS[pattern];
-
-    if (!duration) {
-      return;
-    }
-
-    // Convert readonly array to mutable for Vibration API
-    const mutableDuration = Array.from(duration);
-
-    // Single duration pattern: simple vibration
-    if (mutableDuration.length === 1) {
-      Vibration.vibrate(mutableDuration[0]);
-    } else {
-      // Complex pattern: vibrate with intervals
-      Vibration.vibrate(mutableDuration);
-    }
-  } catch (error) {
-    // Silently fail - some devices/environments don't support vibration
-    console.debug('Haptic feedback not available:', error);
+export const normalizeHapticPattern = (
+  feedback: HapticFeedback | undefined,
+): Pattern | null => {
+  if (!feedback) return null;
+  switch (feedback) {
+    case 'heavy':
+      return 'medium';
+    case 'warning':
+      return 'error';
+    default:
+      return feedback;
   }
 };
 
-/**
- * Cancels any ongoing haptic feedback.
- * Useful for cleanup or stopping repeated patterns.
- *
- * @example
- * // Stop haptic feedback
- * cancelHaptic();
- */
-export const cancelHaptic = (): void => {
-  try {
-    if (Platform.OS !== 'web') {
-      Vibration.cancel();
-    }
-  } catch (error) {
-    // Silently fail - some environments don't support vibration
-    console.debug('Haptic cancel not available:', error);
-  }
+/** Trigger a haptic pattern. Safe to call from any platform. */
+export const triggerHaptic = (feedback: HapticFeedback | undefined): void => {
+  if (Platform.OS === 'web') return;
+  const pattern = normalizeHapticPattern(feedback);
+  if (!pattern) return;
+  const value = PATTERNS[pattern];
+  Vibration.vibrate(typeof value === 'number' ? value : Array.from(value));
 };

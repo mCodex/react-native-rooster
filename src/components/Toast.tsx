@@ -83,19 +83,9 @@ const ToastItem: React.FC<ToastItemProps> = ({
     if (isPressing.current) return;
     isPressing.current = true;
     try {
-      const haptic =
-        message?.hapticFeedback ?? config.accessibility?.hapticFeedback;
-      if (haptic) {
-        // Map fuller toast haptic vocabulary onto the patterns supported by
-        // our haptics util.
-        const pattern =
-          haptic === 'heavy'
-            ? 'medium'
-            : haptic === 'warning'
-              ? 'error'
-              : haptic;
-        triggerHaptic(pattern);
-      }
+      triggerHaptic(
+        message?.hapticFeedback ?? config.accessibility?.hapticFeedback,
+      );
       message?.onPress?.();
       dismiss();
     } finally {
@@ -268,7 +258,8 @@ const ToastItem: React.FC<ToastItemProps> = ({
       style={containerStyle}
       accessible={true}
       accessibilityLiveRegion={accessibilityProps.liveRegion}
-      // @ts-expect-error - Web platform keyboard support
+      // biome-ignore lint/suspicious/noTsIgnore: tsc strict build flags @ts-expect-error as unused for RN-Web onKeyDown
+      // @ts-ignore - Web platform keyboard support
       onKeyDown={handleKeyDown}
       {...(panResponder ? panResponder.panHandlers : {})}
     >
@@ -279,9 +270,11 @@ const ToastItem: React.FC<ToastItemProps> = ({
         onPress={handlePress}
         onFocus={pauseAutoDismiss}
         onBlur={resumeAutoDismiss}
-        // @ts-expect-error - RN Web hover events
+        // biome-ignore lint/suspicious/noTsIgnore: tsc strict build flags @ts-expect-error as unused for RN-Web onHoverIn
+        // @ts-ignore - RN Web hover events
         onHoverIn={pauseAutoDismiss}
-        // @ts-expect-error - RN Web hover events
+        // biome-ignore lint/suspicious/noTsIgnore: tsc strict build flags @ts-expect-error as unused for RN-Web onHoverOut
+        // @ts-ignore - RN Web hover events
         onHoverOut={resumeAutoDismiss}
         style={toastStyles.pressable}
         // WCAG 2.2 SC 2.5.8 — minimum tap target 24x24, we exceed via hitSlop.

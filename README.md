@@ -132,20 +132,6 @@ See `src/types.ts` for the full type definition.
 | `toast` | Imperative facade callable from anywhere. |
 | `configureToast(config)` | Alias for `toast.configure(...)`. |
 
-### Subpath imports
-
-Advanced helpers live behind subpath imports so the main bundle stays minimal:
-
-```ts
-import { triggerHaptic, HAPTIC_PATTERNS } from 'react-native-rooster/haptics';
-import {
-  calculateContrastRatio,
-  validateWcag22,
-  getReducedMotionAnimationConfig,
-} from 'react-native-rooster/accessibility';
-import { calculateToastHeight } from 'react-native-rooster/sizing';
-```
-
 ### `ToastApi`
 
 ```ts
@@ -172,16 +158,12 @@ Every method that adds a toast returns its **id**, which you can pass to `remove
 
 | SC | Requirement | How Rooster handles it |
 | --- | --- | --- |
-| 1.4.3 | Contrast minimum 4.5:1 | Default palette ships compliant; `validateWcag22()` helper checks custom colors. |
+| 1.4.3 | Contrast minimum 4.5:1 | Default palette ships compliant. Override per type via `config.bgColor`. |
 | 2.1.1 | Keyboard accessible | Toasts are focusable; <kbd>Escape</kbd> dismisses. |
 | 2.2.1 | Timing adjustable | Auto-dismiss pauses on focus/hover; `disableAutoDismiss` opts out globally. |
 | 2.3.3 | Animation from interactions | Reduce Motion fades only — no translation, halved durations. |
 | 2.5.8 | Target size ≥ 24×24 | `Pressable` + 12dp `hitSlop` on every side. |
 | 4.1.3 | Status messages | `accessibilityLiveRegion` set per type (errors/warnings = `assertive`). |
-
-```ts
-import { validateWcag22, getReducedMotionAnimationConfig } from 'react-native-rooster/accessibility';
-```
 
 ---
 
@@ -213,9 +195,6 @@ The migration is a **single rename** in 99% of apps.
 | `<ToastProvider initialConfig={cfg}>` | `<Toaster config={cfg} />` |
 | `useToast()` | `useToast()` *(unchanged)* |
 | `addToast`, `removeToast`, `setToastConfig` | *(unchanged)* |
-| `import { triggerHaptic } from 'react-native-rooster'` | `import { triggerHaptic } from 'react-native-rooster/haptics'` |
-| `import { validateAccessibility } from 'react-native-rooster'` | `import { validateAccessibility } from 'react-native-rooster/accessibility'` |
-| `import { calculateToastHeight } from 'react-native-rooster'` | `import { calculateToastHeight } from 'react-native-rooster/sizing'` |
 | `ToastContextProps`, `ToastProviderProps` *(deprecated v3 type aliases)* | Removed — use `ToastApi` and `ToasterProps` |
 
 There is **no Context** anymore. `useToast()` returns the same singleton `toast` object — components no longer re-render when toasts change.
@@ -249,7 +228,7 @@ There is **no Context** anymore. `useToast()` returns the same singleton `toast`
 | **`maxVisible` + `overflow`** | Prevents runaway stacks. Defaults (`maxVisible: 5`, `overflow: 'evict'`) keep the screen usable even under load; opt into `'queue'` if you'd rather show every toast in order. |
 | **Native-driver `Animated` only — no Reanimated, no gesture-handler** | Zero new peer dependencies. Animations run on the UI thread and the install footprint stays identical to v3. |
 | **WCAG 2.2 AA defaults (reduce-motion, 24×24 hit-targets, live regions, ESC to dismiss)** | Compliance shouldn't be opt-in. Reduce-motion is honored automatically; auto-dismiss pauses on focus/hover. |
-| **Subpath exports (`/accessibility`, `/haptics`, `/sizing`)** | The main entry point ships only the **3 runtime symbols** 99% of apps use (`Toaster`, `useToast`, `toast`). Advanced helpers are still available — just one import path away — but they no longer pull into bundles that don't reference them. Result: a minimal compiled barrel and excellent tree-shaking even with bundlers that respect `package.json#exports` over `sideEffects`. |
+| **Single, minimal entry point** | The package exposes a small public surface: `Toaster`, `useToast`, `toast`, `configureToast`, plus the type definitions. Combined with `"sideEffects": false`, bundlers strip everything you don't use — no need for subpath imports or extra ceremony. |
 | **Removed deprecated `ToastContextProps` / `ToastProviderProps` aliases** | They were holdovers from the Context era. v4 uses the canonical `ToastApi` and `ToasterProps` names. |
 | **Single shared `HapticFeedback` type** | Was duplicated as a 7-member union in two places; now a single named alias kept in sync automatically. |
 
