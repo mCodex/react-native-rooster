@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useEffect, useRef } from 'react';
+import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import toastStore from '../store/toastStore';
@@ -90,7 +91,13 @@ const Toaster: React.FC<ToasterProps> = ({ config }) => {
   if (ids.length === 0) return null;
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider
+      // Float above the host layout so we don't claim flex space and create
+      // an empty area when mounted as a sibling. `box-none` keeps the
+      // surrounding region tap-through.
+      style={StyleSheet.absoluteFill}
+      pointerEvents="box-none"
+    >
       <ToastContainer
         ids={ids}
         toastConfig={liveConfig}
